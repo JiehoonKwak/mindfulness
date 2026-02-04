@@ -5,6 +5,8 @@ server:
     - "http://localhost:3141"
     - "http://127.0.0.1:3141"
     - "http://TAILSCALE_IP:3141"
+    - "http://YOUR_TAILSCALE_HOSTNAME:3141"
+    - "https://YOUR_TAILSCALE_HOSTNAME:3141"
 
 database:
   url: "sqlite:///./backend/data/mindfulness.db"
