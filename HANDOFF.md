@@ -7,68 +7,80 @@ branch: main
 
 ## Resume
 
-Phase 1-3 implementation complete. Commit the new frontend/, backend/, config/ directories and test in browser.
+Aura-style redesign complete (Phases A-E). Run `bun dev` to test zen aesthetic UI, clock dial, and Three.js breathing animation.
 
 ## Status
 
 | Task | Status | Priority |
 |------|--------|----------|
-| P1-001 to P1-008 Foundation | DONE | - |
-| P2-000 to P2-011 Visuals | DONE | - |
-| P3-001 to P3-005 Breathing | DONE | - |
+| Phase A: Theme Infrastructure | DONE | - |
+| Phase B: Custom Timer ClockDial | DONE | - |
+| Phase C: Three.js Breathing | DONE | - |
+| Phase D: Meditate Page Redesign | DONE | - |
+| Phase E: Aurora Shader Update | DONE | - |
 | Commit changes | TODO | P1 |
-| Browser testing | TODO | P1 |
-| Add bell sound files | TODO | P2 |
+| Test on iOS Safari | TODO | P1 |
 
 ## Key Context
 
-**Problem**: Greenfield implementation of meditation web app Phase 1-3 from plan file.
+**Problem**: Redesign mindfulness app from generic to Aura-style zen aesthetic per mock/ reference.
 
 **Decisions**:
-- Tailwind v4 uses `@import "tailwindcss"` + `@theme` directive (not old tailwind directives)
-- React 19 requires explicit `React.CSSProperties` for CSS custom properties
-- `verbatimModuleSyntax` requires `import type` for type-only imports
-- Aurora visual has WebGL + Canvas fallback for iOS Safari
-- Mobile performance: LiquidMetal uses 5 balls on mobile vs 8 on desktop
+- Three.js for breathing animation (AuraBreathing.tsx) - teal/blue WebGL sphere with shader
+- ClockDial for custom timer - SVG with drag handle, 1-60 min
+- Glass-morphism UI pattern: `bg-[var(--color-surface)]/40 backdrop-blur-xl border rounded-2xl`
+- Removed FlowerAnimation variant from BreathingGuide (now AuraBreathing only)
+- Aurora set as default visual (was breathingCircle)
 
 **Gotchas**:
-- Tailwind v4 colors defined via `@theme { --color-* }` in CSS, not tailwind.config.js
-- `datetime.utcnow()` deprecated in Python 3.12+, use `datetime.now(UTC)`
-- BellPlayer needs user gesture before AudioContext works on iOS
+- SVG `textTransform` must be in `style={{}}` not as attribute (React type error)
+- three.js added: `bun add three @types/three`
+- BreathingGuide no longer accepts `variant` prop
 
 ## File Chains
 
 ```
-Chain: Timer Integration
-stores/timerStore.ts -> hooks/useTimer.ts -> components/Timer/*.tsx -> pages/Meditate.tsx
+Chain: Theme System
+styles/themes.css -> stores/settingsStore.ts -> components/ThemeSwitcher.tsx -> pages/Settings.tsx
 
-Chain: Breathing System
-components/BreathingGuide/patterns.ts -> stores/breathingStore.ts -> hooks/useBreathingTimer.ts -> components/BreathingGuide/*.tsx
+Chain: Clock Timer
+components/Timer/ClockDial.tsx -> components/Timer/DurationPicker.tsx -> pages/Meditate.tsx
 
-Chain: Visual Rendering
-components/Visuals/types.ts -> components/Visuals/*/[Visual].tsx -> components/Visuals/index.ts (lazy) -> pages/Meditate.tsx (Suspense)
+Chain: Aura Breathing
+stores/breathingStore.ts -> components/BreathingGuide/AuraBreathing.tsx -> components/BreathingGuide/BreathingGuide.tsx
 ```
 
 ## Changes
 
-**Uncommitted (new directories):**
-- `frontend/` - Complete React app with 10 visuals, timer, breathing guide, themes, i18n
-- `backend/` - FastAPI + SQLModel with session CRUD, 9 passing tests
-- `config/config.yaml` - Server, database, meditation presets
+**Uncommitted:**
+- `frontend/src/App.tsx` - text-white -> text-[var(--color-text)]
+- `frontend/src/index.css` - removed duplicate CSS vars
+- `frontend/src/pages/Settings.tsx` - wired ThemeSwitcher, language, bell toggles
+- `frontend/src/components/ThemeSwitcher.tsx` - glass-morphism styling
+- `frontend/src/components/Timer/ClockDial.tsx` - NEW: circular drag dial
+- `frontend/src/components/Timer/DurationPicker.tsx` - integrated ClockDial
+- `frontend/src/components/Timer/Timer.tsx` - zen typography
+- `frontend/src/components/Timer/TimerControls.tsx` - icon-only round buttons
+- `frontend/src/components/BreathingGuide/AuraBreathing.tsx` - NEW: Three.js sphere
+- `frontend/src/components/BreathingGuide/BreathingGuide.tsx` - uses AuraBreathing
+- `frontend/src/components/Visuals/VisualSelector.tsx` - glass-morphism pills
+- `frontend/src/components/Visuals/Aurora/shaders.ts` - teal-blue zen colors
+- `frontend/src/pages/Meditate.tsx` - zen layout, toggle styling
+- `frontend/src/stores/timerStore.ts` - aurora as default visual
+- `frontend/src/i18n/*.json` - added bellEnabled translation
 
-**Deleted (cleanup):**
-- `tmp/` - Plan loop artifacts cleaned up
+**Commits:**
+- 72e5453 session-end: 2026-02-04 19:20:18
 
 ## Next Steps
 
-1. **Commit**: `git add frontend backend config && git commit -m "feat: implement Phase 1-3 (foundation, visuals, breathing)"`
-2. **Test in browser**: Run `bun run dev` and verify all routes, visuals, breathing animations
-3. **Add bell sounds**: Download meditation bell MP3s to `frontend/public/sounds/`
-4. **Phase 4+**: Continue with music, journal, stats per PLAN.md
+1. **Commit**: `git add . && git commit -m "feat: aura-style redesign (zen UI, clock dial, Three.js breathing)"`
+2. **Test clock dial**: Verify drag-to-set on mobile touch devices
+3. **Test Three.js**: Check AuraBreathing sphere renders on iOS Safari (WebGL support)
 
 ## Artifacts
 
 - Skills: None created
-- Memories: None (no memories/ dir)
-- CLAUDE.md: N/A (doesn't exist)
-- README.md: GENERATED
+- Memories: None
+- CLAUDE.md: N/A
+- README.md: May need update (BreathingGuide description changed)

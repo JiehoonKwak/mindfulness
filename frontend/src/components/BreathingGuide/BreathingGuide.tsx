@@ -1,54 +1,66 @@
 import { useTranslation } from "react-i18next";
 import { useBreathingTimer } from "../../hooks/useBreathingTimer";
 import { BREATHING_PATTERNS, getPhaseKey } from "./patterns";
-import FlowerAnimation from "./FlowerAnimation";
-import CircleAnimation from "./CircleAnimation";
+import AuraBreathing from "./AuraBreathing";
 
 interface Props {
-  variant?: "flower" | "circle";
   showControls?: boolean;
 }
 
-export default function BreathingGuide({
-  variant = "flower",
-  showControls = true,
-}: Props) {
+export default function BreathingGuide({ showControls = true }: Props) {
   const { t } = useTranslation();
-  const { pattern, phase, phaseTime, cycleCount, isActive, setPattern, start, stop } =
-    useBreathingTimer();
+  const {
+    pattern,
+    phase,
+    phaseTime,
+    cycleCount,
+    isActive,
+    setPattern,
+    start,
+    stop,
+  } = useBreathingTimer();
 
   return (
     <div className="flex flex-col items-center">
-      <div className="w-full max-w-md aspect-square">
-        {variant === "flower" ? <FlowerAnimation /> : <CircleAnimation />}
+      <div className="w-full max-w-md aspect-square flex items-center justify-center">
+        <AuraBreathing />
       </div>
 
       {isActive && (
         <div className="text-center mt-4">
-          <p className="text-2xl font-light">{t(getPhaseKey(phase))}</p>
-          <p className="text-4xl font-bold mt-2">{phaseTime}</p>
+          <p className="text-2xl font-light tracking-widest uppercase">
+            {t(getPhaseKey(phase))}
+          </p>
+          <p className="text-5xl font-extralight mt-2 tabular-nums">
+            {phaseTime}
+          </p>
         </div>
       )}
 
       {cycleCount > 0 && (
-        <p className="text-sm text-[var(--color-text-muted)] mt-4">
+        <p className="text-sm text-[var(--color-text-muted)] mt-4 tracking-wider">
           {cycleCount} {t("breathing.cycles")}
         </p>
       )}
 
       {showControls && (
-        <div className="mt-8 space-y-4">
+        <div className="mt-8 space-y-6">
           {!isActive && (
             <div className="flex flex-wrap justify-center gap-2">
               {BREATHING_PATTERNS.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => setPattern(p.id)}
-                  className={`px-4 py-2 rounded-full text-sm ${
-                    pattern.id === p.id
-                      ? "bg-primary text-white"
-                      : "bg-surface border border-border"
-                  }`}
+                  className={`
+                    px-4 py-2 rounded-2xl backdrop-blur-xl
+                    border transition-all duration-200
+                    text-sm tracking-wider
+                    ${
+                      pattern.id === p.id
+                        ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white"
+                        : "bg-[var(--color-surface)]/40 border-[var(--color-border)]/50 text-[var(--color-text-muted)]"
+                    }
+                  `}
                 >
                   {t(p.nameKey)}
                 </button>
@@ -60,16 +72,40 @@ export default function BreathingGuide({
             {!isActive ? (
               <button
                 onClick={start}
-                className="bg-primary text-white px-8 py-3 rounded-full text-lg"
+                className="
+                  w-16 h-16 rounded-full
+                  bg-[var(--color-primary)] text-white
+                  flex items-center justify-center
+                  shadow-lg shadow-[var(--color-primary)]/30
+                  hover:scale-105 transition-transform
+                "
               >
-                {t("timer.start")}
+                <svg
+                  className="w-6 h-6 ml-1"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
               </button>
             ) : (
               <button
                 onClick={stop}
-                className="bg-surface border border-red-500 text-red-500 px-8 py-3 rounded-full"
+                className="
+                  w-16 h-16 rounded-full
+                  bg-[var(--color-surface)]/60 backdrop-blur-xl
+                  border border-red-500/50 text-red-500
+                  flex items-center justify-center
+                  hover:bg-red-500/10 transition-colors
+                "
               >
-                {t("timer.stop")}
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <rect x="6" y="6" width="12" height="12" rx="1" />
+                </svg>
               </button>
             )}
           </div>

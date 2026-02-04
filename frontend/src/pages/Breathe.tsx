@@ -14,7 +14,7 @@ export default function Breathe() {
       </header>
 
       <main className="flex-1 flex items-center justify-center">
-        <BreathingGuide variant="flower" showControls={true} />
+        <BreathingGuide showControls={true} />
       </main>
     </div>
   );

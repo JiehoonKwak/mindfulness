@@ -9,7 +9,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <BellPlayer />
-      <div className="min-h-screen bg-background text-white">
+      <div className="min-h-screen bg-background text-[var(--color-text)]">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/meditate" element={<Meditate />} />

@@ -44,49 +44,58 @@ export const fragmentShader = `
   void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution;
 
-    // Create multiple aurora bands
+    // Create multiple aurora bands with zen aesthetic
     float aurora = 0.0;
 
-    // Band 1 - main green aurora
-    float band1 = snoise(vec2(uv.x * 3.0 + u_time * 0.1, uv.y * 0.5 + u_time * 0.05));
-    band1 = smoothstep(0.3, 0.7, uv.y + band1 * 0.2);
-    band1 *= smoothstep(0.9, 0.5, uv.y + band1 * 0.1);
-    aurora += band1 * 0.6;
+    // Band 1 - main flowing wave
+    float band1 = snoise(vec2(uv.x * 2.5 + u_time * 0.08, uv.y * 0.4 + u_time * 0.04));
+    band1 = smoothstep(0.25, 0.65, uv.y + band1 * 0.25);
+    band1 *= smoothstep(0.95, 0.5, uv.y + band1 * 0.12);
+    aurora += band1 * 0.5;
 
-    // Band 2 - secondary wave
-    float band2 = snoise(vec2(uv.x * 5.0 - u_time * 0.08, uv.y * 0.8 + u_time * 0.03));
-    band2 = smoothstep(0.4, 0.6, uv.y + band2 * 0.15);
-    band2 *= smoothstep(0.85, 0.55, uv.y + band2 * 0.1);
-    aurora += band2 * 0.4;
+    // Band 2 - secondary gentle wave
+    float band2 = snoise(vec2(uv.x * 4.0 - u_time * 0.06, uv.y * 0.6 + u_time * 0.025));
+    band2 = smoothstep(0.35, 0.55, uv.y + band2 * 0.18);
+    band2 *= smoothstep(0.88, 0.5, uv.y + band2 * 0.1);
+    aurora += band2 * 0.35;
 
     // Band 3 - subtle accent
-    float band3 = snoise(vec2(uv.x * 7.0 + u_time * 0.12, uv.y * 1.0 - u_time * 0.04));
-    band3 = smoothstep(0.45, 0.55, uv.y + band3 * 0.1);
-    band3 *= smoothstep(0.8, 0.6, uv.y + band3 * 0.08);
-    aurora += band3 * 0.3;
+    float band3 = snoise(vec2(uv.x * 6.0 + u_time * 0.1, uv.y * 0.9 - u_time * 0.035));
+    band3 = smoothstep(0.42, 0.52, uv.y + band3 * 0.12);
+    band3 *= smoothstep(0.82, 0.55, uv.y + band3 * 0.08);
+    aurora += band3 * 0.25;
 
-    // Color gradient - green to cyan to purple
-    vec3 color1 = vec3(0.0, 0.8, 0.4);  // Green
-    vec3 color2 = vec3(0.0, 0.6, 0.8);  // Cyan
-    vec3 color3 = vec3(0.5, 0.0, 0.8);  // Purple
+    // Zen color gradient - teal to blue (matching aura sphere)
+    vec3 color1 = vec3(0.18, 0.83, 0.75);  // Teal #2dd4bf
+    vec3 color2 = vec3(0.23, 0.51, 0.96);  // Blue #3b82f6
+    vec3 color3 = vec3(0.49, 0.23, 0.93);  // Purple accent
 
-    float colorMix = snoise(vec2(uv.x * 2.0 + u_time * 0.05, u_time * 0.02)) * 0.5 + 0.5;
-    vec3 auroraColor = mix(mix(color1, color2, colorMix), color3, colorMix * colorMix);
+    float colorMix = snoise(vec2(uv.x * 1.5 + u_time * 0.04, u_time * 0.015)) * 0.5 + 0.5;
+    vec3 auroraColor = mix(color1, color2, colorMix);
+    auroraColor = mix(auroraColor, color3, pow(colorMix, 3.0) * 0.3);
 
-    // Apply aurora intensity
+    // Apply aurora intensity with soft glow
     vec3 finalColor = auroraColor * aurora;
 
-    // Add subtle stars in background
-    float stars = snoise(uv * 100.0) * 0.5 + 0.5;
-    stars = pow(stars, 20.0) * 0.3;
-    finalColor += vec3(stars) * (1.0 - aurora * 2.0);
+    // Add soft bloom effect
+    float bloom = aurora * aurora * 0.3;
+    finalColor += auroraColor * bloom;
 
-    // Dark sky gradient background
-    vec3 skyTop = vec3(0.0, 0.02, 0.1);
-    vec3 skyBottom = vec3(0.0, 0.0, 0.05);
-    vec3 sky = mix(skyBottom, skyTop, uv.y);
+    // Subtle ambient particles
+    float stars = snoise(uv * 80.0 + u_time * 0.02) * 0.5 + 0.5;
+    stars = pow(stars, 25.0) * 0.15;
+    finalColor += vec3(stars) * (1.0 - aurora * 1.5);
+
+    // Dark zen background gradient
+    vec3 skyTop = vec3(0.02, 0.04, 0.08);
+    vec3 skyBottom = vec3(0.0, 0.01, 0.03);
+    vec3 sky = mix(skyBottom, skyTop, uv.y * 0.8);
 
     finalColor = max(finalColor, sky);
+
+    // Subtle vignette for depth
+    float vignette = 1.0 - smoothstep(0.4, 1.0, length((uv - 0.5) * 1.2));
+    finalColor *= 0.85 + vignette * 0.15;
 
     gl_FragColor = vec4(finalColor, 1.0);
   }
@@ -95,7 +104,7 @@ export const fragmentShader = `
 export function createShader(
   gl: WebGLRenderingContext,
   type: number,
-  source: string
+  source: string,
 ): WebGLShader | null {
   const shader = gl.createShader(type);
   if (!shader) return null;
@@ -115,7 +124,7 @@ export function createShader(
 export function createProgram(
   gl: WebGLRenderingContext,
   vertexShaderObj: WebGLShader,
-  fragmentShaderObj: WebGLShader
+  fragmentShaderObj: WebGLShader,
 ): WebGLProgram | null {
   const program = gl.createProgram();
   if (!program) return null;

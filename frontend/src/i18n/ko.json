@@ -50,7 +50,8 @@
     "darkMode": "다크 모드",
     "lightMode": "라이트 모드",
     "bellSound": "종소리",
-    "enableBell": "시작/종료 시 종소리"
+    "enableBell": "시작/종료 시 종소리",
+    "bellEnabled": "종소리 활성화"
   },
   "themes": {
     "ocean": "오션",

@@ -50,7 +50,8 @@
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "bellSound": "Bell Sound",
-    "enableBell": "Bell at start/end"
+    "enableBell": "Bell at start/end",
+    "bellEnabled": "Enable Bell"
   },
   "themes": {
     "ocean": "Ocean",

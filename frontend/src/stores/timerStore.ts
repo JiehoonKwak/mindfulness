@@ -25,7 +25,7 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   duration: 600, // 10 minutes default
   remaining: 600,
   status: "idle",
-  selectedVisual: "breathingCircle",
+  selectedVisual: "aurora",
   breathingEnabled: false,
   breathingPattern: "box",
 
