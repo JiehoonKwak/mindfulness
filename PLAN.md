@@ -184,96 +184,297 @@ Each visual should:
 
 ---
 
-### 4. AI Music Generation 🤖
+### 4. AI Music Generation & Sound Management 🤖🎵
 
-Multiple options for generating meditation background music:
+#### Music Strategy: Pre-generate & Store
 
-#### Option 1: Meta MusicGen (Recommended - Free & Open Source)
+**NOT real-time generation** - music is pre-generated and stored on the server:
 
-**Best for self-hosted deployment:**
-- Fully open source (MIT license for code, CC-BY-NC 4.0 for weights)
-- Run locally on your server (no API costs)
-- Python library: `audiocraft`
-- Models: small (300M), medium (1.5B), large (3.3B)
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Music Workflow                        │
+├─────────────────────────────────────────────────────────┤
+│  1. Admin generates music (one-time, via button)        │
+│  2. Music saved to server: /sounds/generated/           │
+│  3. User selects from library OR random playback        │
+│  4. Instant playback (no generation delay)              │
+└─────────────────────────────────────────────────────────┘
+```
+
+**UI Flow:**
+- Settings page: "Generate New Music" button
+- Select preset prompt or write custom
+- Generation runs in background
+- Notification when complete
+- New track appears in music library
+
+---
+
+#### Free Music Download Sources (Primary)
+
+Before generating with AI, download free meditation music:
+
+| Source | License | Quality | Notes |
+|--------|---------|---------|-------|
+| [Scott Buckley](https://www.scottbuckley.com.au/library/mood/calm/) | CC BY 4.0 | Excellent | Professional composer, calm/ambient |
+| [Audionautix](https://audionautix.com/free-music/meditative) | CC BY 4.0 | Good | Large library, no signup |
+| [Freesound](https://freesound.org/) | CC0/CC BY | Varies | Ambient sounds, loops |
+| [Free Music Archive](https://freemusicarchive.org/) | Various CC | Good | Curated collections |
+| [Incompetech](https://incompetech.com/) | CC BY 3.0 | Good | Kevin MacLeod library |
+| [SoundCloud CC](https://soundcloud.com/royaltyfreebackgroundmusic) | CC BY-NC-ND | Good | Meditation playlists |
+| [Pixabay Music](https://pixabay.com/music/) | Pixabay License | Good | No attribution needed |
+| [Mixkit](https://mixkit.co/free-stock-music/) | Free License | Good | Royalty-free |
+
+**Download Script:**
+```python
+# scripts/download_sounds.py
+SOURCES = {
+    "scott_buckley": {
+        "urls": [
+            "https://www.scottbuckley.com.au/library/stillness/",
+            "https://www.scottbuckley.com.au/library/reverie/",
+        ],
+        "license": "CC BY 4.0",
+        "attribution": "Music by Scott Buckley – www.scottbuckley.com.au"
+    },
+    # ... more sources
+}
+```
+
+---
+
+#### AI Music Generation (Secondary)
+
+For custom music when free sources aren't enough:
+
+##### MacBook Requirements (Apple Silicon)
+
+| Model | RAM | MusicGen Support | Performance |
+|-------|-----|------------------|-------------|
+| M1/M2/M3 | 8GB | ❌ Not recommended | Heavy swap, freezes |
+| M1/M2/M3 | 16GB | ⚠️ Base model only | Slow, ~70GB swap usage |
+| M1/M2/M3 | 32GB | ✅ Medium model | Usable, some swap |
+| M1/M2/M3 | 64GB+ | ✅ Large model | Smooth operation |
+
+**Recommendation:**
+- **32GB+ RAM**: Run MusicGen locally
+- **16GB or less**: Use cloud API (Suno, Mubert) or download free music
+
+##### Generation Options
+
+| Provider | Cost | Best For | MacBook Friendly |
+|----------|------|----------|------------------|
+| **Free Downloads** | Free | Initial library | ✅ Yes |
+| **MusicGen** | Free | Local, 32GB+ RAM | ⚠️ 32GB+ RAM |
+| **Suno** | ~$0.04/song | High quality | ✅ Cloud-based |
+| **Mubert** | Freemium | Quick generation | ✅ Cloud-based |
+| **Stable Audio** | Free | Short clips | ⚠️ 32GB+ RAM |
+
+##### MusicGen Local Setup (32GB+ RAM)
 
 ```python
+# scripts/generate_music.py
 from audiocraft.models import MusicGen
+import torch
+
+# Use MPS (Metal) on Apple Silicon
+device = "mps" if torch.backends.mps.is_available() else "cpu"
 
 model = MusicGen.get_pretrained('facebook/musicgen-medium')
-model.set_generation_params(duration=60)  # 60 seconds
+model.to(device)
+model.set_generation_params(duration=120)  # 2 minutes
 
-prompts = ['calm ambient meditation music, slow tempo, peaceful drone']
+prompts = ['calm ambient meditation music, slow tempo, peaceful drone, no drums']
 wav = model.generate(prompts)
+
+# Save to library
+import torchaudio
+torchaudio.save('sounds/generated/meditation_001.wav', wav[0], 32000)
 ```
 
-**Pros:** Free, private, no API limits
-**Cons:** Requires GPU (or slow on CPU), ~4GB VRAM for medium model
+---
 
-#### Option 2: Stable Audio Open (Free & Open Source)
+#### Audio Architecture: Layered Playback
 
-- Open source by Stability AI
-- Up to 47 seconds of audio per generation
-- Trained on Freesound & Free Music Archive (CC licensed)
-- Can be fine-tuned on custom audio
+Bells and background music are **separate layers**, not hardcoded together:
 
-```python
-from diffusers import StableAudioPipeline
-
-pipe = StableAudioPipeline.from_pretrained("stabilityai/stable-audio-open-1.0")
-audio = pipe("peaceful meditation ambient music").audios[0]
+```
+┌──────────────────────────────────────────────────────────┐
+│                   Web Audio API Graph                     │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  [Bell Source] ──► [Gain] ──┐                            │
+│                             │                            │
+│  [Music Source] ──► [Gain] ──┼──► [Master Gain] ──► 🔊   │
+│                             │                            │
+│  [Ambient Source] ──► [Gain]┘                            │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
 ```
 
-#### Option 3: Google Gemini Lyria RealTime (API)
+##### Audio Layer System
 
-- Real-time streaming music generation
-- WebSocket-based continuous generation
-- Good for live, adaptive music
-- **Pricing:** Paid API (check current rates)
+```typescript
+// frontend/src/hooks/useAudioLayers.ts
+interface AudioLayers {
+  bell: {
+    source: AudioBufferSourceNode | null;
+    gain: GainNode;
+    volume: number;  // 0-1
+  };
+  music: {
+    source: AudioBufferSourceNode | null;
+    gain: GainNode;
+    volume: number;
+    fadeIn: number;   // seconds
+    fadeOut: number;
+  };
+  ambient: {
+    sources: Map<string, AudioBufferSourceNode>;
+    gains: Map<string, GainNode>;
+    volumes: Map<string, number>;
+  };
+  master: {
+    gain: GainNode;
+    volume: number;
+  };
+}
+```
 
-#### Option 4: Mubert API (Freemium)
+##### Bell + Music Coordination
 
-- Cloud-based, no local GPU needed
-- Developer API available
-- Good for meditation/ambient genres
-- **Free tier:** Limited generations
+```typescript
+// Meditation session audio flow
+async function startMeditation(duration: number) {
+  // 1. Play start bell
+  await playBell('start');
 
-#### Option 5: Suno (via Third-Party APIs)
+  // 2. Wait for bell to finish (or overlap slightly)
+  await delay(500);
 
-- High-quality full songs
-- **Free tier:** 50 credits/day (non-commercial)
-- Third-party API providers:
-  - Apiframe: 300 free credits/month
-  - AIMLAPI: Free trial available
+  // 3. Fade in background music
+  fadeInMusic(2000);  // 2 second fade
 
-#### Recommendation for This Project
+  // 4. Start ambient sounds (if any)
+  startAmbientLayers();
 
-**Primary:** Meta MusicGen (self-hosted, free)
-**Fallback:** Pre-generated library of meditation tracks
+  // 5. Set up end sequence
+  setTimeout(async () => {
+    // Fade out music before end bell
+    fadeOutMusic(3000);  // 3 second fade
+    await delay(2500);
 
-| Provider | Cost | Quality | Local | Best For |
-|----------|------|---------|-------|----------|
-| MusicGen | Free | Good | Yes | Self-hosted |
-| Stable Audio Open | Free | Good | Yes | Short samples |
-| Gemini Lyria | Paid | Excellent | No | Real-time |
-| Mubert | Freemium | Good | No | Quick cloud |
-| Suno | Freemium | Excellent | No | Full tracks |
+    // Play end bell
+    await playBell('end');
+  }, duration - 3000);
+}
+```
 
-#### Music Generation Presets
+##### Crossfade & Smooth Transitions
+
+```typescript
+function fadeInMusic(durationMs: number) {
+  const { gain } = audioLayers.music;
+  const targetVolume = audioLayers.music.volume;
+
+  gain.gain.setValueAtTime(0, audioContext.currentTime);
+  gain.gain.linearRampToValueAtTime(
+    targetVolume,
+    audioContext.currentTime + durationMs / 1000
+  );
+}
+
+function fadeOutMusic(durationMs: number) {
+  const { gain } = audioLayers.music;
+
+  gain.gain.linearRampToValueAtTime(
+    0,
+    audioContext.currentTime + durationMs / 1000
+  );
+}
+```
+
+---
+
+#### Music Library Structure
+
+```
+sounds/
+├── bells/                    # Start/end sounds
+│   ├── tibetan_bowl.mp3
+│   ├── singing_bowl.mp3
+│   ├── zen_gong.mp3
+│   └── soft_chime.mp3
+│
+├── ambient/                  # Loopable ambient sounds
+│   ├── rain_light.mp3
+│   ├── ocean_waves.mp3
+│   └── forest.mp3
+│
+├── music/                    # Background music (non-looping)
+│   ├── downloaded/           # From free sources
+│   │   ├── scott_buckley_stillness.mp3
+│   │   ├── audionautix_peaceful.mp3
+│   │   └── ...
+│   └── generated/            # AI-generated
+│       ├── meditation_001.mp3
+│       ├── focus_002.mp3
+│       └── ...
+│
+└── metadata.json             # Track info, attribution
+```
+
+##### Metadata Example
+
+```json
+{
+  "music": [
+    {
+      "id": "stillness",
+      "filename": "downloaded/scott_buckley_stillness.mp3",
+      "title": "Stillness",
+      "artist": "Scott Buckley",
+      "duration": 180,
+      "source": "scott_buckley",
+      "license": "CC BY 4.0",
+      "attribution": "Music by Scott Buckley – www.scottbuckley.com.au",
+      "mood": ["calm", "meditation", "ambient"],
+      "generated": false
+    },
+    {
+      "id": "gen_001",
+      "filename": "generated/meditation_001.mp3",
+      "title": "Generated Meditation #1",
+      "duration": 120,
+      "prompt": "calm ambient meditation music, slow tempo",
+      "model": "musicgen-medium",
+      "generated": true,
+      "createdAt": "2026-02-04T10:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+#### Generation Presets (for AI)
 
 ```yaml
 presets:
   - id: deep_relaxation
-    prompt: "calm ambient meditation music, slow tempo, peaceful drone, no drums"
+    prompt: "calm ambient meditation music, slow tempo, peaceful drone, no drums, no vocals"
   - id: focus
-    prompt: "minimal concentration music, subtle rhythms, lo-fi ambient"
+    prompt: "minimal concentration music, subtle rhythms, lo-fi ambient, soft synth pads"
   - id: sleep
-    prompt: "very slow dreamy music, soft pads, fade out, sleep inducing"
+    prompt: "very slow dreamy music, soft pads, gentle fade out, sleep inducing, ethereal"
   - id: morning
-    prompt: "gentle awakening music, hopeful, gradually building, soft piano"
+    prompt: "gentle awakening music, hopeful, gradually building energy, soft piano"
   - id: nature_blend
-    prompt: "ambient music with nature sounds, birds, flowing water, peaceful"
+    prompt: "ambient music blending with nature, birds, flowing water, peaceful forest"
   - id: tibetan
-    prompt: "tibetan singing bowls, meditation bells, spiritual ambient"
+    prompt: "tibetan singing bowls, meditation bells, spiritual ambient, monastery atmosphere"
+  - id: binaural
+    prompt: "binaural beats, theta waves, deep meditation, no melody, pure tones"
 ```
 
 ---
@@ -764,13 +965,6 @@ visuals:
       name_en: "Ocean Depth"
   default_speed: 1.0
 
-# Sounds
-sounds:
-  bells_dir: "./sounds/bells"
-  ambient_dir: "./sounds/ambient"
-  generated_dir: "./sounds/generated"
-  default_ambient_volume: 0.5
-
 # Goals
 goals:
   daily_default_minutes: 10
@@ -793,44 +987,76 @@ discord:
       times: ["09:00", "21:00"]
       timezone: "Asia/Seoul"
 
-# AI Music Generation
+# Sound & Music
+sounds:
+  bells_dir: "./sounds/bells"
+  ambient_dir: "./sounds/ambient"
+  music_dir: "./sounds/music"
+
+  # Audio layer settings
+  layers:
+    bell_volume: 0.8
+    music_volume: 0.5
+    ambient_volume: 0.4
+    master_volume: 1.0
+
+  # Fade settings (milliseconds)
+  fade:
+    music_fade_in: 2000
+    music_fade_out: 3000
+    ambient_fade_in: 1500
+    ambient_fade_out: 2000
+
+# Free Music Sources (download from these)
+free_music_sources:
+  - id: scott_buckley
+    url: "https://www.scottbuckley.com.au/library/mood/calm/"
+    license: "CC BY 4.0"
+    attribution: "Music by Scott Buckley – www.scottbuckley.com.au"
+  - id: audionautix
+    url: "https://audionautix.com/free-music/meditative"
+    license: "CC BY 4.0"
+    attribution: "Music by Jason Shaw on Audionautix.com"
+  - id: freesound
+    url: "https://freesound.org/"
+    license: "CC0/CC BY"
+  - id: pixabay
+    url: "https://pixabay.com/music/"
+    license: "Pixabay License"
+
+# AI Music Generation (for custom tracks)
 music_generation:
   enabled: true
-  primary_provider: "musicgen"  # musicgen, stable_audio, gemini, mubert
+  primary_strategy: "download_first"  # download_first, generate_first
 
-  # MusicGen (local, free)
-  musicgen:
-    model: "facebook/musicgen-medium"  # small, medium, large
-    device: "cuda"  # cuda, cpu
-    default_duration: 60
+  # Local generation (32GB+ RAM recommended)
+  local:
+    provider: "musicgen"  # musicgen, stable_audio
+    model: "facebook/musicgen-medium"
+    device: "mps"  # mps (Apple Silicon), cuda, cpu
+    default_duration: 120
+    min_ram_gb: 32
 
-  # Stable Audio Open (local, free)
-  stable_audio:
-    model: "stabilityai/stable-audio-open-1.0"
-    max_duration: 47
+  # Cloud generation (fallback or if <32GB RAM)
+  cloud:
+    provider: "suno"  # suno, mubert
+    suno:
+      api_provider: "apiframe"  # apiframe, aimlapi
+      api_key: "${SUNO_API_KEY}"
+    mubert:
+      api_key: "${MUBERT_API_KEY}"
 
-  # Gemini Lyria (cloud API)
-  gemini:
-    api_key: "${GEMINI_API_KEY}"
-
-  # Mubert (cloud API)
-  mubert:
-    api_key: "${MUBERT_API_KEY}"
-
-  output_dir: "./sounds/generated"
-  max_duration_seconds: 300
+  output_dir: "./sounds/music/generated"
 
   presets:
     - id: deep_relaxation
-      prompt: "calm ambient meditation music, slow tempo, peaceful drone, no drums"
+      prompt: "calm ambient meditation music, slow tempo, peaceful drone, no drums, no vocals"
     - id: focus
-      prompt: "minimal concentration music, subtle rhythms, lo-fi ambient"
+      prompt: "minimal concentration music, subtle rhythms, lo-fi ambient, soft synth pads"
     - id: sleep
-      prompt: "very slow dreamy music, soft pads, fade out, sleep inducing"
+      prompt: "very slow dreamy music, soft pads, fade out, sleep inducing, ethereal"
     - id: morning
       prompt: "gentle awakening music, hopeful, gradually building, soft piano"
-    - id: nature_blend
-      prompt: "ambient music with nature sounds, birds, flowing water, peaceful"
     - id: tibetan
       prompt: "tibetan singing bowls, meditation bells, spiritual ambient"
 
