@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import MusicSelector from "../components/MusicSelector/MusicSelector";
 import { useSettingsStore } from "../stores/settingsStore";
 import { Icons } from "../components/Icons";
+import { BELL_SOUNDS, getAmbientUrl, getBellUrl } from "../constants/sounds";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -13,13 +14,6 @@ const EXPORT_FORMATS = [
   { id: "csv", labelKey: "settings.export.csv", ext: ".csv" },
   { id: "ical", labelKey: "settings.export.ical", ext: ".ics" },
   { id: "markdown", labelKey: "settings.export.markdown", ext: ".md" },
-] as const;
-
-const BELL_SOUNDS = [
-  { id: "tibetan_bowl", labelKey: "settings.bells.tibetanBowl" },
-  { id: "singing_bowl", labelKey: "settings.bells.singingBowl" },
-  { id: "zen_gong", labelKey: "settings.bells.zenGong" },
-  { id: "soft_chime", labelKey: "settings.bells.softChime" },
 ] as const;
 
 const AMBIENT_OPTIONS = [
@@ -53,6 +47,38 @@ export default function Settings() {
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookSaved, setWebhookSaved] = useState(false);
   const [webhookTesting, setWebhookTesting] = useState(false);
+  const bellPreviewRef = useRef<HTMLAudioElement | null>(null);
+  const ambientPreviewRef = useRef<HTMLAudioElement | null>(null);
+
+  // Load saved webhook URL on mount
+  useEffect(() => {
+    const loadWebhook = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/discord/webhook`);
+        if (res.ok) {
+          const data = await res.json();
+          setWebhookUrl(data.webhook_url || "");
+        }
+      } catch (error) {
+        console.error("Failed to load webhook:", error);
+      }
+    };
+    loadWebhook();
+  }, []);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (bellPreviewRef.current) {
+        bellPreviewRef.current.pause();
+        bellPreviewRef.current = null;
+      }
+      if (ambientPreviewRef.current) {
+        ambientPreviewRef.current.pause();
+        ambientPreviewRef.current = null;
+      }
+    };
+  }, []);
 
   const handleLanguageChange = (lang: "ko" | "en") => {
     setLanguage(lang);
@@ -207,7 +233,14 @@ export default function Settings() {
                   key={bell.id}
                   onClick={() => {
                     setBellSound(bell.id);
-                    new Audio(`/sounds/bells/${bell.id}.mp3`).play();
+                    // Stop previous preview
+                    if (bellPreviewRef.current) {
+                      bellPreviewRef.current.pause();
+                      bellPreviewRef.current.currentTime = 0;
+                    }
+                    // Play new preview
+                    bellPreviewRef.current = new Audio(getBellUrl(bell.id));
+                    bellPreviewRef.current.play();
                   }}
                   className={`
                     px-4 py-3 rounded-xl backdrop-blur-xl
@@ -240,7 +273,27 @@ export default function Settings() {
             {AMBIENT_OPTIONS.map((sound) => (
               <button
                 key={sound.id}
-                onClick={() => setDefaultAmbient(sound.id)}
+                onClick={() => {
+                  setDefaultAmbient(sound.id);
+                  // Stop previous preview
+                  if (ambientPreviewRef.current) {
+                    ambientPreviewRef.current.pause();
+                    ambientPreviewRef.current.currentTime = 0;
+                  }
+                  // Play preview if not "none"
+                  const url = getAmbientUrl(sound.id);
+                  if (url) {
+                    ambientPreviewRef.current = new Audio(url);
+                    ambientPreviewRef.current.loop = false;
+                    ambientPreviewRef.current.play();
+                    // Stop after 3 seconds (preview)
+                    setTimeout(() => {
+                      if (ambientPreviewRef.current) {
+                        ambientPreviewRef.current.pause();
+                      }
+                    }, 3000);
+                  }
+                }}
                 className={`
                   px-4 py-3 rounded-xl backdrop-blur-xl
                   bg-[var(--color-surface)]/40

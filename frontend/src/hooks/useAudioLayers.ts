@@ -13,6 +13,8 @@ interface UseAudioLayersReturn {
   removeAmbient: (id: string) => void;
   setAmbientVolume: (id: string, volume: number) => void;
   setMasterVolume: (volume: number) => void;
+  pauseAll: () => void;
+  resumeAll: () => void;
   fadeOutAll: (durationMs?: number) => void;
   isAmbientPlaying: (id: string) => boolean;
 }
@@ -137,6 +139,20 @@ export function useAudioLayers(): UseAudioLayersReturn {
     }
   }, []);
 
+  // Pause all audio (suspend context)
+  const pauseAll = useCallback(() => {
+    if (contextRef.current && contextRef.current.state === "running") {
+      contextRef.current.suspend();
+    }
+  }, []);
+
+  // Resume all audio
+  const resumeAll = useCallback(() => {
+    if (contextRef.current && contextRef.current.state === "suspended") {
+      contextRef.current.resume();
+    }
+  }, []);
+
   // Fade out all sounds
   const fadeOutAll = useCallback((durationMs: number = 2000) => {
     const ctx = contextRef.current;
@@ -182,6 +198,8 @@ export function useAudioLayers(): UseAudioLayersReturn {
     removeAmbient,
     setAmbientVolume,
     setMasterVolume,
+    pauseAll,
+    resumeAll,
     fadeOutAll,
     isAmbientPlaying,
   };

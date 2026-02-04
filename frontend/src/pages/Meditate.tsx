@@ -12,6 +12,7 @@ import { VisualSelector, visualComponents } from "../components/Visuals";
 import { BreathingGuide } from "../components/BreathingGuide";
 import PostSessionModal from "../components/Journal/PostSessionModal";
 import SoundMixer from "../components/SoundMixer/SoundMixer";
+import { getAmbientUrl } from "../constants/sounds";
 
 export default function Meditate() {
   const { t } = useTranslation();
@@ -29,14 +30,30 @@ export default function Meditate() {
   // Auto-play default ambient when meditation starts (only on transition TO running)
   useEffect(() => {
     if (status === "running" && prevStatusRef.current !== "running" && defaultAmbient !== "none") {
-      const soundUrl = `/sounds/ambient/${defaultAmbient === "rain" ? "rain_light" :
-                                          defaultAmbient === "ocean" ? "ocean_waves" :
-                                          defaultAmbient}.mp3`;
-      audio.addAmbient(defaultAmbient, soundUrl);
-      setActiveAmbients((prev) => new Set([...prev, defaultAmbient]));
+      const soundUrl = getAmbientUrl(defaultAmbient);
+      if (soundUrl) {
+        audio.addAmbient(defaultAmbient, soundUrl);
+        setActiveAmbients((prev) => new Set([...prev, defaultAmbient]));
+      }
     }
-    prevStatusRef.current = status;
   }, [status, defaultAmbient, audio]);
+
+  // Handle audio on timer status changes
+  useEffect(() => {
+    if (prevStatusRef.current === "running" && status === "paused") {
+      // Timer paused - pause audio
+      audio.pauseAll();
+    } else if (prevStatusRef.current === "paused" && status === "running") {
+      // Timer resumed - resume audio
+      audio.resumeAll();
+    } else if (prevStatusRef.current !== "idle" && status === "idle") {
+      // Timer stopped - fade out and clear
+      audio.fadeOutAll(500);
+      setActiveAmbients(new Set());
+    }
+    // CRITICAL: Update ref to track current status for next comparison
+    prevStatusRef.current = status;
+  }, [status, audio]);
 
   // Show journal modal when session completes
   useEffect(() => {
