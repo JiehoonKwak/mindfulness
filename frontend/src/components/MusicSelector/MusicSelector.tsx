@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Icons } from "../Icons";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8141";
+import { API_BASE } from "../../api/config";
 
 interface Preset {
   id: string;

@@ -7,7 +7,7 @@ import { useSettingsStore } from "../stores/settingsStore";
 import { Icons } from "../components/Icons";
 import { BELL_SOUNDS, getAmbientUrl, getBellUrl } from "../constants/sounds";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8141";
+import { API_BASE } from "../api/config";
 
 const EXPORT_FORMATS = [
   { id: "json", labelKey: "settings.export.json", ext: ".json" },
