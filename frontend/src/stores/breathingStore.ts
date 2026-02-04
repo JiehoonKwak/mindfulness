@@ -8,7 +8,9 @@ interface BreathingState {
   phaseTime: number;
   cycleCount: number;
   isActive: boolean;
+  selectedVisual: string;
   setPattern: (id: string) => void;
+  setSelectedVisual: (id: string) => void;
   start: () => void;
   stop: () => void;
   tick: () => void;
@@ -20,11 +22,14 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
   phaseTime: 4,
   cycleCount: 0,
   isActive: false,
+  selectedVisual: "waves",
 
   setPattern: (id) => {
     const pattern = BREATHING_PATTERNS.find((p) => p.id === id) || BREATHING_PATTERNS[1];
     set({ pattern, phase: "inhale", phaseTime: pattern.inhale, cycleCount: 0 });
   },
+
+  setSelectedVisual: (id) => set({ selectedVisual: id }),
 
   start: () => {
     const { pattern } = get();

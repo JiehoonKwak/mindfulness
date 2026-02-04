@@ -28,6 +28,11 @@
       "box": "박스 브리딩",
       "calming": "카밍 브레스",
       "energizing": "에너자이징"
+    },
+    "visuals": {
+      "waves": "파동",
+      "lotus": "연꽃",
+      "orb": "오브"
     }
   },
   "visuals": {

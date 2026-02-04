@@ -28,6 +28,11 @@
       "box": "Box Breathing",
       "calming": "Calming Breath",
       "energizing": "Energizing"
+    },
+    "visuals": {
+      "waves": "Waves",
+      "lotus": "Lotus",
+      "orb": "Orb"
     }
   },
   "visuals": {
