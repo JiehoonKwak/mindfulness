@@ -49,7 +49,7 @@ Frontend (React 19 + Vite)          Backend (FastAPI)
 
 **Key directories:**
 - `frontend/src/pages/` - Route components (Home, Meditate, Breathe, Settings, Insights)
-- `frontend/src/components/Visuals/` - 4 meditation animations (Aurora, BreathSphere, FloatingOrbs, RippleWater)
+- `frontend/src/components/Visuals/` - 4 meditation visuals (Aurora, Constellation, Sacred Geometry, Ripple Water)
 - `frontend/src/stores/` - Zustand state (timer, session, settings, breathing)
 - `frontend/src/api/` - Backend fetch wrappers
 - `backend/app/routes/` - FastAPI endpoints
@@ -66,7 +66,7 @@ Frontend (React 19 + Vite)          Backend (FastAPI)
 
 **Working:** Timer, 4 visuals (breath-synced), breathing guide, 2 themes (zen-dark/zen-light), session CRUD, i18n (ko/en), bell selector, sound mixer, stats/history merged into Insights page, goals/streaks, post-session journal modal, data export (JSON/CSV/iCal/MD), Discord notifications, daily reminders scheduler
 
-**Sounds:** Bell sounds (4 types) and ambient sounds (rain, ocean, forest) in /sounds/
+**Sounds:** Bell sounds (4 types) and ambient sounds (10 types: rain, ocean, forest, tibetan bowls, wind chimes, white noise, river, campfire, wind, birds) in /sounds/
 
 **DB Tables:** session, goal, tag, session_tag, generated_music
 

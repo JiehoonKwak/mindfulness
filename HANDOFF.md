@@ -1,5 +1,5 @@
 ---
-created: 2026-02-04T23:15:00
+created: 2026-02-05T00:10:00
 branch: main
 ---
 
@@ -7,95 +7,82 @@ branch: main
 
 ## Resume
 
-Complete UI overhaul implemented - pure black/white theme, 4 new breath-synced visuals, merged Stats+History into Insights page. All uncommitted changes need to be tested and committed.
+UI overhaul complete and committed (95a2d69). All 19 steps from plan implemented: monochrome palette, 2 new Three.js visuals, zen quotes, button contrast fixes, 10 ambient sounds, auto-play on meditation start. Ready for visual testing.
 
 ## Status
 
 | Task | Status | Priority |
 |------|--------|----------|
-| Theme system (2 themes) | Done | P1 |
-| Home page redesign | Done | P1 |
-| Insights page (merged Stats+History) | Done | P1 |
-| 3 new visuals (BreathSphere, FloatingOrbs, RippleWater) | Done | P1 |
-| Delete 9 old visuals | Done | P1 |
-| Backend scheduler + reminders API | Done | P2 |
-| Discord triggers on session complete | Done | P2 |
-| Music selector UI + Gemini integration | Done | P2 |
-| Remove purple/indigo colors | Done | P1 |
-| Full E2E verification | Pending | P1 |
+| Fix monochrome colors (Aurora, RippleWater, AuraBreathing) | Done | P1 |
+| Replace BreathSphere with "Particle Constellation" | Done | P1 |
+| Replace FloatingOrbs with "Sacred Geometry" | Done | P1 |
+| Add ZenQuote component to Home page | Done | P1 |
+| Fix button contrast (DurationPicker, BreathingGuide, Settings) | Done | P1 |
+| Remove Timer ring during idle state | Done | P1 |
+| Remove breathing toggle from Meditate | Done | P1 |
+| Add auto-play ambient on meditation start | Done | P1 |
+| Add default ambient selector to Settings | Done | P1 |
+| Expand ambient sounds (3 -> 10) | Done | P1 |
+| Update i18n (en/ko) | Done | P2 |
+| Visual testing | Pending | P1 |
 
 ## Key Context
 
-**Problem**: User requested complete UI overhaul with pure black/white AMOLED theme, new breath-synced visuals, and simplified page structure.
+**Problem**: UI had purple/blue colors violating monochrome constraint, buttons invisible in light theme, two clocks on Meditate page, empty home page center, only 3 ambient sounds.
 
 **Decisions**:
-- Merged Stats + History → single Insights page with tabs
-- Stripped 8 themes → 2 (zen-dark, zen-light)
-- Deleted 9 visuals, created 3 new Three.js breath-synced ones
-- accent color = primary color (white/black) - NO purple
-- max-w-lg container for desktop centering
+- BreathSphere -> "Particle Constellation" (white particles + connection lines)
+- FloatingOrbs -> "Sacred Geometry" (nested rotating wireframe shapes)
+- Button text: `text-[var(--color-bg)]` not `text-white` for theme-aware contrast
+- Auto-play uses useRef to track previous status (prevents re-trigger on pause/resume)
+- Downloaded 7 MP3s from BigSoundBank.com (CC0 license)
 
 **Gotchas**:
-- `--color-primary` is WHITE in dark mode, BLACK in light mode
-- Buttons must use `text-[var(--color-bg)]` not `text-white` for proper contrast
-- User HATES purple/indigo AI slop colors - documented in CLAUDE.md
+- Settings.tsx had 3 catch blocks with unused `error` - only fixed one, others remain
+- Pre-existing ESLint warnings for setState in useEffect (acceptable pattern for audio sync)
+- Lint warnings in AuraBreathing for ref cleanup - pre-existing, not from our changes
 
 ## File Chains
 
 ```
-Chain: Theme System
-themes.css -> settingsStore.ts -> ThemeSwitcher.tsx -> Home.tsx
-Relationship: CSS vars define colors, store manages state, components consume
+Chain: Color Fixes
+shaders.ts -> RippleWater.tsx -> AuraBreathing.tsx
+Relationship: All had non-monochrome colors (teal/blue/purple) requiring fix
 
-Chain: Visual Effects
-breathingStore.ts -> BreathSphere.tsx / FloatingOrbs.tsx / RippleWater.tsx -> VisualSelector.tsx -> Meditate.tsx
-Relationship: Breathing state drives visual animations, selector shows previews
+Chain: New Visuals
+BreathSphere.tsx (Constellation) + FloatingOrbs.tsx (Sacred Geometry) -> Visuals/index.ts -> i18n/
+Relationship: Components replaced, names updated in index and translations
 
-Chain: Pages
-App.tsx -> Home.tsx / Insights.tsx / Settings.tsx
-Relationship: Router defines routes, pages deleted (Stats, History) replaced by Insights
+Chain: Meditate Page
+Timer.tsx -> Meditate.tsx -> settingsStore.ts -> SoundMixer.tsx
+Relationship: Timer shows only during running, Meditate reads defaultAmbient from store for auto-play
+
+Chain: Settings Flow
+settingsStore.ts -> Settings.tsx -> MusicSelector.tsx
+Relationship: Store defines AmbientSound type, Settings renders selector, MusicSelector shows explanation
 ```
 
 ## Changes
 
-**Uncommitted Modified:**
-- `frontend/src/styles/themes.css` - 2 themes only, no purple
-- `frontend/src/stores/settingsStore.ts` - ThemeId type updated
-- `frontend/src/components/ThemeSwitcher.tsx` - Toggle button instead of grid
-- `frontend/src/pages/Home.tsx` - Heatmap hero, centered layout
-- `frontend/src/pages/Settings.tsx` - Simplified, added MusicSelector
-- `frontend/src/App.tsx` - Routes updated (Insights replaces Stats/History)
-- `frontend/src/i18n/*.json` - Updated theme/visual strings
-- `backend/app/main.py` - Scheduler lifespan
-- `backend/app/routes/sessions.py` - Discord triggers
+**Committed:**
+- 95a2d69 feat(ui): complete UI overhaul - monochrome palette, new visuals, zen quotes
+  - 26 files changed (+443/-248)
+  - 7 new MP3 files in /sounds/ambient/
+  - New ZenQuote component
 
-**Uncommitted New:**
-- `frontend/src/components/Icons.tsx` - SVG icon system
-- `frontend/src/pages/Insights.tsx` - Merged Stats+History
-- `frontend/src/components/Visuals/BreathSphere/` - Three.js breath sphere
-- `frontend/src/components/Visuals/FloatingOrbs/` - Floating orbs visual
-- `frontend/src/components/Visuals/RippleWater/` - Water ripple visual
-- `frontend/src/components/MusicSelector/` - Music generation UI
-- `backend/app/services/scheduler.py` - APScheduler for reminders
-- `backend/app/routes/reminders.py` - Reminder config API
-
-**Uncommitted Deleted:**
-- `frontend/src/pages/History.tsx`
-- `frontend/src/pages/Stats.tsx`
-- 9 visual directories (BreathingCircle, ParticleFlow, etc.)
-
-**Recent commits:**
-- 19d5269 session-end: 2026-02-04 22:21:21
+**Uncommitted:**
+- plans/20260204_2349_ui-overhaul.md (approved plan - not committed)
+- plans/20260204_2325_*.md, plans/20260204_2334_*.md (iteration drafts)
 
 ## Next Steps
 
-1. **Run full E2E test** - `./dev start` and verify all pages work
-2. **Test new visuals** - Start meditation, verify BreathSphere/FloatingOrbs/RippleWater animate with breathing
-3. **Commit changes** - Large commit with UI overhaul
+1. **Visual test** - `./dev start`, verify all 4 visuals are monochrome, buttons visible in both themes
+2. **Test auto-play** - Set default ambient in Settings, start meditation, confirm sound plays
+3. **Clean up plans** - Delete iteration drafts, keep only final plan if desired
 
 ## Artifacts
 
-- CLAUDE.md: Applied (added Design Preferences section with "no AI slop" rule)
-- README.md: Skipped (no drift detected)
-- Skills: None created
-- Memories: None created
+- CLAUDE.md: Applied (updated visual names, expanded sounds list)
+- README.md: Skipped (no drift)
+- Skills: None
+- Memories: None
