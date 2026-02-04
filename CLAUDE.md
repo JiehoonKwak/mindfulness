@@ -9,7 +9,7 @@ Meditation web app with custom timer, 4 animated visuals, breathing guides, soun
 ## Commands
 
 ```bash
-# Full stack (fe:5173 + be:8000)
+# Full stack (fe:3141 + be:8141)
 ./dev start
 
 # Frontend only
@@ -50,6 +50,7 @@ Frontend (React 19 + Vite)          Backend (FastAPI)
 **Key directories:**
 - `frontend/src/pages/` - Route components (Home, Meditate, Breathe, Settings, Insights)
 - `frontend/src/components/Visuals/` - 4 meditation visuals (Aurora, Constellation, Sacred Geometry, Ripple Water)
+- `frontend/src/components/BreathingVisuals/` - 3 breathing visuals (Waves, Lotus, Orb)
 - `frontend/src/stores/` - Zustand state (timer, session, settings, breathing)
 - `frontend/src/api/` - Backend fetch wrappers
 - `backend/app/routes/` - FastAPI endpoints
