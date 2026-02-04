@@ -1,193 +1,266 @@
 ---
 created: 2026-02-04
 branch: main
-severity: CRITICAL GAP ANALYSIS
 ---
 
-# Handoff - Gap Analysis
+# Handoff
 
-## Resume
+## Summary
 
-**STOP. Read this first.** Only ~15% of PLAN.md was implemented. Major features missing: sounds, stats, journal, goals, discord, AI music, data export.
+Meditation web app. ~15% of PLAN.md implemented. Core timer/visuals work, but sounds, stats, journal, goals are missing.
 
-## Critical Gap Summary
+---
 
-| Category | Planned | Done | Status |
-|----------|---------|------|--------|
-| Sound files | 20+ files | 0 | EMPTY DIRECTORIES |
-| Backend routes | 8 routes | 1 | sessions.py only |
-| Database tables | 9 tables | 1 | session only |
-| Frontend pages | 5 pages | 4 | Stats.tsx missing |
-| Major features | 12 | 3 | Timer, Visuals, Breathing only |
+## What IS Working
 
-## What's Actually Working
+### Frontend
+- **Timer**: Custom ClockDial (1-60 min drag), preset buttons, progress ring
+- **10 Visuals**: Aurora (WebGL), ParticleFlow, GradientWaves, Mandala, CosmicDust, ZenGarden, LiquidMetal, SacredGeometry, OceanDepth, BreathingCircle
+- **Breathing Guide**: 4 patterns (4-7-8, Box, Calming, Energizing), Three.js AuraBreathing sphere
+- **Themes**: 8 themes (5 dark, 3 light), CSS variables, persisted
+- **i18n**: Korean (default) + English
+- **Pages**: Home, Meditate, Breathe, Settings
 
-1. Timer with ClockDial (custom 1-60 min)
-2. 10 visual animations (WebGL/Canvas/CSS)
-3. Breathing guide (4 patterns, AuraBreathing)
-4. Theme system (8 themes, dark/light)
-5. i18n (Korean/English)
-6. Session API (just wired, needs testing)
-7. Settings page (theme, language, bell toggle)
+### Backend
+- **FastAPI** server with CORS
+- **SQLite** database at `backend/data/mindfulness.db`
+- **Session API**: POST/GET/PATCH/DELETE `/api/sessions/`
 
-## What's Completely Missing
+### Integration
+- timerStore calls sessionStore on start/stop/complete
+- Sessions logged to database (needs verification)
 
-### Phase 4: Sounds (100% MISSING)
-- [ ] No audio files in sounds/bells/ or sounds/ambient/
-- [ ] No download_sounds.py script
-- [ ] No Web Audio API sound mixer
-- [ ] No volume controls
-- [ ] No sound presets
-- [ ] No interval bells
+---
 
-### Phase 5: Journal & Tags (100% MISSING)
-- [ ] No post-session journal UI
-- [ ] No mood emoji selector
-- [ ] No notes input
-- [ ] No tags table in database
-- [ ] No tag CRUD API
+## What is MISSING
 
-### Phase 6: Statistics (100% MISSING)
-- [ ] No Stats.tsx page
-- [ ] No heatmap component
-- [ ] No charts (weekly/monthly)
-- [ ] No streak calculation
-- [ ] No stats API endpoints
+### P0: Critical (App Broken Without)
 
-### Phase 7: Data Export (100% MISSING)
-- [ ] No JSON/CSV/iCal/Markdown export
-- [ ] No export API endpoints
+**No Sound Files**
+```
+sounds/bells/    <- EMPTY (need: tibetan_bowl.mp3, singing_bowl.mp3, zen_gong.mp3)
+sounds/ambient/  <- EMPTY (need: rain.mp3, ocean.mp3, forest.mp3)
+sounds/music/    <- DOESN'T EXIST
+```
+- BellPlayer.tsx exists but has no audio files to play
+- No download script exists
 
-### Phase 8: Goals (100% MISSING)
-- [ ] No goals table
-- [ ] No goals API
-- [ ] No home dashboard with progress rings
-- [ ] No streak display
+**No Stats Page**
+```
+frontend/src/pages/Stats.tsx        <- MISSING
+frontend/src/components/Stats/      <- MISSING
+backend/app/routes/stats.py         <- MISSING
+```
+- No heatmap (GitHub-style calendar)
+- No charts (weekly/monthly)
+- No streak display
 
-### Phase 9: Discord (100% MISSING)
-- [ ] No discord.py service
-- [ ] No webhook notifications
-- [ ] No reminder scheduler
+### P1: Important (Core Value Missing)
 
-### Phase 10: AI Music (100% MISSING)
-- [ ] No music_gen.py script
-- [ ] No MusicGen integration
-- [ ] No generated music library
+**No Post-Session Journal**
+- No mood selector (before/after)
+- No notes input
+- No energy level slider
+- Session model has fields, but no UI
 
-### Phase 12: Polish (100% MISSING)
-- [ ] No PWA configuration
-- [ ] No Docker setup
-- [ ] No loading states
+**No Goals System**
+```
+backend/app/routes/goals.py         <- MISSING
+frontend/src/components/Goals/      <- MISSING
+Database table: goals               <- MISSING
+```
+- No daily/weekly goals
+- No progress rings on Home
+- No streak tracking
+
+**No Tags System**
+```
+backend/app/routes/tags.py          <- MISSING
+Database tables: tags, session_tags <- MISSING
+```
+
+**No History Page**
+```
+frontend/src/pages/History.tsx      <- MISSING
+```
+- No session list view
+- No filtering by date/tag
+
+### P2: Medium Priority
+
+**Sound Mixer Not Implemented**
+- PLAN specifies Web Audio API layered playback
+- Volume controls for bell/music/ambient
+- Fade in/out transitions
+- Sound presets saving
+
+**Interval Bells**
+- Bell at N-minute intervals during meditation
+
+**Data Export**
+```
+backend/app/routes/export.py        <- MISSING
+```
+- No JSON/CSV/iCal/Markdown export
+
+### P3: Nice to Have
+
+**Discord Integration**
+```
+backend/app/services/discord.py     <- MISSING
+```
+- No webhook notifications
+- No daily reminders
+
+**AI Music Generation**
+```
+scripts/generate_music.py           <- MISSING
+backend/app/services/music_gen.py   <- MISSING
+```
+- No MusicGen/Suno integration
+
+**PWA**
+- No service worker
+- No manifest configured
+
+**Docker**
+```
+docker-compose.yaml                 <- MISSING
+```
+
+---
 
 ## Database Gap
 
-**Current (1 table):**
-```
-session (id, started_at, ended_at, duration, completed, visual_type, mood_*, note)
+**Current schema (1 table):**
+```sql
+session (id, started_at, ended_at, planned_duration_seconds,
+         actual_duration_seconds, completed, visual_type,
+         bell_sound, mood_before, mood_after, note)
 ```
 
 **PLAN.md specifies 9 tables:**
-```
-sessions, session_tags, tags, goals, daily_stats,
-streaks, user_settings, sound_presets, generated_music
-```
-
-## Backend Gap
-
-**Current:** `/backend/app/routes/sessions.py` only
-
-**PLAN.md specifies:**
-```
-routes/
-├── sessions.py    <- EXISTS
-├── stats.py       <- MISSING
-├── goals.py       <- MISSING
-├── tags.py        <- MISSING
-└── sounds.py      <- MISSING
-
-services/
-├── discord.py     <- MISSING
-├── music_gen.py   <- MISSING
-└── scheduler.py   <- MISSING
+```sql
+sessions        -- EXISTS
+session_tags    -- MISSING
+tags            -- MISSING
+goals           -- MISSING
+daily_stats     -- MISSING (cache for heatmap)
+streaks         -- MISSING
+user_settings   -- MISSING
+sound_presets   -- MISSING
+generated_music -- MISSING
 ```
 
-## Frontend Gap
+---
 
-**Current pages:** Home, Meditate, Breathe, Settings
+## Backend API Gap
 
-**PLAN.md specifies:**
-- Stats.tsx (heatmap, charts) <- MISSING
-- History.tsx (session list) <- MISSING
-- Home dashboard with goals <- NOT IMPLEMENTED
-
-## Priority Next Steps
-
-### Immediate (P0) - Make it functional
-1. **Download bell sounds** - App is silent without them
-   ```bash
-   # Manual for now:
-   # Download from freesound.org to sounds/bells/
-   # - tibetan_bowl.mp3
-   # - singing_bowl.mp3
-   ```
-
-2. **Test session logging** - Just wired, verify it works
-   ```bash
-   ./dev start
-   # Do a meditation
-   sqlite3 backend/data/mindfulness.db "SELECT * FROM session;"
-   ```
-
-### Short-term (P1) - Core value
-3. Add Stats.tsx with heatmap
-4. Add post-session journal (mood, notes)
-5. Add streak calculation
-
-### Medium-term (P2) - Full experience
-6. Download/add ambient sounds
-7. Implement sound mixer
-8. Add goals system
-9. Add History page
-
-### Long-term (P3) - Nice to have
-10. Discord integration
-11. AI music generation
-12. Data export
-13. PWA
-
-## Root Cause
-
-Implementation focused on:
-- Visuals (aesthetic but not core value)
-- UI redesign (aura-style, zen aesthetic)
-- ClockDial custom timer
-
-Should have prioritized:
-- Sound files (meditation app needs sound!)
-- Session logging working end-to-end
-- Stats/heatmap (motivation & retention)
-- Journal (core value proposition)
-
-## File Reference
-
+**Implemented:**
 ```
-MISSING entirely:
-- scripts/download_sounds.py
-- scripts/generate_music.py
-- scripts/backup_db.py
-- frontend/src/pages/Stats.tsx
-- frontend/src/pages/History.tsx
-- frontend/src/components/Stats/*
-- frontend/src/components/Journal/*
-- frontend/src/components/Goals/*
-- backend/app/routes/stats.py
-- backend/app/routes/goals.py
-- backend/app/routes/tags.py
-- backend/app/services/discord.py
-- backend/app/services/music_gen.py
-- docker-compose.yaml
+/api/health
+/api/sessions/  (CRUD)
 ```
 
-## Apology
+**PLAN.md specifies but MISSING:**
+```
+/api/stats/summary
+/api/stats/heatmap
+/api/stats/streak
+/api/goals/
+/api/tags/
+/api/sounds/bells
+/api/sounds/ambient
+/api/sounds/presets
+/api/export/json
+/api/export/csv
+/api/music/generate
+/api/discord/test
+```
 
-I focused on visual polish (Three.js breathing sphere, zen UI) instead of core functionality. A meditation app without sound is fundamentally broken. The gap between PLAN.md and implementation is severe. Trust needs to be rebuilt through completing missing features.
+---
+
+## File Structure Reference
+
+```
+mindfulness/
+├── frontend/
+│   └── src/
+│       ├── pages/
+│       │   ├── Home.tsx        # Basic, no goals dashboard
+│       │   ├── Meditate.tsx    # Working
+│       │   ├── Breathe.tsx     # Working
+│       │   ├── Settings.tsx    # Theme/language/bell toggle
+│       │   ├── Stats.tsx       # MISSING
+│       │   └── History.tsx     # MISSING
+│       ├── components/
+│       │   ├── Timer/          # Working (ClockDial, DurationPicker)
+│       │   ├── Visuals/        # Working (10 visuals)
+│       │   ├── BreathingGuide/ # Working (AuraBreathing)
+│       │   ├── Stats/          # MISSING
+│       │   ├── Journal/        # MISSING
+│       │   └── Goals/          # MISSING
+│       └── stores/
+│           ├── timerStore.ts   # Working
+│           ├── sessionStore.ts # Working (API calls)
+│           ├── settingsStore.ts# Working
+│           └── breathingStore.ts# Working
+├── backend/
+│   └── app/
+│       ├── routes/
+│       │   ├── sessions.py     # Working
+│       │   ├── stats.py        # MISSING
+│       │   ├── goals.py        # MISSING
+│       │   └── tags.py         # MISSING
+│       └── services/
+│           ├── discord.py      # MISSING
+│           └── music_gen.py    # MISSING
+├── sounds/
+│   ├── bells/                  # EMPTY
+│   ├── ambient/                # EMPTY
+│   └── music/                  # MISSING
+├── scripts/                    # MISSING entirely
+├── config/config.yaml          # Basic config exists
+└── PLAN.md                     # Full spec (1500 lines)
+```
+
+---
+
+## Commands
+
+```bash
+# Start dev servers
+./dev start        # frontend:5173 + backend:8000
+
+# Frontend only
+cd frontend && bun dev
+
+# Backend only
+cd backend && uv run uvicorn app.main:app --reload
+
+# Check database
+sqlite3 backend/data/mindfulness.db "SELECT * FROM session;"
+
+# Build
+cd frontend && bun run build
+```
+
+---
+
+## Priority Order for Next Session
+
+1. **Download bell sounds** - App is silent
+2. **Add Stats.tsx with heatmap** - Core retention feature
+3. **Add post-session journal UI** - Mood + notes
+4. **Add goals + streak tracking** - Motivation
+5. **Add History.tsx** - View past sessions
+6. **Download ambient sounds** - Rain, ocean, forest
+7. **Implement sound mixer** - Layer sounds with volume control
+
+---
+
+## Reference
+
+- Full spec: `PLAN.md` (1500 lines, 12 phases)
+- Mock designs: `mock/` directory (Aura-style reference)
+- Sound sources: freesound.org, pixabay.com/music (CC0)
