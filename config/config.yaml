@@ -4,9 +4,7 @@ server:
   cors_origins:
     - "http://localhost:3141"
     - "http://127.0.0.1:3141"
-    - "http://TAILSCALE_IP:3141"
-    - "http://YOUR_TAILSCALE_HOSTNAME:3141"
-    - "https://YOUR_TAILSCALE_HOSTNAME:3141"
+    # Add your Tailscale IP/hostname here for remote access
 
 database:
   url: "sqlite:///./backend/data/mindfulness.db"

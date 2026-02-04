@@ -4,7 +4,10 @@ const getApiBase = (): string => {
   }
 
   // Use same hostname as frontend, port 8141
-  if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname !== "localhost"
+  ) {
     return `http://${window.location.hostname}:8141`;
   }
 
