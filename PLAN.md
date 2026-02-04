@@ -1,298 +1,803 @@
-# 🧘 Mindfulness 웹앱 개발 계획
+# 🧘 Mindfulness Web App - Development Plan
 
-## 개요
-iOS, Mac에서 Tailscale을 통해 접근 가능한 가벼운 명상/마음챙김 웹앱
+## Overview
 
----
-
-## 기술 스택
-
-| 구분 | 기술 | 비고 |
-|------|------|------|
-| Frontend | React + Vite | 빠른 빌드, HMR |
-| Styling | Tailwind CSS | 유틸리티 우선, 반응형 쉬움 |
-| Backend | Python (FastAPI) | 비동기, 자동 API 문서 |
-| Database | SQLite | 단일 파일, 쿼리 용이 |
-| Config | YAML | 사람이 읽기 쉬움 |
+A lightweight, self-hosted meditation and mindfulness web application accessible via Tailscale from iOS devices and Mac. Designed to be beautiful, motivating, and feature-rich while remaining simple to deploy.
 
 ---
 
-## 프로젝트 구조 (제안)
+## Tech Stack
+
+| Component | Technology | Rationale |
+|-----------|-----------|-----------|
+| Frontend | React + Vite | Fast builds, HMR, modern DX |
+| Styling | Tailwind CSS | Utility-first, responsive design |
+| Animations | Framer Motion | Smooth, performant animations |
+| Charts | Recharts / D3.js | Heatmaps and statistics |
+| Backend | Python (FastAPI) | Async, auto-generated API docs |
+| Database | SQLite | Single file, powerful queries |
+| Config | YAML | Human-readable configuration |
+| i18n | react-i18next | Korean (primary) + English |
+
+---
+
+## Project Structure
 
 ```
 mindfulness/
-├── frontend/                 # React 앱
+├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Timer/        # 명상 타이머
-│   │   │   ├── Visuals/      # 아름다운 애니메이션들
-│   │   │   ├── Stats/        # 통계 & Heatmap
-│   │   │   └── Journal/      # 명상 후 기록
+│   │   │   ├── Timer/           # Meditation timer
+│   │   │   ├── Visuals/         # Beautiful animations
+│   │   │   │   ├── BreathingCircle/
+│   │   │   │   ├── ParticleFlow/
+│   │   │   │   ├── GradientWaves/
+│   │   │   │   ├── Aurora/
+│   │   │   │   ├── Mandala/
+│   │   │   │   ├── CosmicDust/
+│   │   │   │   └── ZenGarden/
+│   │   │   ├── Stats/           # Heatmap & charts
+│   │   │   ├── Journal/         # Post-session notes
+│   │   │   ├── Goals/           # Daily/weekly goals
+│   │   │   └── Settings/
 │   │   ├── hooks/
 │   │   ├── pages/
+│   │   │   ├── Home.tsx         # Main dashboard with goals
+│   │   │   ├── Meditate.tsx     # Timer & visuals
+│   │   │   ├── Stats.tsx        # Statistics & heatmap
+│   │   │   ├── History.tsx      # Session history
+│   │   │   └── Settings.tsx
+│   │   ├── i18n/
+│   │   │   ├── ko.json          # Korean (primary)
+│   │   │   └── en.json          # English
+│   │   ├── stores/              # Zustand state management
 │   │   └── assets/
-│   │       └── sounds/       # 알림음, ambient 사운드
+│   │       └── sounds/
 │   └── package.json
 │
-├── backend/                  # Python FastAPI
+├── backend/
 │   ├── app/
 │   │   ├── main.py
 │   │   ├── routes/
+│   │   │   ├── sessions.py
+│   │   │   ├── stats.py
+│   │   │   ├── goals.py
+│   │   │   ├── tags.py
+│   │   │   └── sounds.py
 │   │   ├── models/
-│   │   └── services/
-│   │       └── discord.py    # Discord 알림
+│   │   ├── services/
+│   │   │   ├── discord.py       # Discord notifications
+│   │   │   ├── music_gen.py     # Gemini Lyria integration
+│   │   │   └── scheduler.py     # Reminder scheduling
+│   │   └── config.py
 │   ├── requirements.txt
 │   └── data/
-│       └── mindfulness.db    # SQLite DB
+│       └── mindfulness.db
 │
 ├── config/
-│   └── config.yaml           # 전체 설정
+│   └── config.yaml
 │
-├── sounds/                   # 공유 사운드 파일
-│   ├── bells/                # 시작/종료 벨
-│   └── ambient/              # 배경 음악
+├── sounds/
+│   ├── bells/                   # Start/end bells
+│   │   ├── tibetan_bowl.mp3
+│   │   ├── singing_bowl.mp3
+│   │   ├── zen_gong.mp3
+│   │   ├── soft_chime.mp3
+│   │   └── bird_song.mp3
+│   ├── ambient/                 # Background sounds
+│   │   ├── rain_light.mp3
+│   │   ├── rain_heavy.mp3
+│   │   ├── ocean_waves.mp3
+│   │   ├── forest.mp3
+│   │   ├── campfire.mp3
+│   │   ├── wind.mp3
+│   │   ├── stream.mp3
+│   │   ├── thunderstorm.mp3
+│   │   ├── white_noise.mp3
+│   │   ├── brown_noise.mp3
+│   │   └── pink_noise.mp3
+│   └── generated/               # AI-generated music
 │
-└── scripts/
-    └── generate_music.py     # AI 음악 생성 스크립트
+├── scripts/
+│   ├── generate_music.py        # Gemini Lyria music generation
+│   ├── download_sounds.py       # Download free sounds
+│   └── backup_db.py
+│
+└── docker-compose.yaml          # Optional containerization
 ```
 
 ---
 
-## 핵심 기능
+## Core Features
 
-### 1. 명상 타이머 ⏱️
-- **프리셋 시간**: 3분, 5분, 10분, 12분, 15분, 20분, 30분
-- **커스텀 시간**: 사용자 설정 가능
-- **시작/종료 알림음**: 다양한 벨 소리 선택
-  - 티베트 싱잉볼
-  - 부드러운 종
-  - 자연 소리 (새, 물)
-  - 커스텀 업로드
+### 1. Meditation Timer ⏱️
 
-### 2. 아름다운 비주얼 🎨
-명상 중 표시되는 시각적 요소 (Apple Watch 스타일)
+**Preset Durations:**
+- 3, 5, 10, 12, 15, 20, 30, 45, 60 minutes
+- Custom duration input
 
-| 비주얼 | 설명 |
-|--------|------|
-| Breathing Circle | 숨쉬기에 맞춰 확대/축소되는 원 |
-| Particle Flow | 부드럽게 흐르는 파티클 |
-| Gradient Waves | 그라데이션 물결 |
-| Aurora | 오로라 효과 |
-| Mandala | 회전하는 만다라 패턴 |
-| Minimalist | 단순한 진행 표시 |
+**Bell Sounds (Start/End):**
+| Sound | Description |
+|-------|-------------|
+| Tibetan Singing Bowl | Deep, resonant tone |
+| Zen Gong | Traditional Japanese |
+| Soft Chime | Gentle, minimal |
+| Crystal Bowl | Clear, high-pitched |
+| Bird Song | Natural awakening |
+| Custom Upload | User's own sounds |
 
-### 3. 배경 음악/사운드 🎵
-- **Ambient 사운드**
-  - 빗소리, 파도, 숲속, 모닥불
-  - 백색/갈색/핑크 노이즈
-- **AI 생성 음악** (Gemini API)
-  - 명상에 적합한 ambient 음악 생성
-  - 다양한 무드 선택 가능
-- **볼륨 조절**: 개별 + 마스터
-
-### 4. 기록 & 저널 📝
-명상 완료 후 기록:
-- 날짜 & 시간 (자동)
-- 명상 길이 (자동)
-- 기분 (이모지 선택)
-- 메모 (선택적 텍스트)
-- 사용한 비주얼/사운드 (자동)
-
-### 5. 통계 & 시각화 📊
-- **Heatmap**: GitHub 스타일 연간 활동
-- **주간/월간 차트**: 명상 시간 추이
-- **스트릭**: 연속 명상 일수
-- **총 통계**: 총 세션, 총 시간, 평균 시간
-- **시간대 분석**: 주로 명상하는 시간
-
-### 6. Discord 알림 🔔
-- 명상 완료 시 알림
-- 일일/주간 요약
-- 스트릭 달성 축하
-- 리마인더 (선택적)
+**Interval Bells:** Optional bells at intervals (e.g., every 5 minutes)
 
 ---
 
-## config.yaml 예시
+### 2. Beautiful Visuals 🎨
+
+Apple Watch-inspired animations during meditation:
+
+| Visual | Description | Technique |
+|--------|-------------|-----------|
+| **Breathing Circle** | Expands/contracts with breath rhythm (4-7-8, box breathing) | CSS transform + scale |
+| **Particle Flow** | Soft particles drifting across screen | Canvas / Three.js |
+| **Gradient Waves** | Flowing gradient colors | CSS animation |
+| **Aurora** | Northern lights effect | WebGL shaders |
+| **Mandala** | Slowly rotating geometric patterns | SVG animation |
+| **Cosmic Dust** | Stars and nebula slowly moving | Canvas particles |
+| **Zen Garden** | Minimalist sand ripples | SVG paths |
+| **Liquid Metal** | Mercury-like fluid motion | Metaball algorithm |
+| **Sacred Geometry** | Flower of life, Metatron's cube | SVG morph |
+| **Ocean Depth** | Deep sea bioluminescence | Canvas + glow effects |
+
+Each visual should:
+- Be configurable (speed, colors)
+- Support dark/light mode
+- Be performant on mobile devices
+- Have smooth transitions between states
+
+---
+
+### 3. Ambient Sounds 🎵
+
+**Categories:**
+
+| Category | Sounds |
+|----------|--------|
+| **Rain** | Light rain, Heavy rain, Rain on window, Thunderstorm |
+| **Nature** | Forest, Ocean waves, River stream, Wind, Birds |
+| **Fire** | Campfire, Fireplace crackling |
+| **Urban** | Café ambience, Library, Train |
+| **Noise** | White, Pink, Brown noise |
+| **Music** | Lo-fi, Ambient drone, Binaural beats |
+
+**Sound Mixer:**
+- Layer multiple sounds simultaneously
+- Individual volume controls
+- Master volume
+- Fade in/out transitions
+- Save favorite combinations as presets
+
+**Sources for Free Sounds:**
+- [Freesound.org](https://freesound.org/) - CC licensed sounds
+- [Mixkit](https://mixkit.co/free-sound-effects/nature/) - Royalty-free
+- [Pixabay](https://pixabay.com/sound-effects/) - No attribution required
+- [Ambient-Mixer](https://www.ambient-mixer.com/) - CC Sampling Plus
+
+---
+
+### 4. AI Music Generation 🤖
+
+Using **Google Gemini Lyria RealTime API**:
+
+- Generate custom meditation music on demand
+- Text prompts like "calm ambient music for deep meditation"
+- Real-time streaming audio generation
+- Save generated tracks to library
+- Mood/style presets:
+  - Deep relaxation
+  - Focus & concentration
+  - Sleep preparation
+  - Morning energy
+  - Stress relief
+
+---
+
+### 5. Tags System 🏷️
+
+**Multi-select tags for sessions:**
+
+| Category | Example Tags |
+|----------|-------------|
+| **Time of Day** | Morning, Afternoon, Evening, Night |
+| **Purpose** | Stress relief, Focus, Sleep, Energy, Gratitude |
+| **Type** | Breath-focused, Body scan, Open awareness, Loving-kindness |
+| **Location** | Home, Office, Outdoors, Commute |
+| **Custom** | User-defined tags |
+
+Features:
+- Create custom tags with colors
+- Filter history/stats by tags
+- Tag suggestions based on time of day
+- Tag-based insights ("You meditate most when tagged 'Stress relief'")
+
+---
+
+### 6. Goals & Motivation 🎯
+
+**Goal Types:**
+
+| Goal | Example |
+|------|---------|
+| **Daily Duration** | Meditate for 10 minutes today |
+| **Weekly Sessions** | Complete 5 sessions this week |
+| **Streak** | Maintain 7-day streak |
+| **Monthly Total** | 300 minutes this month |
+
+**Home Dashboard Display:**
+- Current streak (prominent)
+- Today's progress ring
+- Weekly goal progress
+- Motivational quote (optional)
+- Quick-start button
+
+**Gamification (Tasteful):**
+- Milestone badges (7-day, 30-day, 100-day streaks)
+- Monthly summaries
+- Personal bests
+- No leaderboards (keep it personal)
+
+---
+
+### 7. Post-Session Journal 📝
+
+After each meditation:
+
+| Field | Type | Required |
+|-------|------|----------|
+| Mood Before | Emoji selector (😰😐😊😌🧘) | Optional |
+| Mood After | Emoji selector | Optional |
+| Energy Level | 1-5 scale | Optional |
+| Notes | Free text (500 char max) | Optional |
+| Tags | Multi-select | Optional |
+
+Auto-recorded:
+- Date & time
+- Duration
+- Visual used
+- Sounds used
+- Completed vs. abandoned
+
+---
+
+### 8. Statistics & Visualization 📊
+
+**Heatmap (GitHub-style):**
+- Full year view
+- Color intensity = minutes meditated
+- Click day for details
+- Streak highlighting
+
+**Charts:**
+- Weekly/Monthly bar charts
+- Time of day distribution (radar chart)
+- Tag frequency (pie chart)
+- Mood trends over time
+- Session length trends
+
+**Summary Stats:**
+- Total sessions (all time)
+- Total minutes
+- Current streak
+- Longest streak
+- Average session length
+- Most used tags
+- Favorite time of day
+- Completion rate
+
+---
+
+### 9. Discord Integration 🔔
+
+**Webhook Notifications:**
+
+| Event | Message Example |
+|-------|-----------------|
+| Session Complete | "🧘 Completed 15-min meditation! Streak: 7 days" |
+| Streak Milestone | "🔥 Amazing! 30-day meditation streak achieved!" |
+| Weekly Summary | "📊 This week: 5 sessions, 75 minutes total" |
+| Goal Achieved | "🎯 Weekly goal completed: 5/5 sessions!" |
+| Reminder | "💭 Time for your daily mindfulness practice" |
+
+**Reminder System:**
+- Configurable reminder times
+- Multiple reminders per day
+- Skip weekends option
+- Gentle, encouraging messages
+
+---
+
+### 10. Settings & Configuration ⚙️
+
+**config.yaml:**
 
 ```yaml
-# Server Configuration
+# ===========================================
+# Mindfulness App Configuration
+# ===========================================
+
+# Server
 server:
   host: "0.0.0.0"
   port: 8000
   debug: false
+  cors_origins:
+    - "http://localhost:5173"
+    - "http://100.x.x.x:5173"  # Tailscale IP
 
 # Database
 database:
   path: "./backend/data/mindfulness.db"
+  backup:
+    enabled: true
+    interval_hours: 24
+    keep_last: 7
 
-# Timer Presets (minutes)
+# Localization
+i18n:
+  default_language: "ko"  # Korean
+  available: ["ko", "en"]
+
+# Timer
 timer:
-  presets: [3, 5, 10, 12, 15, 20, 30]
-  default: 10
-
-# Notifications
-discord:
-  enabled: true
-  webhook_url: "YOUR_DISCORD_WEBHOOK_URL"
-  notify_on:
-    session_complete: true
-    streak_milestone: true
-    daily_summary: false
-    weekly_summary: true
-
-# AI Music Generation
-music_generation:
-  provider: "gemini"
-  api_key: "YOUR_GEMINI_API_KEY"
-  output_dir: "./sounds/generated"
+  presets: [3, 5, 10, 12, 15, 20, 30, 45, 60]
+  default_duration: 10
+  default_bell: "singing_bowl"
+  default_visual: "breathing_circle"
+  interval_bell:
+    enabled: false
+    interval_minutes: 5
 
 # Visuals
 visuals:
-  default: "breathing_circle"
   available:
-    - breathing_circle
-    - particle_flow
-    - gradient_waves
-    - aurora
-    - mandala
-    - minimalist
+    - id: breathing_circle
+      name_ko: "호흡 원"
+      name_en: "Breathing Circle"
+    - id: particle_flow
+      name_ko: "파티클 흐름"
+      name_en: "Particle Flow"
+    - id: gradient_waves
+      name_ko: "그라데이션 물결"
+      name_en: "Gradient Waves"
+    - id: aurora
+      name_ko: "오로라"
+      name_en: "Aurora"
+    - id: mandala
+      name_ko: "만다라"
+      name_en: "Mandala"
+    - id: cosmic_dust
+      name_ko: "우주 먼지"
+      name_en: "Cosmic Dust"
+    - id: zen_garden
+      name_ko: "선 정원"
+      name_en: "Zen Garden"
+  default_speed: 1.0
+  dark_mode: true
 
 # Sounds
 sounds:
   bells_dir: "./sounds/bells"
   ambient_dir: "./sounds/ambient"
-  default_bell: "singing_bowl"
-  default_ambient: "rain"
+  generated_dir: "./sounds/generated"
+  default_ambient_volume: 0.5
+
+# Goals
+goals:
+  daily_default_minutes: 10
+  weekly_default_sessions: 5
+  show_streaks: true
+  show_badges: true
+
+# Discord
+discord:
+  enabled: true
+  webhook_url: "${DISCORD_WEBHOOK_URL}"  # From environment
+  language: "ko"  # Message language
+  notifications:
+    session_complete: true
+    streak_milestones: [7, 14, 30, 60, 100, 365]
+    weekly_summary: true
+    weekly_summary_day: "sunday"
+    daily_reminder:
+      enabled: true
+      times: ["09:00", "21:00"]
+      timezone: "Asia/Seoul"
+
+# AI Music Generation
+music_generation:
+  enabled: true
+  provider: "gemini"
+  api_key: "${GEMINI_API_KEY}"  # From environment
+  output_dir: "./sounds/generated"
+  max_duration_seconds: 600
+  presets:
+    - id: deep_relaxation
+      prompt: "calm ambient meditation music, slow tempo, peaceful"
+    - id: focus
+      prompt: "concentration music, minimal, subtle rhythms"
+    - id: sleep
+      prompt: "sleep music, very slow, dreamy, fade out"
+    - id: morning
+      prompt: "gentle awakening music, hopeful, gradually building"
+
+# Tags (defaults, users can add more)
+tags:
+  defaults:
+    - id: morning
+      name_ko: "아침"
+      name_en: "Morning"
+      color: "#FFB347"
+    - id: evening
+      name_ko: "저녁"
+      name_en: "Evening"
+      color: "#7B68EE"
+    - id: stress
+      name_ko: "스트레스 해소"
+      name_en: "Stress Relief"
+      color: "#98D8C8"
+    - id: focus
+      name_ko: "집중"
+      name_en: "Focus"
+      color: "#87CEEB"
+    - id: sleep
+      name_ko: "수면"
+      name_en: "Sleep"
+      color: "#DDA0DD"
+    - id: gratitude
+      name_ko: "감사"
+      name_en: "Gratitude"
+      color: "#F0E68C"
+
+# PWA
+pwa:
+  enabled: true
+  name: "Mindfulness"
+  short_name: "Mindful"
+  theme_color: "#1a1a2e"
+  background_color: "#16213e"
 ```
 
 ---
 
-## 데이터베이스 스키마
+## Database Schema
 
 ```sql
--- 명상 세션 기록
+-- Sessions table
 CREATE TABLE sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     started_at DATETIME NOT NULL,
     ended_at DATETIME,
-    duration_seconds INTEGER NOT NULL,
+    planned_duration_seconds INTEGER NOT NULL,
+    actual_duration_seconds INTEGER,
     completed BOOLEAN DEFAULT FALSE,
 
-    -- 설정
+    -- Settings used
     visual_type TEXT,
     bell_sound TEXT,
-    ambient_sound TEXT,
-    ambient_volume REAL,
+    ambient_sounds TEXT,  -- JSON array
+    ambient_volumes TEXT, -- JSON object
 
-    -- 기록
-    mood TEXT,  -- emoji
+    -- Journal
+    mood_before TEXT,
+    mood_after TEXT,
+    energy_level INTEGER,
     note TEXT,
 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 일일 통계 (캐시용)
+-- Session tags (many-to-many)
+CREATE TABLE session_tags (
+    session_id INTEGER,
+    tag_id INTEGER,
+    PRIMARY KEY (session_id, tag_id),
+    FOREIGN KEY (session_id) REFERENCES sessions(id),
+    FOREIGN KEY (tag_id) REFERENCES tags(id)
+);
+
+-- Tags
+CREATE TABLE tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name_ko TEXT NOT NULL,
+    name_en TEXT NOT NULL,
+    color TEXT DEFAULT '#808080',
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Goals
+CREATE TABLE goals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL,  -- 'daily_minutes', 'weekly_sessions', 'monthly_minutes'
+    target_value INTEGER NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Daily stats cache
 CREATE TABLE daily_stats (
     date DATE PRIMARY KEY,
     total_sessions INTEGER DEFAULT 0,
     total_seconds INTEGER DEFAULT 0,
-    streak_count INTEGER DEFAULT 0
+    completed_sessions INTEGER DEFAULT 0
 );
 
--- 설정 저장
+-- Streaks
+CREATE TABLE streaks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    length INTEGER DEFAULT 1,
+    is_current BOOLEAN DEFAULT FALSE
+);
+
+-- User settings (key-value store)
 CREATE TABLE user_settings (
     key TEXT PRIMARY KEY,
     value TEXT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Sound presets (saved ambient combinations)
+CREATE TABLE sound_presets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    sounds TEXT NOT NULL,  -- JSON
+    volumes TEXT NOT NULL, -- JSON
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Generated music
+CREATE TABLE generated_music (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT NOT NULL,
+    prompt TEXT NOT NULL,
+    duration_seconds INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes
+CREATE INDEX idx_sessions_started_at ON sessions(started_at);
+CREATE INDEX idx_sessions_completed ON sessions(completed);
+CREATE INDEX idx_daily_stats_date ON daily_stats(date);
 ```
 
 ---
 
-## API 엔드포인트
+## API Endpoints
 
 ```
-# 세션
-POST   /api/sessions              # 세션 시작
-PATCH  /api/sessions/{id}         # 세션 업데이트 (완료, 메모 추가)
-GET    /api/sessions              # 세션 목록 (필터링, 페이지네이션)
-GET    /api/sessions/{id}         # 세션 상세
+# Sessions
+POST   /api/sessions                    # Start new session
+PATCH  /api/sessions/{id}               # Update session (complete, add notes)
+GET    /api/sessions                    # List sessions (with filters, pagination)
+GET    /api/sessions/{id}               # Get session details
+DELETE /api/sessions/{id}               # Delete session
 
-# 통계
-GET    /api/stats/summary         # 전체 요약
-GET    /api/stats/heatmap         # 히트맵 데이터
-GET    /api/stats/chart           # 차트 데이터 (주간/월간)
-GET    /api/stats/streak          # 스트릭 정보
+# Statistics
+GET    /api/stats/summary               # Overall statistics
+GET    /api/stats/heatmap?year=2026     # Heatmap data for year
+GET    /api/stats/chart?period=weekly   # Chart data
+GET    /api/stats/streak                # Current and longest streak
+GET    /api/stats/insights              # AI-generated insights
 
-# 설정
-GET    /api/settings              # 설정 조회
-PUT    /api/settings              # 설정 업데이트
+# Goals
+GET    /api/goals                       # List active goals
+POST   /api/goals                       # Create goal
+PATCH  /api/goals/{id}                  # Update goal
+DELETE /api/goals/{id}                  # Delete goal
+GET    /api/goals/progress              # Current progress on all goals
 
-# 사운드
-GET    /api/sounds/bells          # 벨 소리 목록
-GET    /api/sounds/ambient        # Ambient 소리 목록
-POST   /api/sounds/generate       # AI 음악 생성 요청
+# Tags
+GET    /api/tags                        # List all tags
+POST   /api/tags                        # Create custom tag
+PATCH  /api/tags/{id}                   # Update tag
+DELETE /api/tags/{id}                   # Delete custom tag
 
-# 헬스체크
-GET    /api/health                # 서버 상태
+# Sounds
+GET    /api/sounds/bells                # List bell sounds
+GET    /api/sounds/ambient              # List ambient sounds
+GET    /api/sounds/presets              # List saved presets
+POST   /api/sounds/presets              # Save new preset
+DELETE /api/sounds/presets/{id}         # Delete preset
+
+# Music Generation
+POST   /api/music/generate              # Generate new music
+GET    /api/music/generated             # List generated tracks
+DELETE /api/music/generated/{id}        # Delete generated track
+
+# Settings
+GET    /api/settings                    # Get user settings
+PUT    /api/settings                    # Update settings
+
+# Discord
+POST   /api/discord/test                # Send test notification
+GET    /api/discord/status              # Check webhook status
+
+# Health
+GET    /api/health                      # Server health check
 ```
 
 ---
 
-## 개발 단계 (Phase)
+## Development Phases
 
-### Phase 1: 기본 기능 ✅
-- [ ] 프로젝트 셋업 (React + FastAPI)
-- [ ] 기본 타이머 구현
-- [ ] 시작/종료 벨 소리
-- [ ] 세션 기록 저장
-- [ ] 기본 UI
+### Phase 1: Foundation ✅
+- [ ] Project scaffolding (React + Vite + Tailwind)
+- [ ] FastAPI backend setup
+- [ ] SQLite database initialization
+- [ ] YAML config loading
+- [ ] Basic timer functionality
+- [ ] Start/end bell sounds
+- [ ] Session CRUD API
+- [ ] Basic responsive UI
+- [ ] i18n setup (Korean + English)
 
-### Phase 2: 비주얼 & 사운드 🎨
-- [ ] 명상 비주얼 구현 (최소 3개)
-- [ ] Ambient 사운드 추가
-- [ ] 사운드 믹싱 (벨 + ambient)
-- [ ] 비주얼/사운드 선택 UI
+### Phase 2: Visuals 🎨
+- [ ] Breathing Circle animation
+- [ ] Particle Flow effect
+- [ ] Gradient Waves
+- [ ] Aurora effect
+- [ ] Mandala rotation
+- [ ] Cosmic Dust
+- [ ] Zen Garden
+- [ ] Visual selector UI
+- [ ] Dark/Light mode support
 
-### Phase 3: 통계 & 기록 📊
-- [ ] 명상 후 기록 UI (기분, 메모)
-- [ ] Heatmap 구현
-- [ ] 차트 (주간/월간)
-- [ ] 스트릭 계산 및 표시
+### Phase 3: Sounds 🎵
+- [ ] Download/collect free ambient sounds
+- [ ] Audio player with Web Audio API
+- [ ] Sound mixer (multi-layer)
+- [ ] Volume controls
+- [ ] Fade in/out transitions
+- [ ] Sound preset saving
+- [ ] Interval bell feature
 
-### Phase 4: 알림 & 연동 🔔
-- [ ] Discord 웹훅 연동
-- [ ] 알림 설정 UI
-- [ ] PWA 설정 (iOS 홈 화면 추가용)
+### Phase 4: Journal & Tags 📝
+- [ ] Post-session journal UI
+- [ ] Mood emoji selector
+- [ ] Energy level slider
+- [ ] Notes input
+- [ ] Tag system implementation
+- [ ] Multi-select tag UI
+- [ ] Custom tag creation
+- [ ] Tag filtering in history
 
-### Phase 5: AI 음악 생성 🎵
-- [ ] Gemini API 연동
-- [ ] 음악 생성 UI
-- [ ] 생성된 음악 관리
+### Phase 5: Statistics 📊
+- [ ] GitHub-style heatmap component
+- [ ] Weekly/Monthly charts
+- [ ] Streak calculation logic
+- [ ] Summary statistics cards
+- [ ] Time of day analysis
+- [ ] Tag frequency chart
+- [ ] Mood trend visualization
+- [ ] Export data feature
 
-### Phase 6: 마무리 ✨
-- [ ] 모바일 반응형 최적화
-- [ ] 다크/라이트 모드
-- [ ] 성능 최적화
-- [ ] 배포 스크립트
+### Phase 6: Goals & Gamification 🎯
+- [ ] Goal creation UI
+- [ ] Daily/Weekly/Monthly goals
+- [ ] Progress tracking
+- [ ] Home dashboard redesign
+- [ ] Goal progress rings
+- [ ] Streak display
+- [ ] Milestone badges
+- [ ] Achievement notifications
+
+### Phase 7: Discord Integration 🔔
+- [ ] Webhook configuration
+- [ ] Session complete notifications
+- [ ] Streak milestone alerts
+- [ ] Weekly summary generation
+- [ ] Reminder scheduler
+- [ ] Notification preferences UI
+
+### Phase 8: AI Music Generation 🤖
+- [ ] Gemini Lyria API integration
+- [ ] Music generation UI
+- [ ] Prompt presets
+- [ ] Generated music library
+- [ ] Music player integration
+
+### Phase 9: Polish & Deploy ✨
+- [ ] PWA configuration
+- [ ] iOS home screen optimization
+- [ ] Performance optimization
+- [ ] Loading states & skeletons
+- [ ] Error handling
+- [ ] Backup script
+- [ ] Deployment documentation
+- [ ] Docker setup (optional)
 
 ---
 
-## 논의 필요 사항 ❓
+## Design Principles
 
-1. **비주얼 우선순위**: 어떤 비주얼을 먼저 구현할까요?
-2. **Ambient 사운드**: 어떤 소리들을 우선 추가할까요?
-3. **Discord 알림 내용**: 어떤 정보를 포함할까요?
-4. **다국어 지원**: 한국어만? 영어도?
-5. **백업 방식**: 자동 백업이 필요할까요?
+Based on research from top meditation apps:
+
+1. **Calm & Muted Colors**
+   - Dark mode primary: Deep blues, purples
+   - Light mode: Soft pastels, warm whites
+   - Avoid harsh contrasts
+
+2. **Soft Shapes & Smooth Lines**
+   - Rounded corners everywhere
+   - Smooth animations (ease-in-out)
+   - No sharp edges
+
+3. **Minimal Cognitive Load**
+   - One primary action per screen
+   - Clear, simple navigation
+   - Reduce choices when meditating
+
+4. **Tasteful Gamification**
+   - Focus on personal progress, not competition
+   - Streaks as motivation, not pressure
+   - Celebrate milestones gently
+
+5. **Reliability First**
+   - Timer must be rock-solid
+   - Sounds must play reliably
+   - No interruptions during meditation
 
 ---
 
-## 참고 자료
+## Reference Resources
 
-- [FastAPI 문서](https://fastapi.tiangolo.com/)
-- [React 문서](https://react.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Gemini API](https://ai.google.dev/)
+**Design Inspiration:**
+- [Headspace](https://www.headspace.com/) - Gamification & UX
+- [Calm](https://www.calm.com/) - Personalization & sounds
+- [Insight Timer](https://insighttimer.com/) - Community & stats
+
+**Open Source References:**
+- [meditation-timer (GitHub)](https://github.com/benji6/meditation-timer) - PWA timer
+- [Bodhi Timer](https://github.com/yuttadhammo/BodhiTimer) - Bell sounds
+
+**Free Sound Sources:**
+- [Freesound.org](https://freesound.org/)
+- [Mixkit](https://mixkit.co/)
+- [Pixabay Sounds](https://pixabay.com/sound-effects/)
+- [Ambient-Mixer](https://www.ambient-mixer.com/)
+
+**Technical:**
+- [Framer Motion](https://www.framer.com/motion/) - React animations
+- [Gemini Lyria](https://ai.google.dev/gemini-api/docs/music-generation) - Music generation
 - [Discord Webhooks](https://discord.com/developers/docs/resources/webhook)
+
+**CSS Animation Examples:**
+- [Breathing CSS Animation](https://codepen.io/machi/pen/YymGzP)
+- [Calm Breathe Bubble](https://codepen.io/stiliyana/pen/dqoOBr)
+- [Focused Breathing Tutorial](https://dev.to/scrabill/focused-breathing-a-css-animation-to-help-with-meditation-and-focused-breathing-exercises-dob)
+
+---
+
+## Questions for Discussion ❓
+
+1. **Visual Priority:** Which 3-4 visuals should we implement first?
+2. **Sound Priority:** Which ambient sounds are most important to you?
+3. **Breathing Patterns:** Should we include guided breathing patterns (4-7-8, box breathing)?
+4. **Data Export:** CSV, JSON, or both?
+5. **Backup Location:** Local only, or option to sync somewhere?
+
+---
+
+## Next Steps
+
+1. ✅ Finalize this plan
+2. ⬜ Set up project structure
+3. ⬜ Initialize React + FastAPI
+4. ⬜ Begin Phase 1 implementation
+
+---
+
+*Last updated: 2026-02-04*
