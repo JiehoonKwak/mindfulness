@@ -3,12 +3,14 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 from sqlmodel import select
 
 from ..database import SessionDep
 from ..models.session import Session, SessionCreate, SessionRead, SessionUpdate
 from ..models.tag import SessionTag
+from ..services.discord import discord_service
+from .stats import calculate_streaks
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
@@ -71,14 +73,18 @@ def get_session(session_id: int, db: SessionDep) -> Session:
 
 
 @router.patch("/{session_id}", response_model=SessionRead)
-def update_session(
-    session_id: int, session_update: SessionUpdate, db: SessionDep
+async def update_session(
+    session_id: int,
+    session_update: SessionUpdate,
+    db: SessionDep,
+    background_tasks: BackgroundTasks,
 ) -> Session:
     """Update an existing meditation session."""
     session = db.get(Session, session_id)
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
 
+    was_incomplete = not session.completed
     update_data = session_update.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(session, key, value)
@@ -86,6 +92,21 @@ def update_session(
     db.add(session)
     db.commit()
     db.refresh(session)
+
+    # Trigger Discord notifications on completion
+    if was_incomplete and session.completed and discord_service.webhook_url:
+        background_tasks.add_task(discord_service.notify_session_complete, session)
+
+        # Check for streak milestone
+        all_sessions = db.exec(select(Session).where(Session.completed == True)).all()
+        session_dates = [s.started_at for s in all_sessions]
+        current_streak, _ = calculate_streaks(session_dates)
+
+        if current_streak in [7, 14, 30, 60, 100, 365]:
+            background_tasks.add_task(
+                discord_service.notify_streak_milestone, current_streak
+            )
+
     return session
 
 

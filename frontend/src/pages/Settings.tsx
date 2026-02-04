@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import ThemeSwitcher from "../components/ThemeSwitcher";
+import MusicSelector from "../components/MusicSelector/MusicSelector";
 import { useSettingsStore } from "../stores/settingsStore";
+import { Icons } from "../components/Icons";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -98,18 +100,15 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen p-4">
-      <header className="py-4">
-        <Link to="/" className="text-[var(--color-text-muted)]">
-          &larr; {t("app.title")}
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+      <header className="flex items-center gap-4 p-6">
+        <Link to="/" className="p-2 -m-2">
+          <Icons.chevronLeft className="w-6 h-6" />
         </Link>
+        <h1 className="text-title">{t("settings.title")}</h1>
       </header>
 
-      <main className="max-w-md mx-auto space-y-8">
-        <h1 className="text-2xl font-light tracking-wide">
-          {t("settings.title")}
-        </h1>
-
+      <main className="max-w-md mx-auto px-6 pb-6 space-y-8">
         {/* Theme Section */}
         <section className="space-y-4">
           <h2 className="text-sm uppercase tracking-widest text-[var(--color-text-muted)]">
@@ -254,6 +253,11 @@ export default function Settings() {
               ? t("settings.export.exporting")
               : t("settings.export.download")}
           </button>
+        </section>
+
+        {/* Music Section */}
+        <section className="space-y-4">
+          <MusicSelector />
         </section>
 
         {/* Discord Section */}

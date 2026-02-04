@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Meditation web app with custom timer, 10 animated visuals, breathing guides, sound mixer, stats, goals, and session tracking. React 19 + Vite frontend, FastAPI + SQLite backend. ~85% complete (P0-P2 done).
+Meditation web app with custom timer, 4 animated visuals, breathing guides, sound mixer, stats, goals, and session tracking. React 19 + Vite frontend, FastAPI + SQLite backend. ~90% complete.
 
 ## Commands
 
@@ -34,22 +34,22 @@ Frontend (React 19 + Vite)          Backend (FastAPI)
 │ Pages:              │             │ /api/health      │
 │  Home, Meditate,    │   fetch     │ /api/sessions/*  │
 │  Breathe, Settings, │────────────▶│ /api/sounds/*    │
-│  Stats, History     │             │ /api/stats/*     │
+│  Insights           │             │ /api/stats/*     │
 │                     │             │ /api/goals/*     │
 │ Stores (Zustand):   │             │ /api/tags/*      │
 │  timer, session,    │             │ /api/export/*    │
 │  settings, breathing│             │ /api/discord/*   │
 │                     │             │ /api/music/*     │
-│ Components:         │             │                  │
-│  Visuals(10), Timer │             │ SQLite:          │
-│  SoundMixer, Goals  │             │ mindfulness.db   │
-│  Journal, Stats     │             └──────────────────┘
-└─────────────────────┘
+│ Components:         │             │ /api/reminders/* │
+│  Visuals(4), Timer  │             │                  │
+│  SoundMixer, Goals  │             │ SQLite:          │
+│  Journal, Stats     │             │ mindfulness.db   │
+└─────────────────────┘             └──────────────────┘
 ```
 
 **Key directories:**
-- `frontend/src/pages/` - Route components
-- `frontend/src/components/Visuals/` - 10 meditation animations
+- `frontend/src/pages/` - Route components (Home, Meditate, Breathe, Settings, Insights)
+- `frontend/src/components/Visuals/` - 4 meditation animations (Aurora, BreathSphere, FloatingOrbs, RippleWater)
 - `frontend/src/stores/` - Zustand state (timer, session, settings, breathing)
 - `frontend/src/api/` - Backend fetch wrappers
 - `backend/app/routes/` - FastAPI endpoints
@@ -58,19 +58,28 @@ Frontend (React 19 + Vite)          Backend (FastAPI)
 
 ## Tech Stack
 
-**Frontend:** React 19, Vite 7, Tailwind v4, Zustand 5, Framer Motion 12, Three.js, react-i18next
-**Backend:** FastAPI, SQLModel, SQLite, uv (Python)
+**Frontend:** React 19, Vite 7, Tailwind v4, Zustand 5, Three.js, react-i18next
+**Backend:** FastAPI, SQLModel, SQLite, APScheduler, uv (Python)
 **Tools:** bun (JS), uv (Python), ESLint flat config
 
 ## Current State & Gaps
 
-**Working:** Timer, 10 visuals, breathing guide, 8 themes, session CRUD, i18n (ko/en), bell selector, sound mixer, stats page with heatmap, goals/streaks, history page with filters, post-session journal modal, data export (JSON/CSV/iCal/MD), Discord notifications
+**Working:** Timer, 4 visuals (breath-synced), breathing guide, 2 themes (zen-dark/zen-light), session CRUD, i18n (ko/en), bell selector, sound mixer, stats/history merged into Insights page, goals/streaks, post-session journal modal, data export (JSON/CSV/iCal/MD), Discord notifications, daily reminders scheduler
 
-**Sounds:** Bell sounds (4 types) and ambient sounds (rain, ocean, forest) downloaded to /sounds/
+**Sounds:** Bell sounds (4 types) and ambient sounds (rain, ocean, forest) in /sounds/
 
 **DB Tables:** session, goal, tag, session_tag, generated_music
 
-**P3 (optional):** AI music generation requires SUNO_API_KEY environment variable
+**P3 (optional):** AI music generation requires GEMINI_API_KEY environment variable
+
+## Design Preferences
+
+**CRITICAL - User hates AI slop:**
+- NO purple/indigo accent colors
+- Pure monochrome only: black (#000000) and white (#ffffff)
+- Clean, minimal UI - no unnecessary visual flourish
+- System fonts only (no custom font loading)
+- Buttons: white bg + black text (dark mode), black bg + white text (light mode)
 
 ## Project Standards
 

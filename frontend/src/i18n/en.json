@@ -32,21 +32,16 @@
   },
   "visuals": {
     "select": "Select Visual",
-    "breathingCircle": "Breathing Circle",
-    "particleFlow": "Particle Flow",
-    "gradientWaves": "Gradient Waves",
     "aurora": "Aurora",
-    "mandala": "Mandala",
-    "cosmicDust": "Cosmic Dust",
-    "zenGarden": "Zen Garden",
-    "liquidMetal": "Liquid Metal",
-    "sacredGeometry": "Sacred Geometry",
-    "oceanDepth": "Ocean Depth"
+    "breathSphere": "Breath Sphere",
+    "floatingOrbs": "Floating Orbs",
+    "rippleWater": "Ripple Water"
   },
   "settings": {
     "title": "Settings",
     "language": "Language",
     "theme": "Theme",
+    "tapToToggle": "Tap to toggle",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "bellSound": "Bell Sound",
@@ -78,14 +73,8 @@
     }
   },
   "themes": {
-    "ocean": "Ocean",
-    "forest": "Forest",
-    "sunset": "Sunset",
-    "midnight": "Midnight",
-    "sakura": "Sakura",
-    "sand": "Sand",
-    "aurora": "Aurora",
-    "zen": "Zen"
+    "dark": "Dark",
+    "light": "Light"
   },
   "stats": {
     "title": "Statistics",
@@ -97,7 +86,8 @@
   },
   "nav": {
     "stats": "Statistics",
-    "history": "History"
+    "history": "History",
+    "insights": "Insights"
   },
   "journal": {
     "title": "How was your session?",
@@ -120,11 +110,16 @@
     "noSessions": "No sessions yet",
     "incomplete": "Incomplete"
   },
+  "insights": {
+    "overview": "Overview",
+    "history": "History"
+  },
   "sounds": {
     "mixer": "Sound Mixer",
     "master": "Master Volume",
     "rain": "Rain",
     "ocean": "Ocean",
-    "forest": "Forest"
+    "forest": "Forest",
+    "music": "Background Music"
   }
 }

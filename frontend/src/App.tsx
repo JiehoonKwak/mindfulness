@@ -3,8 +3,7 @@ import Home from "./pages/Home";
 import Meditate from "./pages/Meditate";
 import Settings from "./pages/Settings";
 import Breathe from "./pages/Breathe";
-import Stats from "./pages/Stats";
-import History from "./pages/History";
+import Insights from "./pages/Insights";
 import BellPlayer from "./components/BellPlayer";
 
 export default function App() {
@@ -17,8 +16,10 @@ export default function App() {
           <Route path="/meditate" element={<Meditate />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/breathe" element={<Breathe />} />
-          <Route path="/stats" element={<Stats />} />
-          <Route path="/history" element={<History />} />
+          <Route path="/insights" element={<Insights />} />
+          {/* Legacy routes redirect to insights */}
+          <Route path="/stats" element={<Insights />} />
+          <Route path="/history" element={<Insights />} />
         </Routes>
       </div>
     </BrowserRouter>

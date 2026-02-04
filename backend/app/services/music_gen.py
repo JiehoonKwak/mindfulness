@@ -1,52 +1,81 @@
-"""Music generation service using external APIs.
+"""Music generation service using Gemini API.
 
-Note: This is a placeholder implementation. To enable actual music generation,
-you'll need to configure an API key for a service like Suno (via apiframe.pro)
-or another music generation API.
+Note: Requires GEMINI_API_KEY environment variable to be configured.
+The Gemini 2.0 Flash model supports audio generation.
 """
 
 import os
+import time
+from pathlib import Path
 from typing import Optional
+
+import httpx
 
 
 class MusicGenService:
-    """Service for AI music generation."""
+    """Service for AI music generation using Google Gemini."""
 
     def __init__(self):
-        self.api_key = os.environ.get("SUNO_API_KEY")
+        self.api_key = os.environ.get("GEMINI_API_KEY")
+        self.output_dir = Path("./sounds/music/generated")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    async def generate(self, prompt: str, duration_seconds: int) -> Optional[str]:
+    async def generate(self, prompt: str, duration_seconds: int = 120) -> Optional[str]:
         """Generate music based on a prompt.
 
-        Returns the URL of the generated track, or None if generation fails.
-
-        In a real implementation, this would:
-        1. Call the Suno API (or similar) with the prompt
-        2. Wait for generation to complete
-        3. Download the file to /sounds/music/generated/
-        4. Return the local filename
+        Returns the filename of the generated track, or None if generation fails.
         """
         if not self.api_key:
-            # Placeholder - return None to indicate API not configured
             return None
 
-        # TODO: Implement actual API call
-        # Example with apiframe.pro:
-        # async with httpx.AsyncClient() as client:
-        #     response = await client.post(
-        #         "https://api.apiframe.pro/suno/generate",
-        #         headers={"Authorization": f"Bearer {self.api_key}"},
-        #         json={
-        #             "prompt": prompt,
-        #             "duration": duration_seconds,
-        #         }
-        #     )
-        #     if response.status_code == 200:
-        #         data = response.json()
-        #         # Download and save the file
-        #         ...
+        try:
+            full_prompt = f"""Generate ambient meditation music.
+Style: {prompt}
+Duration: {duration_seconds} seconds
+Requirements: No vocals, slow tempo, calming, suitable for meditation and mindfulness practice.
+The music should help listeners relax and focus on their breathing."""
 
-        return None
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={self.api_key}",
+                    json={
+                        "contents": [{"parts": [{"text": full_prompt}]}],
+                        "generationConfig": {
+                            "response_mime_type": "audio/mp3",
+                        },
+                    },
+                )
+
+                if response.status_code != 200:
+                    print(f"Gemini API error: {response.status_code} - {response.text}")
+                    return None
+
+                data = response.json()
+
+                # Extract audio data from response
+                if "candidates" in data and len(data["candidates"]) > 0:
+                    candidate = data["candidates"][0]
+                    if "content" in candidate and "parts" in candidate["content"]:
+                        for part in candidate["content"]["parts"]:
+                            if "inlineData" in part:
+                                import base64
+
+                                audio_data = base64.b64decode(
+                                    part["inlineData"]["data"]
+                                )
+                                filename = f"meditation_{int(time.time())}.mp3"
+                                filepath = self.output_dir / filename
+
+                                with open(filepath, "wb") as f:
+                                    f.write(audio_data)
+
+                                return filename
+
+                return None
+
+        except Exception as e:
+            print(f"Music generation error: {e}")
+            return None
 
     async def check_status(self, job_id: str) -> dict:
         """Check the status of a generation job."""
@@ -61,15 +90,22 @@ music_gen_service = MusicGenService()
 MUSIC_PRESETS = [
     {
         "id": "ambient",
-        "prompt": "Calm ambient meditation music, soft pads, gentle, peaceful",
+        "label": "Ambient",
+        "prompt": "Calm ambient meditation music, soft pads, gentle drone, peaceful atmosphere",
     },
     {
         "id": "nature",
-        "prompt": "Nature sounds with soft piano, birds, stream, relaxing",
+        "label": "Nature",
+        "prompt": "Gentle nature sounds with soft music, birds, flowing water, forest ambience",
     },
     {
         "id": "tibetan",
-        "prompt": "Tibetan singing bowls meditation, deep resonance, spiritual",
+        "label": "Tibetan",
+        "prompt": "Tibetan singing bowls meditation, deep resonance, spiritual, harmonic overtones",
     },
-    {"id": "binaural", "prompt": "Binaural beats meditation, alpha waves, focus, calm"},
+    {
+        "id": "binaural",
+        "label": "Binaural",
+        "prompt": "Binaural beats meditation, theta waves, deep focus, calm and centered",
+    },
 ]

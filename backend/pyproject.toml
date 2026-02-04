@@ -8,6 +8,8 @@ dependencies = [
     "sqlmodel>=0.0.14",
     "pyyaml>=6.0",
     "python-multipart>=0.0.6",
+    "httpx>=0.26.0",
+    "apscheduler>=3.10.0",
 ]
 
 [project.optional-dependencies]

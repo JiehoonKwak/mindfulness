@@ -5,14 +5,27 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_config
 from .database import init_db
-from .routes import sessions, sounds, stats, goals, tags, export, discord, music
+from .routes import (
+    sessions,
+    sounds,
+    stats,
+    goals,
+    tags,
+    export,
+    discord,
+    music,
+    reminders,
+)
+from .services.scheduler import init_scheduler, shutdown_scheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize database on startup."""
+    """Initialize database and scheduler on startup."""
     init_db()
+    init_scheduler()
     yield
+    shutdown_scheduler()
 
 
 app = FastAPI(title="Mindfulness API", lifespan=lifespan)
@@ -36,6 +49,7 @@ app.include_router(tags.router)
 app.include_router(export.router)
 app.include_router(discord.router)
 app.include_router(music.router)
+app.include_router(reminders.router)
 
 
 @app.get("/api/health")

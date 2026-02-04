@@ -32,21 +32,16 @@
   },
   "visuals": {
     "select": "시각 효과 선택",
-    "breathingCircle": "호흡 원",
-    "particleFlow": "파티클 흐름",
-    "gradientWaves": "그라데이션 물결",
     "aurora": "오로라",
-    "mandala": "만다라",
-    "cosmicDust": "우주 먼지",
-    "zenGarden": "선 정원",
-    "liquidMetal": "리퀴드 메탈",
-    "sacredGeometry": "신성 기하학",
-    "oceanDepth": "심해"
+    "breathSphere": "브레스 스피어",
+    "floatingOrbs": "플로팅 오브",
+    "rippleWater": "리플 워터"
   },
   "settings": {
     "title": "설정",
     "language": "언어",
     "theme": "테마",
+    "tapToToggle": "탭하여 전환",
     "darkMode": "다크 모드",
     "lightMode": "라이트 모드",
     "bellSound": "종소리",
@@ -78,14 +73,8 @@
     }
   },
   "themes": {
-    "ocean": "오션",
-    "forest": "포레스트",
-    "sunset": "선셋",
-    "midnight": "미드나잇",
-    "sakura": "사쿠라",
-    "sand": "샌드",
-    "aurora": "오로라",
-    "zen": "젠"
+    "dark": "다크",
+    "light": "라이트"
   },
   "stats": {
     "title": "통계",
@@ -97,7 +86,8 @@
   },
   "nav": {
     "stats": "통계",
-    "history": "기록"
+    "history": "기록",
+    "insights": "인사이트"
   },
   "journal": {
     "title": "명상은 어떠셨나요?",
@@ -120,11 +110,16 @@
     "noSessions": "기록이 없습니다",
     "incomplete": "미완료"
   },
+  "insights": {
+    "overview": "개요",
+    "history": "기록"
+  },
   "sounds": {
     "mixer": "사운드 믹서",
     "master": "마스터 볼륨",
     "rain": "비",
     "ocean": "바다",
-    "forest": "숲"
+    "forest": "숲",
+    "music": "배경 음악"
   }
 }

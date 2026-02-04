@@ -1,18 +1,19 @@
 import { lazy } from "react";
 
 export const visualComponents = {
-  breathingCircle: lazy(() => import("./BreathingCircle/BreathingCircle")),
-  particleFlow: lazy(() => import("./ParticleFlow/ParticleFlow")),
-  gradientWaves: lazy(() => import("./GradientWaves/GradientWaves")),
   aurora: lazy(() => import("./Aurora/Aurora")),
-  mandala: lazy(() => import("./Mandala/Mandala")),
-  cosmicDust: lazy(() => import("./CosmicDust/CosmicDust")),
-  zenGarden: lazy(() => import("./ZenGarden/ZenGarden")),
-  liquidMetal: lazy(() => import("./LiquidMetal/LiquidMetal")),
-  sacredGeometry: lazy(() => import("./SacredGeometry/SacredGeometry")),
-  oceanDepth: lazy(() => import("./OceanDepth/OceanDepth")),
+  breathSphere: lazy(() => import("./BreathSphere/BreathSphere")),
+  floatingOrbs: lazy(() => import("./FloatingOrbs/FloatingOrbs")),
+  rippleWater: lazy(() => import("./RippleWater/RippleWater")),
 };
 
 export type VisualId = keyof typeof visualComponents;
+
+export const VISUALS = [
+  { id: "aurora", name: "Aurora" },
+  { id: "breathSphere", name: "Breath Sphere" },
+  { id: "floatingOrbs", name: "Floating Orbs" },
+  { id: "rippleWater", name: "Ripple Water" },
+] as const;
 
 export { default as VisualSelector } from "./VisualSelector";

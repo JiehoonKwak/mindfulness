@@ -1,5 +1,5 @@
 ---
-created: 2026-02-04T21:30:00
+created: 2026-02-04T23:15:00
 branch: main
 ---
 
@@ -7,121 +7,95 @@ branch: main
 
 ## Resume
 
-All 9 sprints implemented (P0-P3). Run `./dev start` to verify full stack, then test complete meditation flow with journal modal.
+Complete UI overhaul implemented - pure black/white theme, 4 new breath-synced visuals, merged Stats+History into Insights page. All uncommitted changes need to be tested and committed.
 
 ## Status
 
 | Task | Status | Priority |
 |------|--------|----------|
-| Sprint 1: Audio Foundation | Done | P0 |
-| Sprint 2: Statistics | Done | P0 |
-| Sprint 3: Journal Modal | Done | P1 |
-| Sprint 4: Goals System | Done | P1 |
-| Sprint 5: History & Tags | Done | P1 |
-| Sprint 6: Sound Mixer | Done | P2 |
-| Sprint 7: Data Export | Done | P3 |
-| Sprint 8: Discord Integration | Done | P3 |
-| Sprint 9: AI Music (structure) | Done | P3 |
+| Theme system (2 themes) | Done | P1 |
+| Home page redesign | Done | P1 |
+| Insights page (merged Stats+History) | Done | P1 |
+| 3 new visuals (BreathSphere, FloatingOrbs, RippleWater) | Done | P1 |
+| Delete 9 old visuals | Done | P1 |
+| Backend scheduler + reminders API | Done | P2 |
+| Discord triggers on session complete | Done | P2 |
+| Music selector UI + Gemini integration | Done | P2 |
+| Remove purple/indigo colors | Done | P1 |
+| Full E2E verification | Pending | P1 |
 
 ## Key Context
 
-**Problem**: App was ~15% complete with only timer/visuals working. Missing: sounds, stats, journal, goals, history, export, Discord.
+**Problem**: User requested complete UI overhaul with pure black/white AMOLED theme, new breath-synced visuals, and simplified page structure.
 
 **Decisions**:
-- Used Freesound.org CC0 previews for bell/ambient sounds (no API key needed)
-- Streak calculation: counts from today/yesterday backward for "current"
-- Goals stored in DB, progress calculated on-the-fly from sessions
-- Sound mixer uses Web Audio API with gain nodes for layering
-- AI music generation is placeholder (requires SUNO_API_KEY)
+- Merged Stats + History → single Insights page with tabs
+- Stripped 8 themes → 2 (zen-dark, zen-light)
+- Deleted 9 visuals, created 3 new Three.js breath-synced ones
+- accent color = primary color (white/black) - NO purple
+- max-w-lg container for desktop centering
 
 **Gotchas**:
-- Freesound preview URLs change; some 404'd during implementation
-- TypeScript strict mode requires `type` imports for interfaces
-- `bun run build` must run from frontend/ directory
-- Session journal flow: complete → keep sessionId → updateJournal → clear sessionId
+- `--color-primary` is WHITE in dark mode, BLACK in light mode
+- Buttons must use `text-[var(--color-bg)]` not `text-white` for proper contrast
+- User HATES purple/indigo AI slop colors - documented in CLAUDE.md
 
 ## File Chains
 
 ```
-Chain: Session Flow
-frontend/src/pages/Meditate.tsx -> stores/sessionStore.ts -> api/sessions.ts -> backend/app/routes/sessions.py -> models/session.py
-Relationship: Timer completion triggers session update chain
+Chain: Theme System
+themes.css -> settingsStore.ts -> ThemeSwitcher.tsx -> Home.tsx
+Relationship: CSS vars define colors, store manages state, components consume
 
-Chain: Stats Display
-frontend/src/pages/Stats.tsx -> api/stats.ts -> backend/app/routes/stats.py -> models/session.py
-Relationship: Stats computed from session records
+Chain: Visual Effects
+breathingStore.ts -> BreathSphere.tsx / FloatingOrbs.tsx / RippleWater.tsx -> VisualSelector.tsx -> Meditate.tsx
+Relationship: Breathing state drives visual animations, selector shows previews
 
-Chain: Sound System
-frontend/src/pages/Meditate.tsx -> hooks/useAudioLayers.ts -> components/SoundMixer/SoundMixer.tsx
-Relationship: Web Audio API layering for ambient + bell
+Chain: Pages
+App.tsx -> Home.tsx / Insights.tsx / Settings.tsx
+Relationship: Router defines routes, pages deleted (Stats, History) replaced by Insights
 ```
 
 ## Changes
 
-**Uncommitted (38 files)**:
+**Uncommitted Modified:**
+- `frontend/src/styles/themes.css` - 2 themes only, no purple
+- `frontend/src/stores/settingsStore.ts` - ThemeId type updated
+- `frontend/src/components/ThemeSwitcher.tsx` - Toggle button instead of grid
+- `frontend/src/pages/Home.tsx` - Heatmap hero, centered layout
+- `frontend/src/pages/Settings.tsx` - Simplified, added MusicSelector
+- `frontend/src/App.tsx` - Routes updated (Insights replaces Stats/History)
+- `frontend/src/i18n/*.json` - Updated theme/visual strings
+- `backend/app/main.py` - Scheduler lifespan
+- `backend/app/routes/sessions.py` - Discord triggers
 
-Backend new:
-- `backend/app/models/goal.py` - Goal SQLModel
-- `backend/app/models/tag.py` - Tag + SessionTag models
-- `backend/app/models/generated_music.py` - AI music model
-- `backend/app/routes/sounds.py` - List bells/ambient
-- `backend/app/routes/stats.py` - Summary/heatmap/streak
-- `backend/app/routes/goals.py` - CRUD + progress
-- `backend/app/routes/tags.py` - Tag management
-- `backend/app/routes/export.py` - JSON/CSV/iCal/MD export
-- `backend/app/routes/discord.py` - Webhook config/test
-- `backend/app/routes/music.py` - Generation API (placeholder)
-- `backend/app/services/export.py` - Export formatters
-- `backend/app/services/discord.py` - Webhook sender
-- `backend/app/services/music_gen.py` - Suno placeholder
+**Uncommitted New:**
+- `frontend/src/components/Icons.tsx` - SVG icon system
+- `frontend/src/pages/Insights.tsx` - Merged Stats+History
+- `frontend/src/components/Visuals/BreathSphere/` - Three.js breath sphere
+- `frontend/src/components/Visuals/FloatingOrbs/` - Floating orbs visual
+- `frontend/src/components/Visuals/RippleWater/` - Water ripple visual
+- `frontend/src/components/MusicSelector/` - Music generation UI
+- `backend/app/services/scheduler.py` - APScheduler for reminders
+- `backend/app/routes/reminders.py` - Reminder config API
 
-Frontend new:
-- `frontend/src/pages/Stats.tsx` - Heatmap + summary cards
-- `frontend/src/pages/History.tsx` - Session list with filters
-- `frontend/src/api/stats.ts` - Stats API client
-- `frontend/src/api/goals.ts` - Goals API client
-- `frontend/src/api/tags.ts` - Tags API client
-- `frontend/src/hooks/useAudioLayers.ts` - Web Audio API
-- `frontend/src/components/Stats/Heatmap.tsx` - GitHub-style grid
-- `frontend/src/components/Stats/SummaryCards.tsx` - 4 stat cards
-- `frontend/src/components/Goals/GoalRing.tsx` - Circular progress
-- `frontend/src/components/Goals/StreakDisplay.tsx` - Fire emoji streak
-- `frontend/src/components/Journal/MoodSelector.tsx` - Emoji row
-- `frontend/src/components/Journal/NotesInput.tsx` - Textarea
-- `frontend/src/components/Journal/PostSessionModal.tsx` - Post-session UI
-- `frontend/src/components/SoundMixer/SoundMixer.tsx` - Ambient mixer
+**Uncommitted Deleted:**
+- `frontend/src/pages/History.tsx`
+- `frontend/src/pages/Stats.tsx`
+- 9 visual directories (BreathingCircle, ParticleFlow, etc.)
 
-Sounds:
-- `frontend/public/sounds/bells/*.mp3` - 4 bell sounds
-- `frontend/public/sounds/ambient/*.mp3` - 3 ambient sounds
-- `scripts/download_sounds.py` - Sound downloader
-
-Modified:
-- `backend/app/main.py` - Added all new routers
-- `backend/app/database.py` - Import new models
-- `backend/app/routes/sessions.py` - Added filters (tag, date)
-- `frontend/src/App.tsx` - Added /stats, /history routes
-- `frontend/src/pages/Home.tsx` - Added GoalRing, StreakDisplay, nav links
-- `frontend/src/pages/Meditate.tsx` - Journal modal, sound mixer
-- `frontend/src/pages/Settings.tsx` - Bell selector, export, Discord
-- `frontend/src/stores/settingsStore.ts` - bellSound state
-- `frontend/src/stores/sessionStore.ts` - updateJournal action
-- `frontend/src/stores/timerStore.ts` - reset action
-- `frontend/src/components/BellPlayer.tsx` - Read bellSound from store
-- `frontend/src/i18n/en.json` - All new translations
-- `frontend/src/i18n/ko.json` - All new translations
-- `CLAUDE.md` - Updated to ~85% complete
+**Recent commits:**
+- 19d5269 session-end: 2026-02-04 22:21:21
 
 ## Next Steps
 
-1. **Verify**: Run `./dev start`, complete a meditation, check journal modal appears
-2. **Test APIs**: `curl localhost:8000/api/stats/summary`, `curl localhost:8000/api/sounds/bells`
-3. **Commit**: Stage all changes with descriptive commit message
-4. **Optional**: Set `SUNO_API_KEY` env var for AI music generation
+1. **Run full E2E test** - `./dev start` and verify all pages work
+2. **Test new visuals** - Start meditation, verify BreathSphere/FloatingOrbs/RippleWater animate with breathing
+3. **Commit changes** - Large commit with UI overhaul
 
 ## Artifacts
 
-- Skills: None created this session
-- Memories: None saved this session
-- CLAUDE.md: Updated (completion status, architecture diagram, current state)
-- README.md: Not modified (no user-facing doc changes needed)
+- CLAUDE.md: Applied (added Design Preferences section with "no AI slop" rule)
+- README.md: Skipped (no drift detected)
+- Skills: None created
+- Memories: None created

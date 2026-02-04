@@ -1,27 +1,26 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { getGoalsProgress, type GoalProgress } from "../api/goals";
-import { getStreak, type StreakInfo } from "../api/stats";
-import GoalRing from "../components/Goals/GoalRing";
-import StreakDisplay from "../components/Goals/StreakDisplay";
+import { getStatsSummary, getHeatmap } from "../api/stats";
+import type { StatsSummary, HeatmapEntry } from "../api/stats";
+import Heatmap from "../components/Stats/Heatmap";
+import { Icons } from "../components/Icons";
 
 export default function Home() {
   const { t } = useTranslation();
-  const [goalProgress, setGoalProgress] = useState<GoalProgress | null>(null);
-  const [streak, setStreak] = useState<StreakInfo | null>(null);
+  const [summary, setSummary] = useState<StatsSummary | null>(null);
+  const [heatmap, setHeatmap] = useState<HeatmapEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [progressData, streakData] = await Promise.all([
-          getGoalsProgress(),
-          getStreak(),
+        const [summaryData, heatmapData] = await Promise.all([
+          getStatsSummary(),
+          getHeatmap(90),
         ]);
-        // Use first active goal for display
-        setGoalProgress(progressData[0] || null);
-        setStreak(streakData);
+        setSummary(summaryData);
+        setHeatmap(heatmapData);
       } catch (error) {
         console.error("Failed to fetch home data:", error);
       } finally {
@@ -32,50 +31,65 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-4xl font-bold mb-2">{t("app.title")}</h1>
-      <p className="text-[var(--color-text-muted)] mb-4">{t("app.tagline")}</p>
+    <div className="min-h-screen flex flex-col bg-[var(--color-bg)] text-[var(--color-text)]">
+      <div className="flex-1 flex flex-col max-w-lg mx-auto w-full">
+        {/* Header */}
+        <header className="flex justify-between items-center p-6">
+          <h1 className="text-title">{t("app.title")}</h1>
+          <Link to="/settings" className="p-2 -m-2">
+            <Icons.settings className="w-6 h-6 text-[var(--color-text-muted)]" />
+          </Link>
+        </header>
 
-      {/* Goal & Streak Display */}
-      <div className="flex flex-col items-center gap-3 mb-8">
-        <GoalRing progress={goalProgress} loading={loading} />
-        <StreakDisplay currentStreak={streak?.current ?? 0} loading={loading} />
+        {/* Heatmap hero */}
+        <section className="px-6 py-4">
+          <Heatmap data={heatmap} loading={loading} />
+          <div className="flex justify-between mt-3 text-caption">
+            <span className="flex items-center gap-1.5">
+              <Icons.flame className="w-4 h-4 text-orange-500" />
+              {summary?.current_streak || 0} {t("goals.dayStreak")}
+            </span>
+            <span className="text-mono">
+              {Math.round(summary?.total_minutes || 0)} min
+            </span>
+          </div>
+        </section>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Actions */}
+        <section className="p-6 space-y-3">
+          <Link
+            to="/meditate"
+            className="flex items-center justify-center w-full py-4 rounded-2xl bg-[var(--color-accent)] text-[var(--color-bg)] text-title font-medium"
+          >
+            {t("home.startMeditation")}
+          </Link>
+          <Link
+            to="/breathe"
+            className="flex items-center justify-center w-full py-4 rounded-2xl border border-[var(--color-border)] text-[var(--color-text)] hover:border-[var(--color-accent)]"
+          >
+            {t("breathing.title")}
+          </Link>
+        </section>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <Link
-          to="/meditate"
-          className="bg-primary px-8 py-4 rounded-full text-lg text-center"
-        >
-          {t("home.startMeditation")}
+      {/* Bottom nav */}
+      <nav className="flex justify-around py-4 border-t border-[var(--color-border)] max-w-lg mx-auto w-full">
+        <Link to="/insights" className="p-3 flex flex-col items-center gap-1">
+          <Icons.stats className="w-6 h-6" />
+          <span className="text-xs text-[var(--color-text-muted)]">
+            {t("nav.insights")}
+          </span>
         </Link>
-        <Link
-          to="/breathe"
-          className="bg-surface border border-primary px-8 py-4 rounded-full text-lg text-center"
-        >
-          {t("breathing.title") || "Breathing Guide"}
-        </Link>
-        <div className="flex gap-6 mt-6">
-          <Link
-            to="/stats"
-            className="text-[var(--color-text-muted)] text-center"
-          >
-            {t("nav.stats")}
-          </Link>
-          <Link
-            to="/history"
-            className="text-[var(--color-text-muted)] text-center"
-          >
-            {t("nav.history")}
-          </Link>
-          <Link
-            to="/settings"
-            className="text-[var(--color-text-muted)] text-center"
-          >
+        <Link to="/settings" className="p-3 flex flex-col items-center gap-1">
+          <Icons.settings className="w-6 h-6" />
+          <span className="text-xs text-[var(--color-text-muted)]">
             {t("home.settings")}
-          </Link>
-        </div>
-      </div>
+          </span>
+        </Link>
+      </nav>
     </div>
   );
 }
