@@ -51,7 +51,31 @@
     "lightMode": "라이트 모드",
     "bellSound": "종소리",
     "enableBell": "시작/종료 시 종소리",
-    "bellEnabled": "종소리 활성화"
+    "bellEnabled": "종소리 활성화",
+    "bells": {
+      "tibetanBowl": "티베트 보울",
+      "singingBowl": "싱잉 보울",
+      "zenGong": "젠 공",
+      "softChime": "소프트 차임"
+    },
+    "export": {
+      "title": "데이터 내보내기",
+      "json": "JSON",
+      "csv": "CSV",
+      "ical": "iCal",
+      "markdown": "마크다운",
+      "download": "다운로드",
+      "exporting": "내보내는 중..."
+    },
+    "discord": {
+      "title": "디스코드 알림",
+      "description": "완료된 세션과 마일스톤 알림 받기",
+      "placeholder": "디스코드 웹훅 URL",
+      "save": "저장",
+      "test": "테스트",
+      "testSuccess": "테스트 알림을 보냈습니다!",
+      "testFailed": "테스트 알림 전송 실패"
+    }
   },
   "themes": {
     "ocean": "오션",
@@ -62,5 +86,45 @@
     "sand": "샌드",
     "aurora": "오로라",
     "zen": "젠"
+  },
+  "stats": {
+    "title": "통계",
+    "totalSessions": "총 세션",
+    "totalMinutes": "총 시간 (분)",
+    "currentStreak": "현재 연속",
+    "longestStreak": "최장 연속",
+    "yearActivity": "연간 활동"
+  },
+  "nav": {
+    "stats": "통계",
+    "history": "기록"
+  },
+  "journal": {
+    "title": "명상은 어떠셨나요?",
+    "howDoYouFeel": "지금 기분이 어떠세요?",
+    "notePlaceholder": "생각이나 느낌을 기록해보세요...",
+    "skip": "건너뛰기",
+    "save": "저장"
+  },
+  "goals": {
+    "noGoal": "목표 없음",
+    "dayStreak": "일 연속",
+    "dailyMinutes": "분/일",
+    "dailySessions": "회/일",
+    "weeklyMinutes": "분/주",
+    "weeklySessions": "회/주"
+  },
+  "history": {
+    "title": "기록",
+    "all": "전체",
+    "noSessions": "기록이 없습니다",
+    "incomplete": "미완료"
+  },
+  "sounds": {
+    "mixer": "사운드 믹서",
+    "master": "마스터 볼륨",
+    "rain": "비",
+    "ocean": "바다",
+    "forest": "숲"
   }
 }

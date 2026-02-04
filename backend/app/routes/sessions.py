@@ -1,12 +1,14 @@
 """Sessions API routes for meditation session CRUD operations."""
 
-from typing import List
+from datetime import datetime
+from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 
 from ..database import SessionDep
 from ..models.session import Session, SessionCreate, SessionRead, SessionUpdate
+from ..models.tag import SessionTag
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
@@ -22,10 +24,39 @@ def create_session(session: SessionCreate, db: SessionDep) -> Session:
 
 
 @router.get("/", response_model=List[SessionRead])
-def list_sessions(db: SessionDep, limit: int = 50, offset: int = 0) -> List[Session]:
+def list_sessions(
+    db: SessionDep,
+    limit: int = 50,
+    offset: int = 0,
+    from_date: Optional[str] = Query(None, description="Filter from date (ISO format)"),
+    to_date: Optional[str] = Query(None, description="Filter to date (ISO format)"),
+    tag_id: Optional[int] = Query(None, description="Filter by tag ID"),
+    completed_only: bool = Query(False, description="Only completed sessions"),
+) -> List[Session]:
     """List meditation sessions ordered by most recent first."""
+    query = select(Session)
+
+    if from_date:
+        query = query.where(Session.started_at >= datetime.fromisoformat(from_date))
+    if to_date:
+        query = query.where(Session.started_at <= datetime.fromisoformat(to_date))
+    if completed_only:
+        query = query.where(Session.completed == True)
+    if tag_id:
+        # Join with session_tag to filter by tag
+        session_ids = [
+            st.session_id
+            for st in db.exec(
+                select(SessionTag).where(SessionTag.tag_id == tag_id)
+            ).all()
+        ]
+        if session_ids:
+            query = query.where(Session.id.in_(session_ids))
+        else:
+            return []
+
     sessions = db.exec(
-        select(Session).order_by(Session.started_at.desc()).offset(offset).limit(limit)
+        query.order_by(Session.started_at.desc()).offset(offset).limit(limit)
     ).all()
     return list(sessions)
 

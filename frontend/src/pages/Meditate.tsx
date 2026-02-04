@@ -1,12 +1,16 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useTimer } from "../hooks/useTimer";
+import { useAudioLayers } from "../hooks/useAudioLayers";
 import { useTimerStore } from "../stores/timerStore";
 import { useBreathingStore } from "../stores/breathingStore";
+import { useSessionStore } from "../stores/sessionStore";
 import { Timer, DurationPicker } from "../components/Timer";
 import { VisualSelector, visualComponents } from "../components/Visuals";
 import { BreathingGuide } from "../components/BreathingGuide";
+import PostSessionModal from "../components/Journal/PostSessionModal";
+import SoundMixer from "../components/SoundMixer/SoundMixer";
 
 export default function Meditate() {
   const { t } = useTranslation();
@@ -14,7 +18,37 @@ export default function Meditate() {
   const setBreathingEnabled = useTimerStore(
     (state) => state.setBreathingEnabled,
   );
+  const reset = useTimerStore((state) => state.reset);
   const { start: startBreathing, stop: stopBreathing } = useBreathingStore();
+  const { currentSessionId, updateJournal } = useSessionStore();
+  const [showJournalModal, setShowJournalModal] = useState(false);
+  const [showSoundMixer, setShowSoundMixer] = useState(false);
+  const [activeAmbients, setActiveAmbients] = useState<Set<string>>(new Set());
+  const audio = useAudioLayers();
+
+  // Show journal modal when session completes
+  useEffect(() => {
+    if (status === "complete" && currentSessionId) {
+      setShowJournalModal(true);
+      // Fade out ambient sounds
+      audio.fadeOutAll(2000);
+      setActiveAmbients(new Set());
+    }
+  }, [status, currentSessionId, audio]);
+
+  const handleToggleAmbient = (id: string, url: string, active: boolean) => {
+    if (active) {
+      audio.addAmbient(id, url);
+      setActiveAmbients((prev) => new Set([...prev, id]));
+    } else {
+      audio.removeAmbient(id);
+      setActiveAmbients((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
 
   // Sync breathing with timer
   useEffect(() => {
@@ -63,6 +97,34 @@ export default function Meditate() {
         </div>
       )}
 
+      {/* Sound mixer toggle (when running) */}
+      {isRunning && (
+        <button
+          onClick={() => setShowSoundMixer(!showSoundMixer)}
+          className="
+            absolute top-4 right-4 z-20
+            w-10 h-10 rounded-full
+            bg-[var(--color-surface)]/50 backdrop-blur-sm
+            flex items-center justify-center
+            text-[var(--color-text-muted)]
+            hover:text-[var(--color-text)]
+            transition-colors
+          "
+          title={t("sounds.mixer")}
+        >
+          🎵
+        </button>
+      )}
+
+      <SoundMixer
+        isOpen={showSoundMixer}
+        onClose={() => setShowSoundMixer(false)}
+        onToggleAmbient={handleToggleAmbient}
+        onVolumeChange={audio.setAmbientVolume}
+        onMasterVolumeChange={audio.setMasterVolume}
+        activeAmbients={activeAmbients}
+      />
+
       {/* Timer UI */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4">
         <Timer />
@@ -109,6 +171,19 @@ export default function Meditate() {
           </>
         )}
       </div>
+
+      <PostSessionModal
+        isOpen={showJournalModal}
+        onSave={async (mood, note) => {
+          await updateJournal(mood, note);
+          setShowJournalModal(false);
+          reset();
+        }}
+        onSkip={() => {
+          setShowJournalModal(false);
+          reset();
+        }}
+      />
     </div>
   );
 }

@@ -51,7 +51,31 @@
     "lightMode": "Light Mode",
     "bellSound": "Bell Sound",
     "enableBell": "Bell at start/end",
-    "bellEnabled": "Enable Bell"
+    "bellEnabled": "Enable Bell",
+    "bells": {
+      "tibetanBowl": "Tibetan Bowl",
+      "singingBowl": "Singing Bowl",
+      "zenGong": "Zen Gong",
+      "softChime": "Soft Chime"
+    },
+    "export": {
+      "title": "Export Data",
+      "json": "JSON",
+      "csv": "CSV",
+      "ical": "iCal",
+      "markdown": "Markdown",
+      "download": "Download",
+      "exporting": "Exporting..."
+    },
+    "discord": {
+      "title": "Discord Notifications",
+      "description": "Get notified about completed sessions and milestones",
+      "placeholder": "Discord webhook URL",
+      "save": "Save",
+      "test": "Test",
+      "testSuccess": "Test notification sent!",
+      "testFailed": "Failed to send test notification"
+    }
   },
   "themes": {
     "ocean": "Ocean",
@@ -62,5 +86,45 @@
     "sand": "Sand",
     "aurora": "Aurora",
     "zen": "Zen"
+  },
+  "stats": {
+    "title": "Statistics",
+    "totalSessions": "Total Sessions",
+    "totalMinutes": "Total Minutes",
+    "currentStreak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "yearActivity": "Year Activity"
+  },
+  "nav": {
+    "stats": "Statistics",
+    "history": "History"
+  },
+  "journal": {
+    "title": "How was your session?",
+    "howDoYouFeel": "How do you feel?",
+    "notePlaceholder": "Any thoughts or reflections...",
+    "skip": "Skip",
+    "save": "Save"
+  },
+  "goals": {
+    "noGoal": "No goal set",
+    "dayStreak": "day streak",
+    "dailyMinutes": "min/day",
+    "dailySessions": "sessions/day",
+    "weeklyMinutes": "min/week",
+    "weeklySessions": "sessions/week"
+  },
+  "history": {
+    "title": "History",
+    "all": "All",
+    "noSessions": "No sessions yet",
+    "incomplete": "Incomplete"
+  },
+  "sounds": {
+    "mixer": "Sound Mixer",
+    "master": "Master Volume",
+    "rain": "Rain",
+    "ocean": "Ocean",
+    "forest": "Forest"
   }
 }

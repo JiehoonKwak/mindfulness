@@ -20,6 +20,7 @@ interface TimerState {
   stop: () => void;
   tick: () => void;
   complete: () => void;
+  reset: () => void;
 }
 
 export const useTimerStore = create<TimerState>((set, get) => ({
@@ -75,5 +76,10 @@ export const useTimerStore = create<TimerState>((set, get) => ({
     set({ status: "complete" });
     // Log completed session
     useSessionStore.getState().completeSession(duration);
+  },
+
+  reset: () => {
+    const { duration } = get();
+    set({ status: "idle", remaining: duration });
   },
 }));

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_config
 from .database import init_db
-from .routes import sessions
+from .routes import sessions, sounds, stats, goals, tags, export, discord, music
 
 
 @asynccontextmanager
@@ -29,6 +29,13 @@ app.add_middleware(
 )
 
 app.include_router(sessions.router)
+app.include_router(sounds.router)
+app.include_router(stats.router)
+app.include_router(goals.router)
+app.include_router(tags.router)
+app.include_router(export.router)
+app.include_router(discord.router)
+app.include_router(music.router)
 
 
 @app.get("/api/health")

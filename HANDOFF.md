@@ -1,266 +1,127 @@
 ---
-created: 2026-02-04
+created: 2026-02-04T21:30:00
 branch: main
 ---
 
 # Handoff
 
-## Summary
+## Resume
 
-Meditation web app. ~15% of PLAN.md implemented. Core timer/visuals work, but sounds, stats, journal, goals are missing.
+All 9 sprints implemented (P0-P3). Run `./dev start` to verify full stack, then test complete meditation flow with journal modal.
 
----
+## Status
 
-## What IS Working
+| Task | Status | Priority |
+|------|--------|----------|
+| Sprint 1: Audio Foundation | Done | P0 |
+| Sprint 2: Statistics | Done | P0 |
+| Sprint 3: Journal Modal | Done | P1 |
+| Sprint 4: Goals System | Done | P1 |
+| Sprint 5: History & Tags | Done | P1 |
+| Sprint 6: Sound Mixer | Done | P2 |
+| Sprint 7: Data Export | Done | P3 |
+| Sprint 8: Discord Integration | Done | P3 |
+| Sprint 9: AI Music (structure) | Done | P3 |
 
-### Frontend
-- **Timer**: Custom ClockDial (1-60 min drag), preset buttons, progress ring
-- **10 Visuals**: Aurora (WebGL), ParticleFlow, GradientWaves, Mandala, CosmicDust, ZenGarden, LiquidMetal, SacredGeometry, OceanDepth, BreathingCircle
-- **Breathing Guide**: 4 patterns (4-7-8, Box, Calming, Energizing), Three.js AuraBreathing sphere
-- **Themes**: 8 themes (5 dark, 3 light), CSS variables, persisted
-- **i18n**: Korean (default) + English
-- **Pages**: Home, Meditate, Breathe, Settings
+## Key Context
 
-### Backend
-- **FastAPI** server with CORS
-- **SQLite** database at `backend/data/mindfulness.db`
-- **Session API**: POST/GET/PATCH/DELETE `/api/sessions/`
+**Problem**: App was ~15% complete with only timer/visuals working. Missing: sounds, stats, journal, goals, history, export, Discord.
 
-### Integration
-- timerStore calls sessionStore on start/stop/complete
-- Sessions logged to database (needs verification)
+**Decisions**:
+- Used Freesound.org CC0 previews for bell/ambient sounds (no API key needed)
+- Streak calculation: counts from today/yesterday backward for "current"
+- Goals stored in DB, progress calculated on-the-fly from sessions
+- Sound mixer uses Web Audio API with gain nodes for layering
+- AI music generation is placeholder (requires SUNO_API_KEY)
 
----
+**Gotchas**:
+- Freesound preview URLs change; some 404'd during implementation
+- TypeScript strict mode requires `type` imports for interfaces
+- `bun run build` must run from frontend/ directory
+- Session journal flow: complete → keep sessionId → updateJournal → clear sessionId
 
-## What is MISSING
-
-### P0: Critical (App Broken Without)
-
-**No Sound Files**
-```
-sounds/bells/    <- EMPTY (need: tibetan_bowl.mp3, singing_bowl.mp3, zen_gong.mp3)
-sounds/ambient/  <- EMPTY (need: rain.mp3, ocean.mp3, forest.mp3)
-sounds/music/    <- DOESN'T EXIST
-```
-- BellPlayer.tsx exists but has no audio files to play
-- No download script exists
-
-**No Stats Page**
-```
-frontend/src/pages/Stats.tsx        <- MISSING
-frontend/src/components/Stats/      <- MISSING
-backend/app/routes/stats.py         <- MISSING
-```
-- No heatmap (GitHub-style calendar)
-- No charts (weekly/monthly)
-- No streak display
-
-### P1: Important (Core Value Missing)
-
-**No Post-Session Journal**
-- No mood selector (before/after)
-- No notes input
-- No energy level slider
-- Session model has fields, but no UI
-
-**No Goals System**
-```
-backend/app/routes/goals.py         <- MISSING
-frontend/src/components/Goals/      <- MISSING
-Database table: goals               <- MISSING
-```
-- No daily/weekly goals
-- No progress rings on Home
-- No streak tracking
-
-**No Tags System**
-```
-backend/app/routes/tags.py          <- MISSING
-Database tables: tags, session_tags <- MISSING
-```
-
-**No History Page**
-```
-frontend/src/pages/History.tsx      <- MISSING
-```
-- No session list view
-- No filtering by date/tag
-
-### P2: Medium Priority
-
-**Sound Mixer Not Implemented**
-- PLAN specifies Web Audio API layered playback
-- Volume controls for bell/music/ambient
-- Fade in/out transitions
-- Sound presets saving
-
-**Interval Bells**
-- Bell at N-minute intervals during meditation
-
-**Data Export**
-```
-backend/app/routes/export.py        <- MISSING
-```
-- No JSON/CSV/iCal/Markdown export
-
-### P3: Nice to Have
-
-**Discord Integration**
-```
-backend/app/services/discord.py     <- MISSING
-```
-- No webhook notifications
-- No daily reminders
-
-**AI Music Generation**
-```
-scripts/generate_music.py           <- MISSING
-backend/app/services/music_gen.py   <- MISSING
-```
-- No MusicGen/Suno integration
-
-**PWA**
-- No service worker
-- No manifest configured
-
-**Docker**
-```
-docker-compose.yaml                 <- MISSING
-```
-
----
-
-## Database Gap
-
-**Current schema (1 table):**
-```sql
-session (id, started_at, ended_at, planned_duration_seconds,
-         actual_duration_seconds, completed, visual_type,
-         bell_sound, mood_before, mood_after, note)
-```
-
-**PLAN.md specifies 9 tables:**
-```sql
-sessions        -- EXISTS
-session_tags    -- MISSING
-tags            -- MISSING
-goals           -- MISSING
-daily_stats     -- MISSING (cache for heatmap)
-streaks         -- MISSING
-user_settings   -- MISSING
-sound_presets   -- MISSING
-generated_music -- MISSING
-```
-
----
-
-## Backend API Gap
-
-**Implemented:**
-```
-/api/health
-/api/sessions/  (CRUD)
-```
-
-**PLAN.md specifies but MISSING:**
-```
-/api/stats/summary
-/api/stats/heatmap
-/api/stats/streak
-/api/goals/
-/api/tags/
-/api/sounds/bells
-/api/sounds/ambient
-/api/sounds/presets
-/api/export/json
-/api/export/csv
-/api/music/generate
-/api/discord/test
-```
-
----
-
-## File Structure Reference
+## File Chains
 
 ```
-mindfulness/
-├── frontend/
-│   └── src/
-│       ├── pages/
-│       │   ├── Home.tsx        # Basic, no goals dashboard
-│       │   ├── Meditate.tsx    # Working
-│       │   ├── Breathe.tsx     # Working
-│       │   ├── Settings.tsx    # Theme/language/bell toggle
-│       │   ├── Stats.tsx       # MISSING
-│       │   └── History.tsx     # MISSING
-│       ├── components/
-│       │   ├── Timer/          # Working (ClockDial, DurationPicker)
-│       │   ├── Visuals/        # Working (10 visuals)
-│       │   ├── BreathingGuide/ # Working (AuraBreathing)
-│       │   ├── Stats/          # MISSING
-│       │   ├── Journal/        # MISSING
-│       │   └── Goals/          # MISSING
-│       └── stores/
-│           ├── timerStore.ts   # Working
-│           ├── sessionStore.ts # Working (API calls)
-│           ├── settingsStore.ts# Working
-│           └── breathingStore.ts# Working
-├── backend/
-│   └── app/
-│       ├── routes/
-│       │   ├── sessions.py     # Working
-│       │   ├── stats.py        # MISSING
-│       │   ├── goals.py        # MISSING
-│       │   └── tags.py         # MISSING
-│       └── services/
-│           ├── discord.py      # MISSING
-│           └── music_gen.py    # MISSING
-├── sounds/
-│   ├── bells/                  # EMPTY
-│   ├── ambient/                # EMPTY
-│   └── music/                  # MISSING
-├── scripts/                    # MISSING entirely
-├── config/config.yaml          # Basic config exists
-└── PLAN.md                     # Full spec (1500 lines)
+Chain: Session Flow
+frontend/src/pages/Meditate.tsx -> stores/sessionStore.ts -> api/sessions.ts -> backend/app/routes/sessions.py -> models/session.py
+Relationship: Timer completion triggers session update chain
+
+Chain: Stats Display
+frontend/src/pages/Stats.tsx -> api/stats.ts -> backend/app/routes/stats.py -> models/session.py
+Relationship: Stats computed from session records
+
+Chain: Sound System
+frontend/src/pages/Meditate.tsx -> hooks/useAudioLayers.ts -> components/SoundMixer/SoundMixer.tsx
+Relationship: Web Audio API layering for ambient + bell
 ```
 
----
+## Changes
 
-## Commands
+**Uncommitted (38 files)**:
 
-```bash
-# Start dev servers
-./dev start        # frontend:5173 + backend:8000
+Backend new:
+- `backend/app/models/goal.py` - Goal SQLModel
+- `backend/app/models/tag.py` - Tag + SessionTag models
+- `backend/app/models/generated_music.py` - AI music model
+- `backend/app/routes/sounds.py` - List bells/ambient
+- `backend/app/routes/stats.py` - Summary/heatmap/streak
+- `backend/app/routes/goals.py` - CRUD + progress
+- `backend/app/routes/tags.py` - Tag management
+- `backend/app/routes/export.py` - JSON/CSV/iCal/MD export
+- `backend/app/routes/discord.py` - Webhook config/test
+- `backend/app/routes/music.py` - Generation API (placeholder)
+- `backend/app/services/export.py` - Export formatters
+- `backend/app/services/discord.py` - Webhook sender
+- `backend/app/services/music_gen.py` - Suno placeholder
 
-# Frontend only
-cd frontend && bun dev
+Frontend new:
+- `frontend/src/pages/Stats.tsx` - Heatmap + summary cards
+- `frontend/src/pages/History.tsx` - Session list with filters
+- `frontend/src/api/stats.ts` - Stats API client
+- `frontend/src/api/goals.ts` - Goals API client
+- `frontend/src/api/tags.ts` - Tags API client
+- `frontend/src/hooks/useAudioLayers.ts` - Web Audio API
+- `frontend/src/components/Stats/Heatmap.tsx` - GitHub-style grid
+- `frontend/src/components/Stats/SummaryCards.tsx` - 4 stat cards
+- `frontend/src/components/Goals/GoalRing.tsx` - Circular progress
+- `frontend/src/components/Goals/StreakDisplay.tsx` - Fire emoji streak
+- `frontend/src/components/Journal/MoodSelector.tsx` - Emoji row
+- `frontend/src/components/Journal/NotesInput.tsx` - Textarea
+- `frontend/src/components/Journal/PostSessionModal.tsx` - Post-session UI
+- `frontend/src/components/SoundMixer/SoundMixer.tsx` - Ambient mixer
 
-# Backend only
-cd backend && uv run uvicorn app.main:app --reload
+Sounds:
+- `frontend/public/sounds/bells/*.mp3` - 4 bell sounds
+- `frontend/public/sounds/ambient/*.mp3` - 3 ambient sounds
+- `scripts/download_sounds.py` - Sound downloader
 
-# Check database
-sqlite3 backend/data/mindfulness.db "SELECT * FROM session;"
+Modified:
+- `backend/app/main.py` - Added all new routers
+- `backend/app/database.py` - Import new models
+- `backend/app/routes/sessions.py` - Added filters (tag, date)
+- `frontend/src/App.tsx` - Added /stats, /history routes
+- `frontend/src/pages/Home.tsx` - Added GoalRing, StreakDisplay, nav links
+- `frontend/src/pages/Meditate.tsx` - Journal modal, sound mixer
+- `frontend/src/pages/Settings.tsx` - Bell selector, export, Discord
+- `frontend/src/stores/settingsStore.ts` - bellSound state
+- `frontend/src/stores/sessionStore.ts` - updateJournal action
+- `frontend/src/stores/timerStore.ts` - reset action
+- `frontend/src/components/BellPlayer.tsx` - Read bellSound from store
+- `frontend/src/i18n/en.json` - All new translations
+- `frontend/src/i18n/ko.json` - All new translations
+- `CLAUDE.md` - Updated to ~85% complete
 
-# Build
-cd frontend && bun run build
-```
+## Next Steps
 
----
+1. **Verify**: Run `./dev start`, complete a meditation, check journal modal appears
+2. **Test APIs**: `curl localhost:8000/api/stats/summary`, `curl localhost:8000/api/sounds/bells`
+3. **Commit**: Stage all changes with descriptive commit message
+4. **Optional**: Set `SUNO_API_KEY` env var for AI music generation
 
-## Priority Order for Next Session
+## Artifacts
 
-1. **Download bell sounds** - App is silent
-2. **Add Stats.tsx with heatmap** - Core retention feature
-3. **Add post-session journal UI** - Mood + notes
-4. **Add goals + streak tracking** - Motivation
-5. **Add History.tsx** - View past sessions
-6. **Download ambient sounds** - Rain, ocean, forest
-7. **Implement sound mixer** - Layer sounds with volume control
-
----
-
-## Reference
-
-- Full spec: `PLAN.md` (1500 lines, 12 phases)
-- Mock designs: `mock/` directory (Aura-style reference)
-- Sound sources: freesound.org, pixabay.com/music (CC0)
+- Skills: None created this session
+- Memories: None saved this session
+- CLAUDE.md: Updated (completion status, architecture diagram, current state)
+- README.md: Not modified (no user-facing doc changes needed)

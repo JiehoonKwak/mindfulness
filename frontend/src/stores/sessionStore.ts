@@ -8,6 +8,7 @@ interface SessionState {
   startSession: (duration: number, visual: string) => Promise<void>;
   completeSession: (actualDuration: number) => Promise<void>;
   abandonSession: (actualDuration: number) => Promise<void>;
+  updateJournal: (mood: string | null, note: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -25,7 +26,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       });
       set({ currentSessionId: session.id, isLoading: false });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to start session";
+      const message =
+        err instanceof Error ? err.message : "Failed to start session";
       set({ error: message, isLoading: false });
     }
   },
@@ -41,9 +43,29 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         actual_duration_seconds: actualDuration,
         ended_at: new Date().toISOString(),
       });
+      // Keep currentSessionId for journal update
+      set({ isLoading: false });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to complete session";
+      set({ error: message, isLoading: false });
+    }
+  },
+
+  updateJournal: async (mood, note) => {
+    const { currentSessionId } = get();
+    if (!currentSessionId) return;
+
+    set({ isLoading: true, error: null });
+    try {
+      await api.updateSession(currentSessionId, {
+        mood_after: mood ?? undefined,
+        note: note || undefined,
+      });
       set({ currentSessionId: null, isLoading: false });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to complete session";
+      const message =
+        err instanceof Error ? err.message : "Failed to save journal";
       set({ error: message, isLoading: false });
     }
   },
@@ -61,7 +83,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       });
       set({ currentSessionId: null, isLoading: false });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to abandon session";
+      const message =
+        err instanceof Error ? err.message : "Failed to abandon session";
       set({ error: message, isLoading: false });
     }
   },

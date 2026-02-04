@@ -67,10 +67,21 @@ export async function getSession(id: number): Promise<Session> {
 export async function listSessions(
   limit: number = 50,
   offset: number = 0,
+  tagId?: number,
+  fromDate?: string,
+  toDate?: string,
+  completedOnly: boolean = false,
 ): Promise<Session[]> {
-  const res = await fetch(
-    `${API_BASE}/api/sessions/?limit=${limit}&offset=${offset}`,
-  );
+  const params = new URLSearchParams({
+    limit: limit.toString(),
+    offset: offset.toString(),
+  });
+  if (tagId) params.set("tag_id", tagId.toString());
+  if (fromDate) params.set("from_date", fromDate);
+  if (toDate) params.set("to_date", toDate);
+  if (completedOnly) params.set("completed_only", "true");
+
+  const res = await fetch(`${API_BASE}/api/sessions/?${params}`);
   if (!res.ok) {
     throw new Error(`Failed to list sessions: ${res.statusText}`);
   }

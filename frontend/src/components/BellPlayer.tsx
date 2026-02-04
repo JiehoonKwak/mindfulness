@@ -1,19 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { useTimerStore } from "../stores/timerStore";
 import { useSettingsStore } from "../stores/settingsStore";
 import { useAudio } from "../hooks/useAudio";
 
-// Bell sounds from public/sounds/ directory
-const startBellUrl = "/sounds/start-bell.mp3";
-const endBellUrl = "/sounds/end-bell.mp3";
-
 export default function BellPlayer(): null {
   const status = useTimerStore((state) => state.status);
   const bellEnabled = useSettingsStore((state) => state.bellEnabled);
+  const bellSound = useSettingsStore((state) => state.bellSound);
   const prevStatusRef = useRef(status);
 
-  const startBell = useAudio(startBellUrl, { volume: 0.7 });
-  const endBell = useAudio(endBellUrl, { volume: 0.8 });
+  const bellUrl = useMemo(() => `/sounds/bells/${bellSound}.mp3`, [bellSound]);
+
+  const startBell = useAudio(bellUrl, { volume: 0.7 });
+  const endBell = useAudio(bellUrl, { volume: 0.8 });
 
   useEffect(() => {
     if (!bellEnabled) return;

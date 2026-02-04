@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Meditation web app with custom timer, 10 animated visuals, breathing guides, and session tracking. React 19 + Vite frontend, FastAPI + SQLite backend. ~15% complete.
+Meditation web app with custom timer, 10 animated visuals, breathing guides, sound mixer, stats, goals, and session tracking. React 19 + Vite frontend, FastAPI + SQLite backend. ~85% complete (P0-P2 done).
 
 ## Commands
 
@@ -33,15 +33,17 @@ Frontend (React 19 + Vite)          Backend (FastAPI)
 ┌─────────────────────┐             ┌──────────────────┐
 │ Pages:              │             │ /api/health      │
 │  Home, Meditate,    │   fetch     │ /api/sessions/*  │
-│  Breathe, Settings  │────────────▶│                  │
-│                     │             │ SQLite:          │
-│ Stores (Zustand):   │             │ mindfulness.db   │
-│  timer, session,    │             └──────────────────┘
-│  settings, breathing│
-│                     │
-│ Visuals: 10 types   │
-│ (Aurora=WebGL,      │
-│  others=CSS/Canvas) │
+│  Breathe, Settings, │────────────▶│ /api/sounds/*    │
+│  Stats, History     │             │ /api/stats/*     │
+│                     │             │ /api/goals/*     │
+│ Stores (Zustand):   │             │ /api/tags/*      │
+│  timer, session,    │             │ /api/export/*    │
+│  settings, breathing│             │ /api/discord/*   │
+│                     │             │ /api/music/*     │
+│ Components:         │             │                  │
+│  Visuals(10), Timer │             │ SQLite:          │
+│  SoundMixer, Goals  │             │ mindfulness.db   │
+│  Journal, Stats     │             └──────────────────┘
 └─────────────────────┘
 ```
 
@@ -62,11 +64,13 @@ Frontend (React 19 + Vite)          Backend (FastAPI)
 
 ## Current State & Gaps
 
-**Working:** Timer, 10 visuals, breathing guide, 8 themes, session CRUD, i18n (ko/en)
+**Working:** Timer, 10 visuals, breathing guide, 8 themes, session CRUD, i18n (ko/en), bell selector, sound mixer, stats page with heatmap, goals/streaks, history page with filters, post-session journal modal, data export (JSON/CSV/iCal/MD), Discord notifications
 
-**Missing:** Sound files (sounds/ empty), Stats page, Post-session journal UI, Goals/Tags system, History page
+**Sounds:** Bell sounds (4 types) and ambient sounds (rain, ocean, forest) downloaded to /sounds/
 
-**DB gap:** Only `session` table exists; PLAN.md specifies 9 tables
+**DB Tables:** session, goal, tag, session_tag, generated_music
+
+**P3 (optional):** AI music generation requires SUNO_API_KEY environment variable
 
 ## Project Standards
 
