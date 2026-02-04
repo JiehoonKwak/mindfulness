@@ -1,0 +1,65 @@
+{
+  "app": {
+    "title": "Mindfulness",
+    "tagline": "Daily meditation habit"
+  },
+  "home": {
+    "startMeditation": "Start Meditation",
+    "settings": "Settings",
+    "todayGoal": "Today's Goal"
+  },
+  "timer": {
+    "minutes": "min",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop",
+    "complete": "Complete!"
+  },
+  "breathing": {
+    "title": "Breathing Guide",
+    "inhale": "Breathe in",
+    "hold": "Hold",
+    "exhale": "Breathe out",
+    "cycles": "cycles",
+    "enableDuringMeditation": "Breathing guide during meditation",
+    "patterns": {
+      "478": "4-7-8 Relaxing",
+      "box": "Box Breathing",
+      "calming": "Calming Breath",
+      "energizing": "Energizing"
+    }
+  },
+  "visuals": {
+    "select": "Select Visual",
+    "breathingCircle": "Breathing Circle",
+    "particleFlow": "Particle Flow",
+    "gradientWaves": "Gradient Waves",
+    "aurora": "Aurora",
+    "mandala": "Mandala",
+    "cosmicDust": "Cosmic Dust",
+    "zenGarden": "Zen Garden",
+    "liquidMetal": "Liquid Metal",
+    "sacredGeometry": "Sacred Geometry",
+    "oceanDepth": "Ocean Depth"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "bellSound": "Bell Sound",
+    "enableBell": "Bell at start/end"
+  },
+  "themes": {
+    "ocean": "Ocean",
+    "forest": "Forest",
+    "sunset": "Sunset",
+    "midnight": "Midnight",
+    "sakura": "Sakura",
+    "sand": "Sand",
+    "aurora": "Aurora",
+    "zen": "Zen"
+  }
+}

@@ -1,0 +1,88 @@
+/* Base dark mode (default) */
+:root {
+  --color-bg: #1a1a2e;
+  --color-surface: #16213e;
+  --color-primary: #4ecdc4;
+  --color-accent: #ff6b9d;
+  --color-text: #ffffff;
+  --color-text-muted: #a0a0a0;
+  --color-border: #2a2a4a;
+}
+
+/* Ocean (Dark) - Default */
+[data-theme="ocean"] {
+  --color-bg: #1a1a2e;
+  --color-surface: #16213e;
+  --color-primary: #4ecdc4;
+  --color-accent: #ff6b9d;
+}
+
+/* Forest (Dark) */
+[data-theme="forest"] {
+  --color-bg: #1a2e1a;
+  --color-surface: #1e3d1e;
+  --color-primary: #7cb342;
+  --color-accent: #aed581;
+}
+
+/* Sunset (Dark) */
+[data-theme="sunset"] {
+  --color-bg: #2d1b4e;
+  --color-surface: #3d2a5e;
+  --color-primary: #ff6b35;
+  --color-accent: #f7b731;
+}
+
+/* Midnight (Dark - OLED) */
+[data-theme="midnight"] {
+  --color-bg: #000000;
+  --color-surface: #0a0a0a;
+  --color-primary: #c0c0c0;
+  --color-accent: #808080;
+}
+
+/* Aurora (Dark) */
+[data-theme="aurora"] {
+  --color-bg: #0f0f23;
+  --color-surface: #1a1a3e;
+  --color-primary: #00d4aa;
+  --color-accent: #7c3aed;
+}
+
+/* Sakura (Light) */
+[data-theme="sakura"] {
+  --color-bg: #fff5f5;
+  --color-surface: #ffffff;
+  --color-primary: #ff69b4;
+  --color-accent: #db7093;
+  --color-text: #4a4a4a;
+  --color-text-muted: #888888;
+}
+
+/* Sand (Light) */
+[data-theme="sand"] {
+  --color-bg: #f5f0e6;
+  --color-surface: #ffffff;
+  --color-primary: #c67c4e;
+  --color-accent: #8b5a2b;
+  --color-text: #4a4a4a;
+  --color-text-muted: #888888;
+}
+
+/* Zen (Light) */
+[data-theme="zen"] {
+  --color-bg: #fafaf9;
+  --color-surface: #ffffff;
+  --color-primary: #1a1a1a;
+  --color-accent: #4a4a4a;
+  --color-text: #1a1a1a;
+  --color-text-muted: #666666;
+}
+
+/* Theme transitions */
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}

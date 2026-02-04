@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+log() { echo -e "${GREEN}[dev]${NC} $1"; }
+warn() { echo -e "${YELLOW}[dev]${NC} $1"; }
+err() { echo -e "${RED}[dev]${NC} $1" >&2; }
+
+FRONTEND_PID=""
+BACKEND_PID=""
+
+cleanup() {
+    log "Shutting down..."
+    [[ -n "$FRONTEND_PID" ]] && kill "$FRONTEND_PID" 2>/dev/null || true
+    [[ -n "$BACKEND_PID" ]] && kill "$BACKEND_PID" 2>/dev/null || true
+    exit 0
+}
+
+trap cleanup SIGINT SIGTERM
+
+cmd_start() {
+    local target="${1:-all}"
+
+    case "$target" in
+        frontend|fe)
+            log "Starting frontend..."
+            cd frontend && bun run dev &
+            FRONTEND_PID=$!
+            log "Frontend PID: $FRONTEND_PID"
+            ;;
+        backend|be)
+            log "Starting backend..."
+            cd backend && uv run uvicorn app.main:app --reload --port 8000 &
+            BACKEND_PID=$!
+            log "Backend PID: $BACKEND_PID"
+            ;;
+        all)
+            cmd_start frontend
+            cd "$SCRIPT_DIR"
+            cmd_start backend
+            log "Both servers running. Press Ctrl+C to stop."
+            wait
+            ;;
+        *)
+            err "Unknown target: $target"
+            exit 1
+            ;;
+    esac
+}
+
+cmd_stop() {
+    log "Stopping servers..."
+    pkill -f "bun.*dev" 2>/dev/null || true
+    pkill -f "uvicorn.*app.main" 2>/dev/null || true
+    log "Stopped"
+}
+
+cmd_restart() {
+    cmd_stop
+    sleep 1
+    cmd_start "${1:-all}"
+}
+
+cmd_status() {
+    echo "Frontend: $(pgrep -f 'bun.*dev' >/dev/null && echo 'running' || echo 'stopped')"
+    echo "Backend:  $(pgrep -f 'uvicorn.*app.main' >/dev/null && echo 'running' || echo 'stopped')"
+}
+
+cmd_install() {
+    log "Installing frontend dependencies..."
+    cd frontend && bun install
+    cd "$SCRIPT_DIR"
+
+    log "Installing backend dependencies..."
+    cd backend && uv sync
+    cd "$SCRIPT_DIR"
+
+    log "Done"
+}
+
+cmd_build() {
+    log "Building frontend..."
+    cd frontend && bun run build
+    log "Build complete: frontend/dist/"
+}
+
+cmd_test() {
+    log "Running backend tests..."
+    cd backend && uv run pytest -v
+}
+
+cmd_help() {
+    cat <<EOF
+Usage: ./dev <command> [target]
+
+Commands:
+  start [fe|be|all]   Start servers (default: all)
+  stop                Stop all servers
+  restart [fe|be|all] Restart servers
+  status              Show server status
+  install             Install all dependencies
+  build               Build frontend for production
+  test                Run backend tests
+  help                Show this help
+
+Examples:
+  ./dev start         # Start both servers
+  ./dev start fe      # Start frontend only
+  ./dev restart be    # Restart backend only
+  ./dev status        # Check if servers are running
+EOF
+}
+
+case "${1:-help}" in
+    start)   cmd_start "${2:-all}" ;;
+    stop)    cmd_stop ;;
+    restart) cmd_restart "${2:-all}" ;;
+    status)  cmd_status ;;
+    install) cmd_install ;;
+    build)   cmd_build ;;
+    test)    cmd_test ;;
+    help|*)  cmd_help ;;
+esac

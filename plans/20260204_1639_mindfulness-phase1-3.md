@@ -1,23 +1,30 @@
 # Plan: Mindfulness Web App - Phase 1-3
 
+react -> use vercel-react-best-practices skill
+design -> use frontend-design, web-design-guidelines skill
+
 ## Changes from v2
 
 ### CRITICAL Fixes
 
 1. **Plan is now FULLY SELF-CONTAINED** (Issue #1 from reviewer-v2)
+
    - All code from v1 Tasks 2.2-2.3, 2.5-2.10, 2.11, 3.1-3.4 is now included
    - No more "Same as v1" references
    - Builders can implement from v3 alone
 
 2. **Added breathingStore.ts creation** (Issue #2 from reviewer-v2)
+
    - Task 3.1 now includes complete breathingStore.ts code
    - Import path `../stores/breathingStore` will resolve
 
 3. **Added Visuals/index.ts with visualComponents export** (Issue #3 from reviewer-v2)
+
    - Task 2.11 now includes complete index.ts with lazy loading
    - Export `visualComponents` is properly defined
 
 4. **Updated App.tsx to include BellPlayer** (Issue #4 from reviewer-v2)
+
    - Task 1.3 App.tsx code block now includes BellPlayer import and component
 
 5. **Added themes.css import to main.tsx** (Issue #5 from reviewer-v2)
@@ -43,96 +50,112 @@ Implement Phase 1-3 of the mindfulness meditation web app: Foundation (scaffoldi
 ## Steps
 
 ### Step 1: Project Scaffolding (P1-001)
+
 - **Files**: `frontend/`, `backend/`, `config/config.yaml`
 - **Changes**: Create Vite React project, backend directory structure, config file
 - **Test Requirements**: `bun run dev` starts frontend; directory structure matches PLAN.md
 - **Verification**: Dev server runs on port 5173, all directories exist
 
 ### Step 2: Backend Setup (P1-002)
+
 - **Files**: `backend/app/main.py`, `backend/app/config.py`, `backend/app/database.py`, `backend/app/models/session.py`, `backend/pyproject.toml`
 - **Changes**: FastAPI app with CORS, SQLModel session model, database initialization
 - **Test Requirements**: `GET /api/health` returns 200 with `{"status": "healthy"}`
 - **Verification**: Server runs on port 8000, database file created
 
 ### Step 3: Frontend Setup (P1-003)
+
 - **Files**: `frontend/src/main.tsx`, `frontend/src/App.tsx`, `frontend/src/index.css`, `frontend/tailwind.config.js`, pages
 - **Changes**: React Router setup with /breathe route, Tailwind config, BellPlayer integration
 - **Test Requirements**: Routes `/`, `/meditate`, `/settings`, `/breathe` render correctly
 - **Verification**: Tailwind classes apply, CSS variables work
 
 ### Step 4: i18n Setup (P1-004)
+
 - **Files**: `frontend/src/i18n/index.ts`, `frontend/src/i18n/ko.json`, `frontend/src/i18n/en.json`, `frontend/src/main.tsx`
 - **Changes**: react-i18next config, Korean/English translations including `visuals.select`, themes.css import
 - **Test Requirements**: `t('visuals.select')` returns translated text
 - **Verification**: Language switch persists to localStorage
 
 ### Step 5: Theme System (P1-005)
+
 - **Files**: `frontend/src/styles/themes.css`, `frontend/src/stores/settingsStore.ts`, `frontend/src/components/ThemeSwitcher.tsx`
 - **Changes**: CSS variables for 8 themes, Zustand settings store, theme switcher with fixed variable naming
 - **Test Requirements**: `setTheme('sakura')` applies light mode; theme persists
 - **Verification**: Smooth transitions, correct text colors
 
 ### Step 6: Timer Component (P1-006)
+
 - **Files**: `frontend/src/stores/timerStore.ts`, `frontend/src/components/Timer/*.tsx`, `frontend/src/hooks/useTimer.ts`
 - **Changes**: Zustand timer store with breathing settings, timer display, controls, duration picker, barrel exports
 - **Test Requirements**: Timer decrements by 1 each second; pause stops countdown
 - **Verification**: Progress ring animates smoothly
 
 ### Step 7: Session API (P1-007)
+
 - **Files**: `backend/app/routes/sessions.py`, `frontend/src/stores/sessionStore.ts`, `frontend/src/api/sessions.ts`
 - **Changes**: Session CRUD endpoints, frontend API client, session store
 - **Test Requirements**: POST creates session; PATCH updates; GET lists
 - **Verification**: Full session lifecycle works
 
 ### Step 8: Bell Sound System (P1-008)
+
 - **Files**: `frontend/src/hooks/useAudio.ts`, `frontend/src/components/BellPlayer.tsx`
 - **Changes**: AudioContext-based playback, bell player integrated with timer
 - **Test Requirements**: Bell plays on timer start/complete
 - **Verification**: Audio works on iOS Safari after user gesture
 
 ### Step 9: Visuals Types (P2-000)
+
 - **Files**: `frontend/src/components/Visuals/types.ts`
 - **Changes**: VisualProps interface definition
 - **Test Requirements**: TypeScript compiles without errors
 - **Verification**: All visuals can import from '../types'
 
 ### Step 10-19: Visual Components (P2-001 to P2-010)
+
 - **Files**: `frontend/src/components/Visuals/{BreathingCircle,ParticleFlow,GradientWaves,Aurora,Mandala,CosmicDust,ZenGarden,LiquidMetal,SacredGeometry,OceanDepth}/`
 - **Changes**: 10 visual components with specific rendering techniques (Framer Motion, Canvas, WebGL, SVG)
 - **Test Requirements**: Each visual renders and animates when isActive=true
 - **Verification**: 60fps performance, works on iOS Safari
 
 ### Step 20: Visual Selector (P2-011)
+
 - **Files**: `frontend/src/components/Visuals/VisualSelector.tsx`, `frontend/src/components/Visuals/index.ts`
 - **Changes**: Grid of visual options, lazy loading with visualComponents export
 - **Test Requirements**: Clicking visual updates store; lazy loaded components render
 - **Verification**: All 10 visuals selectable
 
 ### Step 21: Breathing Pattern Engine (P3-001)
+
 - **Files**: `frontend/src/components/BreathingGuide/patterns.ts`, `frontend/src/hooks/useBreathingTimer.ts`, `frontend/src/stores/breathingStore.ts`
 - **Changes**: Pattern definitions (4-7-8, box, calming, energizing), phase state machine, breathing store
 - **Test Requirements**: Box breathing 4-4-4-4 timing; phases with 0 duration skipped
 - **Verification**: Pattern timing accurate, cycle counter increments
 
 ### Step 22: Flower Animation (P3-002)
+
 - **Files**: `frontend/src/components/BreathingGuide/FlowerAnimation.tsx`, `frontend/src/components/BreathingGuide/FlowerAnimation.css`
 - **Changes**: Apple Watch-style 6 petal animation with mix-blend-mode: screen
 - **Test Requirements**: Animation syncs with breathing phase
 - **Verification**: Petals expand on inhale, contract on exhale
 
 ### Step 23: Circle Animation (P3-003)
+
 - **Files**: `frontend/src/components/BreathingGuide/CircleAnimation.tsx`
 - **Changes**: Framer Motion scale animation, concentric circles
 - **Test Requirements**: Scale updates each second
 - **Verification**: Smooth animation
 
 ### Step 24: Standalone Breathing Mode (P3-004)
+
 - **Files**: `frontend/src/components/BreathingGuide/BreathingGuide.tsx`, `frontend/src/pages/Breathe.tsx`
 - **Changes**: Breathing guide component with pattern selector, standalone page at /breathe
 - **Test Requirements**: All 4 patterns selectable; start/stop controls work
 - **Verification**: Phase text updates in real-time
 
 ### Step 25: Timer Integration (P3-005)
+
 - **Files**: `frontend/src/pages/Meditate.tsx`
 - **Changes**: Breathing toggle, breathing overlay during meditation, visual background
 - **Test Requirements**: Enabling breathing shows guide; pause/resume syncs
@@ -142,41 +165,41 @@ Implement Phase 1-3 of the mindfulness meditation web app: Foundation (scaffoldi
 
 ## Files to Modify
 
-| File | Change Type | Description |
-|------|-------------|-------------|
-| `frontend/package.json` | Create | Dependencies: react, zustand, framer-motion, react-i18next, tailwindcss |
-| `frontend/src/main.tsx` | Create | App entry with i18n provider, themes.css import |
-| `frontend/src/App.tsx` | Create | Router setup with /breathe route, BellPlayer component |
-| `frontend/src/stores/timerStore.ts` | Create | Zustand store for timer state with breathing settings |
-| `frontend/src/stores/settingsStore.ts` | Create | Theme, language, bell preferences |
-| `frontend/src/stores/sessionStore.ts` | Create | Current session state |
-| `frontend/src/stores/breathingStore.ts` | Create | Breathing pattern state machine |
-| `frontend/src/i18n/ko.json` | Create | Korean translations including visuals.select |
-| `frontend/src/i18n/en.json` | Create | English translations including visuals.select |
-| `frontend/src/i18n/index.ts` | Create | i18next configuration |
-| `frontend/src/styles/themes.css` | Create | CSS variables for 8 themes |
-| `frontend/src/components/Timer/*` | Create | Timer component suite with index.ts barrel |
-| `frontend/src/components/Visuals/types.ts` | Create | VisualProps interface |
-| `frontend/src/components/Visuals/*` | Create | 10 visual components |
-| `frontend/src/components/Visuals/index.ts` | Create | Barrel export with visualComponents |
-| `frontend/src/components/BreathingGuide/*` | Create | Breathing guide suite |
-| `frontend/src/components/ThemeSwitcher.tsx` | Create | Theme switcher with fixed variable naming |
-| `frontend/src/components/BellPlayer.tsx` | Create | Bell sound player component |
-| `frontend/src/hooks/useAudio.ts` | Create | AudioContext hook for bell sounds |
-| `frontend/src/hooks/useTimer.ts` | Create | Timer interval hook |
-| `frontend/src/hooks/useBreathingTimer.ts` | Create | Breathing interval hook |
-| `frontend/src/pages/Home.tsx` | Create | Dashboard page |
-| `frontend/src/pages/Meditate.tsx` | Create | Meditation session page |
-| `frontend/src/pages/Settings.tsx` | Create | Settings page |
-| `frontend/src/pages/Breathe.tsx` | Create | Standalone breathing page |
-| `frontend/src/api/sessions.ts` | Create | Session API client |
-| `backend/app/main.py` | Create | FastAPI app with CORS |
-| `backend/app/database.py` | Create | SQLModel database setup |
-| `backend/app/config.py` | Create | YAML config loader |
-| `backend/app/models/session.py` | Create | SQLModel session model |
-| `backend/app/routes/sessions.py` | Create | Session CRUD endpoints |
-| `backend/pyproject.toml` | Create | Python dependencies |
-| `config/config.yaml` | Create | App configuration |
+| File                                        | Change Type | Description                                                             |
+| ------------------------------------------- | ----------- | ----------------------------------------------------------------------- |
+| `frontend/package.json`                     | Create      | Dependencies: react, zustand, framer-motion, react-i18next, tailwindcss |
+| `frontend/src/main.tsx`                     | Create      | App entry with i18n provider, themes.css import                         |
+| `frontend/src/App.tsx`                      | Create      | Router setup with /breathe route, BellPlayer component                  |
+| `frontend/src/stores/timerStore.ts`         | Create      | Zustand store for timer state with breathing settings                   |
+| `frontend/src/stores/settingsStore.ts`      | Create      | Theme, language, bell preferences                                       |
+| `frontend/src/stores/sessionStore.ts`       | Create      | Current session state                                                   |
+| `frontend/src/stores/breathingStore.ts`     | Create      | Breathing pattern state machine                                         |
+| `frontend/src/i18n/ko.json`                 | Create      | Korean translations including visuals.select                            |
+| `frontend/src/i18n/en.json`                 | Create      | English translations including visuals.select                           |
+| `frontend/src/i18n/index.ts`                | Create      | i18next configuration                                                   |
+| `frontend/src/styles/themes.css`            | Create      | CSS variables for 8 themes                                              |
+| `frontend/src/components/Timer/*`           | Create      | Timer component suite with index.ts barrel                              |
+| `frontend/src/components/Visuals/types.ts`  | Create      | VisualProps interface                                                   |
+| `frontend/src/components/Visuals/*`         | Create      | 10 visual components                                                    |
+| `frontend/src/components/Visuals/index.ts`  | Create      | Barrel export with visualComponents                                     |
+| `frontend/src/components/BreathingGuide/*`  | Create      | Breathing guide suite                                                   |
+| `frontend/src/components/ThemeSwitcher.tsx` | Create      | Theme switcher with fixed variable naming                               |
+| `frontend/src/components/BellPlayer.tsx`    | Create      | Bell sound player component                                             |
+| `frontend/src/hooks/useAudio.ts`            | Create      | AudioContext hook for bell sounds                                       |
+| `frontend/src/hooks/useTimer.ts`            | Create      | Timer interval hook                                                     |
+| `frontend/src/hooks/useBreathingTimer.ts`   | Create      | Breathing interval hook                                                 |
+| `frontend/src/pages/Home.tsx`               | Create      | Dashboard page                                                          |
+| `frontend/src/pages/Meditate.tsx`           | Create      | Meditation session page                                                 |
+| `frontend/src/pages/Settings.tsx`           | Create      | Settings page                                                           |
+| `frontend/src/pages/Breathe.tsx`            | Create      | Standalone breathing page                                               |
+| `frontend/src/api/sessions.ts`              | Create      | Session API client                                                      |
+| `backend/app/main.py`                       | Create      | FastAPI app with CORS                                                   |
+| `backend/app/database.py`                   | Create      | SQLModel database setup                                                 |
+| `backend/app/config.py`                     | Create      | YAML config loader                                                      |
+| `backend/app/models/session.py`             | Create      | SQLModel session model                                                  |
+| `backend/app/routes/sessions.py`            | Create      | Session CRUD endpoints                                                  |
+| `backend/pyproject.toml`                    | Create      | Python dependencies                                                     |
+| `config/config.yaml`                        | Create      | App configuration                                                       |
 
 ---
 
@@ -210,14 +233,14 @@ Phase 3 Breathing (After 1.6):
 
 ## Risks and Mitigations
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| WebGL on iOS Safari | Aurora visual may fail | Implement Canvas fallback, detect WebGL support |
-| Metaball performance | Liquid Metal heavy on mobile | Use Web Worker, reduce particle count on mobile |
-| Zustand + i18n re-renders | UI flicker on language change | Use shallow selectors, memoize components |
-| Audio on iOS | Requires user gesture | Show "tap to enable audio" overlay on first load, use AudioContext unlock |
-| 10 visuals scope creep | Delays delivery | Prioritize Core 3 first, then expand |
-| Missing types.ts | All visual imports fail | Created P2-000 as prerequisite |
+| Risk                      | Impact                        | Mitigation                                                                |
+| ------------------------- | ----------------------------- | ------------------------------------------------------------------------- |
+| WebGL on iOS Safari       | Aurora visual may fail        | Implement Canvas fallback, detect WebGL support                           |
+| Metaball performance      | Liquid Metal heavy on mobile  | Use Web Worker, reduce particle count on mobile                           |
+| Zustand + i18n re-renders | UI flicker on language change | Use shallow selectors, memoize components                                 |
+| Audio on iOS              | Requires user gesture         | Show "tap to enable audio" overlay on first load, use AudioContext unlock |
+| 10 visuals scope creep    | Delays delivery               | Prioritize Core 3 first, then expand                                      |
+| Missing types.ts          | All visual imports fail       | Created P2-000 as prerequisite                                            |
 
 ---
 
@@ -254,15 +277,15 @@ Workstream D (Breathing - after 1.6):
 
 ## Team Members
 
-| Role | Assignment | Skills Required |
-|------|------------|-----------------|
-| Builder-A | Backend + Timer + Audio | FastAPI, SQLModel, Python, Web Audio API |
-| Builder-B | Frontend Core + Types | React, Zustand, i18n, CSS, TypeScript |
-| Builder-C1 | Visuals (CSS/WebGL) | CSS animations, WebGL/GLSL |
-| Builder-C2 | Visuals (Canvas) | Canvas API, requestAnimationFrame |
-| Builder-C3 | Visuals (SVG/Canvas) | SVG animation, Canvas |
-| Builder-D | Breathing Guide | Framer Motion, CSS, timing |
-| Validator | Testing | Jest, Playwright, iOS Safari |
+| Role       | Assignment              | Skills Required                          |
+| ---------- | ----------------------- | ---------------------------------------- |
+| Builder-A  | Backend + Timer + Audio | FastAPI, SQLModel, Python, Web Audio API |
+| Builder-B  | Frontend Core + Types   | React, Zustand, i18n, CSS, TypeScript    |
+| Builder-C1 | Visuals (CSS/WebGL)     | CSS animations, WebGL/GLSL               |
+| Builder-C2 | Visuals (Canvas)        | Canvas API, requestAnimationFrame        |
+| Builder-C3 | Visuals (SVG/Canvas)    | SVG animation, Canvas                    |
+| Builder-D  | Breathing Guide         | Framer Motion, CSS, timing               |
+| Validator  | Testing                 | Jest, Playwright, iOS Safari             |
 
 ---
 
@@ -271,6 +294,7 @@ Workstream D (Breathing - after 1.6):
 ### Phase 1: Foundation
 
 #### Task 1.1: Project Scaffolding
+
 - **ID**: P1-001
 - **Dependencies**: None
 - **Assigned**: Builder-A
@@ -281,6 +305,7 @@ Workstream D (Breathing - after 1.6):
   - `/Users/jiehoonk/DevHub/sideprojects/mindfulness/sounds/bells/.gitkeep`
 
 **Actions**:
+
 ```bash
 # Frontend scaffolding
 cd /Users/jiehoonk/DevHub/sideprojects/mindfulness
@@ -297,6 +322,7 @@ mkdir -p config sounds/bells sounds/ambient
 ```
 
 Create `config/config.yaml`:
+
 ```yaml
 server:
   host: "0.0.0.0"
@@ -314,17 +340,20 @@ meditation:
 ```
 
 **Verification**:
+
 - `bun run dev` starts frontend on port 5173
 - Directory structure matches PLAN.md
 - `config/config.yaml` exists with basic structure
 
 **Test Requirements**:
+
 - Frontend dev server starts without errors
 - Backend directory structure is correct
 
 ---
 
 #### Task 1.2: Backend Setup (FastAPI + SQLModel)
+
 - **ID**: P1-002
 - **Dependencies**: P1-001
 - **Assigned**: Builder-A
@@ -339,6 +368,7 @@ meditation:
 **Actions**:
 
 Create `backend/pyproject.toml`:
+
 ```toml
 [project]
 name = "mindfulness-backend"
@@ -356,6 +386,7 @@ dev = ["pytest>=8.0.0", "httpx>=0.26.0"]
 ```
 
 Create `backend/app/config.py`:
+
 ```python
 from pathlib import Path
 from functools import lru_cache
@@ -370,6 +401,7 @@ def get_config() -> dict:
 ```
 
 Create `backend/app/database.py`:
+
 ```python
 from sqlmodel import SQLModel, Session, create_engine
 from typing import Annotated
@@ -389,11 +421,13 @@ SessionDep = Annotated[Session, Depends(get_session)]
 ```
 
 Create `backend/app/models/__init__.py`:
+
 ```python
 from .session import Session, SessionCreate, SessionUpdate, SessionRead
 ```
 
 Create `backend/app/models/session.py`:
+
 ```python
 from sqlmodel import SQLModel, Field
 from datetime import datetime
@@ -435,6 +469,7 @@ class SessionRead(SessionBase):
 ```
 
 Create `backend/app/main.py`:
+
 ```python
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -469,11 +504,13 @@ def health_check():
 ```
 
 **Verification**:
+
 - `uv run uvicorn backend.app.main:app --reload` starts on port 8000
 - `GET /api/health` returns `{"status": "healthy"}`
 - Database file created at `backend/data/mindfulness.db`
 
 **Test Requirements**:
+
 ```python
 # backend/tests/test_health.py
 def test_health_endpoint(client):
@@ -485,6 +522,7 @@ def test_health_endpoint(client):
 ---
 
 #### Task 1.3: Frontend Setup (React + Tailwind + Router)
+
 - **ID**: P1-003
 - **Dependencies**: P1-001
 - **Assigned**: Builder-B
@@ -501,27 +539,29 @@ def test_health_endpoint(client):
 **Actions**:
 
 Update `frontend/tailwind.config.js`:
+
 ```javascript
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  darkMode: 'class',
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        primary: 'var(--color-primary)',
-        accent: 'var(--color-accent)',
-        surface: 'var(--color-surface)',
-        background: 'var(--color-bg)',
-        border: 'var(--color-border)',
+        primary: "var(--color-primary)",
+        accent: "var(--color-accent)",
+        surface: "var(--color-surface)",
+        background: "var(--color-bg)",
+        border: "var(--color-border)",
       },
     },
   },
   plugins: [],
-}
+};
 ```
 
 Update `frontend/src/index.css`:
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -540,18 +580,22 @@ Update `frontend/src/index.css`:
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 ```
 
 Create `frontend/src/App.tsx` (INCLUDES BellPlayer):
+
 ```tsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Meditate from './pages/Meditate';
-import Settings from './pages/Settings';
-import Breathe from './pages/Breathe';
-import BellPlayer from './components/BellPlayer';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Meditate from "./pages/Meditate";
+import Settings from "./pages/Settings";
+import Breathe from "./pages/Breathe";
+import BellPlayer from "./components/BellPlayer";
 
 export default function App() {
   return (
@@ -571,35 +615,33 @@ export default function App() {
 ```
 
 Create `frontend/src/pages/Home.tsx`:
+
 ```tsx
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   const { t } = useTranslation();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-4xl font-bold mb-2">{t('app.title')}</h1>
-      <p className="text-text-muted mb-8">{t('app.tagline')}</p>
+      <h1 className="text-4xl font-bold mb-2">{t("app.title")}</h1>
+      <p className="text-text-muted mb-8">{t("app.tagline")}</p>
       <div className="flex flex-col gap-4">
         <Link
           to="/meditate"
           className="bg-primary px-8 py-4 rounded-full text-lg text-center"
         >
-          {t('home.startMeditation')}
+          {t("home.startMeditation")}
         </Link>
         <Link
           to="/breathe"
           className="bg-surface border border-primary px-8 py-4 rounded-full text-lg text-center"
         >
-          {t('breathing.title') || 'Breathing Guide'}
+          {t("breathing.title") || "Breathing Guide"}
         </Link>
-        <Link
-          to="/settings"
-          className="text-text-muted text-center mt-4"
-        >
-          {t('home.settings')}
+        <Link to="/settings" className="text-text-muted text-center mt-4">
+          {t("home.settings")}
         </Link>
       </div>
     </div>
@@ -608,6 +650,7 @@ export default function Home() {
 ```
 
 Create `frontend/src/pages/Meditate.tsx` (placeholder - full version in Task 3.5):
+
 ```tsx
 export default function Meditate() {
   return (
@@ -620,9 +663,10 @@ export default function Meditate() {
 ```
 
 Create `frontend/src/pages/Settings.tsx`:
+
 ```tsx
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -630,11 +674,15 @@ export default function Settings() {
   return (
     <div className="min-h-screen p-4">
       <header className="py-4">
-        <Link to="/" className="text-text-muted">&larr; {t('app.title')}</Link>
+        <Link to="/" className="text-text-muted">
+          &larr; {t("app.title")}
+        </Link>
       </header>
       <main className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-6">{t('settings.title')}</h1>
-        <p className="text-text-muted">Theme and language settings coming soon...</p>
+        <h1 className="text-2xl font-bold mb-6">{t("settings.title")}</h1>
+        <p className="text-text-muted">
+          Theme and language settings coming soon...
+        </p>
       </main>
     </div>
   );
@@ -642,6 +690,7 @@ export default function Settings() {
 ```
 
 Create `frontend/src/pages/Breathe.tsx` (placeholder - full version in Task 3.4):
+
 ```tsx
 export default function Breathe() {
   return (
@@ -654,17 +703,20 @@ export default function Breathe() {
 ```
 
 **Verification**:
+
 - Routes work: `/`, `/meditate`, `/settings`, `/breathe`
 - Tailwind classes apply correctly
 - CSS variables work for theming
 
 **Test Requirements**:
+
 - Router renders correct page for each route
 - Tailwind classes compile without errors
 
 ---
 
 #### Task 1.4: i18n Setup (Korean + English)
+
 - **ID**: P1-004
 - **Dependencies**: P1-003
 - **Assigned**: Builder-B
@@ -677,13 +729,14 @@ export default function Breathe() {
 **Actions**:
 
 Create `frontend/src/i18n/index.ts`:
-```typescript
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import ko from './ko.json';
-import en from './en.json';
 
-const savedLang = localStorage.getItem('language') || 'ko';
+```typescript
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import ko from "./ko.json";
+import en from "./en.json";
+
+const savedLang = localStorage.getItem("language") || "ko";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -691,7 +744,7 @@ i18n.use(initReactI18next).init({
     en: { translation: en },
   },
   lng: savedLang,
-  fallbackLng: 'ko',
+  fallbackLng: "ko",
   interpolation: { escapeValue: false },
 });
 
@@ -699,6 +752,7 @@ export default i18n;
 ```
 
 Create `frontend/src/i18n/ko.json`:
+
 ```json
 {
   "app": {
@@ -768,6 +822,7 @@ Create `frontend/src/i18n/ko.json`:
 ```
 
 Create `frontend/src/i18n/en.json`:
+
 ```json
 {
   "app": {
@@ -837,28 +892,31 @@ Create `frontend/src/i18n/en.json`:
 ```
 
 Update `frontend/src/main.tsx` (INCLUDES themes.css import):
-```tsx
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import './i18n';
-import './index.css';
-import './styles/themes.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+```tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./i18n";
+import "./index.css";
+import "./styles/themes.css";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 ```
 
 **Verification**:
+
 - `useTranslation()` hook works in components
 - Language switch persists to localStorage
 - Korean displays correctly (no encoding issues)
 - `t('visuals.select')` returns correct translation
 
 **Test Requirements**:
+
 - `t('app.title')` returns "마음챙김" when lang=ko
 - `t('app.title')` returns "Mindfulness" when lang=en
 - `t('visuals.select')` returns "시각 효과 선택" when lang=ko
@@ -867,6 +925,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 ---
 
 #### Task 1.5: Theme System (Light/Dark + 8 Color Themes)
+
 - **ID**: P1-005
 - **Dependencies**: P1-003
 - **Assigned**: Builder-B
@@ -878,6 +937,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 **Actions**:
 
 Create `frontend/src/styles/themes.css`:
+
 ```css
 /* Base dark mode (default) */
 :root {
@@ -962,17 +1022,29 @@ Create `frontend/src/styles/themes.css`:
 
 /* Theme transitions */
 * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
 ```
 
 Create `frontend/src/stores/settingsStore.ts`:
-```typescript
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-type ThemeId = 'ocean' | 'forest' | 'sunset' | 'midnight' | 'aurora' | 'sakura' | 'sand' | 'zen';
-type Language = 'ko' | 'en';
+```typescript
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+type ThemeId =
+  | "ocean"
+  | "forest"
+  | "sunset"
+  | "midnight"
+  | "aurora"
+  | "sakura"
+  | "sand"
+  | "zen";
+type Language = "ko" | "en";
 
 interface SettingsState {
   theme: ThemeId;
@@ -983,55 +1055,62 @@ interface SettingsState {
   setBellEnabled: (enabled: boolean) => void;
 }
 
-const LIGHT_THEMES: ThemeId[] = ['sakura', 'sand', 'zen'];
+const LIGHT_THEMES: ThemeId[] = ["sakura", "sand", "zen"];
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      theme: 'ocean',
-      language: 'ko',
+      theme: "ocean",
+      language: "ko",
       bellEnabled: true,
       setTheme: (theme) => {
-        document.documentElement.setAttribute('data-theme', theme);
-        document.documentElement.classList.toggle('dark', !LIGHT_THEMES.includes(theme));
+        document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.classList.toggle(
+          "dark",
+          !LIGHT_THEMES.includes(theme),
+        );
         set({ theme });
       },
       setLanguage: (language) => {
-        localStorage.setItem('language', language);
+        localStorage.setItem("language", language);
         set({ language });
       },
       setBellEnabled: (enabled) => set({ bellEnabled: enabled }),
     }),
-    { name: 'mindfulness-settings' }
-  )
+    { name: "mindfulness-settings" },
+  ),
 );
 
 // Initialize theme on load
 const initTheme = () => {
-  const stored = localStorage.getItem('mindfulness-settings');
+  const stored = localStorage.getItem("mindfulness-settings");
   if (stored) {
     const { state } = JSON.parse(stored);
-    document.documentElement.setAttribute('data-theme', state.theme || 'ocean');
-    document.documentElement.classList.toggle('dark', !LIGHT_THEMES.includes(state.theme));
+    document.documentElement.setAttribute("data-theme", state.theme || "ocean");
+    document.documentElement.classList.toggle(
+      "dark",
+      !LIGHT_THEMES.includes(state.theme),
+    );
   }
 };
 initTheme();
 ```
 
 Create `frontend/src/components/ThemeSwitcher.tsx` (FIXED variable collision):
+
 ```tsx
-import { useSettingsStore } from '../stores/settingsStore';
-import { useTranslation } from 'react-i18next';
+import { useSettingsStore } from "../stores/settingsStore";
+import { useTranslation } from "react-i18next";
 
 const themes = [
-  { id: 'ocean', mode: 'dark' },
-  { id: 'forest', mode: 'dark' },
-  { id: 'sunset', mode: 'dark' },
-  { id: 'midnight', mode: 'dark' },
-  { id: 'aurora', mode: 'dark' },
-  { id: 'sakura', mode: 'light' },
-  { id: 'sand', mode: 'light' },
-  { id: 'zen', mode: 'light' },
+  { id: "ocean", mode: "dark" },
+  { id: "forest", mode: "dark" },
+  { id: "sunset", mode: "dark" },
+  { id: "midnight", mode: "dark" },
+  { id: "aurora", mode: "dark" },
+  { id: "sakura", mode: "light" },
+  { id: "sand", mode: "light" },
+  { id: "zen", mode: "light" },
 ] as const;
 
 export default function ThemeSwitcher() {
@@ -1045,12 +1124,14 @@ export default function ThemeSwitcher() {
           key={themeItem.id}
           onClick={() => setTheme(themeItem.id)}
           className={`p-3 rounded-lg border-2 ${
-            theme === themeItem.id ? 'border-primary' : 'border-transparent'
+            theme === themeItem.id ? "border-primary" : "border-transparent"
           }`}
           data-theme={themeItem.id}
         >
           <div className="w-8 h-8 rounded-full bg-primary mx-auto" />
-          <span className="text-xs mt-1 block">{t(`themes.${themeItem.id}`)}</span>
+          <span className="text-xs mt-1 block">
+            {t(`themes.${themeItem.id}`)}
+          </span>
         </button>
       ))}
     </div>
@@ -1059,6 +1140,7 @@ export default function ThemeSwitcher() {
 ```
 
 **Verification**:
+
 - Theme changes apply immediately
 - Theme persists across page reloads
 - Light themes show correct text colors
@@ -1066,6 +1148,7 @@ export default function ThemeSwitcher() {
 - No variable collision in ThemeSwitcher
 
 **Test Requirements**:
+
 - `setTheme('sakura')` applies light mode
 - `setTheme('ocean')` applies dark mode
 - Theme persists in localStorage
@@ -1073,6 +1156,7 @@ export default function ThemeSwitcher() {
 ---
 
 #### Task 1.6: Timer Component
+
 - **ID**: P1-006
 - **Dependencies**: P1-003, P1-004
 - **Assigned**: Builder-A
@@ -1087,10 +1171,11 @@ export default function ThemeSwitcher() {
 **Actions**:
 
 Create `frontend/src/stores/timerStore.ts`:
-```typescript
-import { create } from 'zustand';
 
-type TimerStatus = 'idle' | 'running' | 'paused' | 'complete';
+```typescript
+import { create } from "zustand";
+
+type TimerStatus = "idle" | "running" | "paused" | "complete";
 
 interface TimerState {
   duration: number; // seconds
@@ -1114,15 +1199,16 @@ interface TimerState {
 export const useTimerStore = create<TimerState>((set, get) => ({
   duration: 600, // 10 minutes default
   remaining: 600,
-  status: 'idle',
-  selectedVisual: 'breathingCircle',
+  status: "idle",
+  selectedVisual: "breathingCircle",
   breathingEnabled: false,
-  breathingPattern: 'box',
+  breathingPattern: "box",
 
-  setDuration: (minutes) => set({
-    duration: minutes * 60,
-    remaining: minutes * 60
-  }),
+  setDuration: (minutes) =>
+    set({
+      duration: minutes * 60,
+      remaining: minutes * 60,
+    }),
 
   setSelectedVisual: (visual) => set({ selectedVisual: visual }),
 
@@ -1130,41 +1216,43 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 
   setBreathingPattern: (pattern) => set({ breathingPattern: pattern }),
 
-  start: () => set({ status: 'running' }),
+  start: () => set({ status: "running" }),
 
-  pause: () => set({ status: 'paused' }),
+  pause: () => set({ status: "paused" }),
 
-  resume: () => set({ status: 'running' }),
+  resume: () => set({ status: "running" }),
 
-  stop: () => set((state) => ({
-    status: 'idle',
-    remaining: state.duration
-  })),
+  stop: () =>
+    set((state) => ({
+      status: "idle",
+      remaining: state.duration,
+    })),
 
   tick: () => {
     const { remaining, status } = get();
-    if (status === 'running' && remaining > 0) {
+    if (status === "running" && remaining > 0) {
       set({ remaining: remaining - 1 });
     } else if (remaining === 0) {
       get().complete();
     }
   },
 
-  complete: () => set({ status: 'complete' }),
+  complete: () => set({ status: "complete" }),
 }));
 ```
 
 Create `frontend/src/hooks/useTimer.ts`:
+
 ```typescript
-import { useEffect, useRef } from 'react';
-import { useTimerStore } from '../stores/timerStore';
+import { useEffect, useRef } from "react";
+import { useTimerStore } from "../stores/timerStore";
 
 export function useTimer() {
   const { status, tick } = useTimerStore();
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (status === 'running') {
+    if (status === "running") {
       intervalRef.current = window.setInterval(tick, 1000);
     } else {
       if (intervalRef.current) {
@@ -1182,14 +1270,15 @@ export function useTimer() {
 ```
 
 Create `frontend/src/components/Timer/Timer.tsx`:
+
 ```tsx
-import { useTimer } from '../../hooks/useTimer';
-import TimerControls from './TimerControls';
+import { useTimer } from "../../hooks/useTimer";
+import TimerControls from "./TimerControls";
 
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 export default function Timer() {
@@ -1202,13 +1291,17 @@ export default function Timer() {
       <div className="relative w-64 h-64">
         <svg className="w-full h-full transform -rotate-90">
           <circle
-            cx="128" cy="128" r="120"
+            cx="128"
+            cy="128"
+            r="120"
             stroke="var(--color-surface)"
             strokeWidth="8"
             fill="none"
           />
           <circle
-            cx="128" cy="128" r="120"
+            cx="128"
+            cy="128"
+            r="120"
             stroke="var(--color-primary)"
             strokeWidth="8"
             fill="none"
@@ -1230,9 +1323,10 @@ export default function Timer() {
 ```
 
 Create `frontend/src/components/Timer/TimerControls.tsx`:
+
 ```tsx
-import { useTimer } from '../../hooks/useTimer';
-import { useTranslation } from 'react-i18next';
+import { useTimer } from "../../hooks/useTimer";
+import { useTranslation } from "react-i18next";
 
 export default function TimerControls() {
   const { t } = useTranslation();
@@ -1240,51 +1334,51 @@ export default function TimerControls() {
 
   return (
     <div className="flex gap-4 mt-8">
-      {status === 'idle' && (
+      {status === "idle" && (
         <button
           onClick={start}
           className="bg-primary text-white px-8 py-3 rounded-full text-lg"
         >
-          {t('timer.start')}
+          {t("timer.start")}
         </button>
       )}
 
-      {status === 'running' && (
+      {status === "running" && (
         <>
           <button
             onClick={pause}
             className="bg-surface border border-primary px-6 py-3 rounded-full"
           >
-            {t('timer.pause')}
+            {t("timer.pause")}
           </button>
           <button
             onClick={stop}
             className="bg-surface border border-red-500 text-red-500 px-6 py-3 rounded-full"
           >
-            {t('timer.stop')}
+            {t("timer.stop")}
           </button>
         </>
       )}
 
-      {status === 'paused' && (
+      {status === "paused" && (
         <>
           <button
             onClick={resume}
             className="bg-primary text-white px-6 py-3 rounded-full"
           >
-            {t('timer.resume')}
+            {t("timer.resume")}
           </button>
           <button
             onClick={stop}
             className="bg-surface border border-red-500 text-red-500 px-6 py-3 rounded-full"
           >
-            {t('timer.stop')}
+            {t("timer.stop")}
           </button>
         </>
       )}
 
-      {status === 'complete' && (
-        <div className="text-2xl text-primary">{t('timer.complete')}</div>
+      {status === "complete" && (
+        <div className="text-2xl text-primary">{t("timer.complete")}</div>
       )}
     </div>
   );
@@ -1292,9 +1386,10 @@ export default function TimerControls() {
 ```
 
 Create `frontend/src/components/Timer/DurationPicker.tsx`:
+
 ```tsx
-import { useTimerStore } from '../../stores/timerStore';
-import { useTranslation } from 'react-i18next';
+import { useTimerStore } from "../../stores/timerStore";
+import { useTranslation } from "react-i18next";
 
 const PRESETS = [3, 5, 10, 12, 15, 20, 30, 45, 60];
 
@@ -1303,7 +1398,7 @@ export default function DurationPicker() {
   const { duration, setDuration, status } = useTimerStore();
   const currentMinutes = duration / 60;
 
-  if (status !== 'idle') return null;
+  if (status !== "idle") return null;
 
   return (
     <div className="flex flex-wrap justify-center gap-2 mt-4">
@@ -1313,11 +1408,11 @@ export default function DurationPicker() {
           onClick={() => setDuration(mins)}
           className={`px-4 py-2 rounded-full ${
             currentMinutes === mins
-              ? 'bg-primary text-white'
-              : 'bg-surface border border-border'
+              ? "bg-primary text-white"
+              : "bg-surface border border-border"
           }`}
         >
-          {mins} {t('timer.minutes')}
+          {mins} {t("timer.minutes")}
         </button>
       ))}
     </div>
@@ -1326,19 +1421,22 @@ export default function DurationPicker() {
 ```
 
 Create `frontend/src/components/Timer/index.ts` (barrel exports):
+
 ```typescript
-export { default as Timer } from './Timer';
-export { default as TimerControls } from './TimerControls';
-export { default as DurationPicker } from './DurationPicker';
+export { default as Timer } from "./Timer";
+export { default as TimerControls } from "./TimerControls";
+export { default as DurationPicker } from "./DurationPicker";
 ```
 
 **Verification**:
+
 - Timer counts down accurately
 - Start/Pause/Resume/Stop all work
 - Progress ring animates smoothly
 - Duration presets change timer
 
 **Test Requirements**:
+
 - Timer decrements by 1 each second
 - Pause stops the countdown
 - Stop resets to initial duration
@@ -1347,6 +1445,7 @@ export { default as DurationPicker } from './DurationPicker';
 ---
 
 #### Task 1.7: Session API Integration
+
 - **ID**: P1-007
 - **Dependencies**: P1-002, P1-006
 - **Assigned**: Builder-A
@@ -1359,11 +1458,13 @@ export { default as DurationPicker } from './DurationPicker';
 **Actions**:
 
 Create `backend/app/routes/__init__.py`:
+
 ```python
 from . import sessions
 ```
 
 Create `backend/app/routes/sessions.py`:
+
 ```python
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
@@ -1422,8 +1523,9 @@ def delete_session(session_id: int, db: SessionDep):
 ```
 
 Create `frontend/src/api/sessions.ts`:
+
 ```typescript
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export interface SessionCreate {
   planned_duration_seconds: number;
@@ -1456,17 +1558,20 @@ export interface Session {
 
 export async function createSession(data: SessionCreate): Promise<Session> {
   const res = await fetch(`${API_BASE}/api/sessions/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
   return res.json();
 }
 
-export async function updateSession(id: number, data: SessionUpdate): Promise<Session> {
+export async function updateSession(
+  id: number,
+  data: SessionUpdate,
+): Promise<Session> {
   const res = await fetch(`${API_BASE}/api/sessions/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
   return res.json();
@@ -1479,9 +1584,10 @@ export async function listSessions(): Promise<Session[]> {
 ```
 
 Create `frontend/src/stores/sessionStore.ts`:
+
 ```typescript
-import { create } from 'zustand';
-import * as api from '../api/sessions';
+import { create } from "zustand";
+import * as api from "../api/sessions";
 
 interface SessionState {
   currentSessionId: number | null;
@@ -1533,12 +1639,14 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 ```
 
 **Verification**:
+
 - POST /api/sessions/ creates a session in DB
 - PATCH /api/sessions/{id} updates session
 - GET /api/sessions/ returns list
 - Frontend stores track session lifecycle
 
 **Test Requirements**:
+
 ```python
 # backend/tests/test_sessions.py
 def test_create_session(client):
@@ -1564,6 +1672,7 @@ def test_complete_session(client):
 ---
 
 #### Task 1.8: Bell Sound System
+
 - **ID**: P1-008
 - **Dependencies**: P1-006
 - **Assigned**: Builder-A
@@ -1575,8 +1684,9 @@ def test_complete_session(client):
 **Actions**:
 
 Create `frontend/src/hooks/useAudio.ts`:
+
 ```typescript
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect } from "react";
 
 export interface UseAudioOptions {
   volume?: number;
@@ -1592,7 +1702,8 @@ export function useAudio(src: string, options: UseAudioOptions = {}) {
   // Initialize AudioContext on first user interaction (iOS requirement)
   const initAudioContext = useCallback(() => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
       gainNodeRef.current = audioContextRef.current.createGain();
       gainNodeRef.current.connect(audioContextRef.current.destination);
       gainNodeRef.current.gain.value = options.volume ?? 1;
@@ -1611,7 +1722,7 @@ export function useAudio(src: string, options: UseAudioOptions = {}) {
       audioBufferRef.current = await ctx.decodeAudioData(arrayBuffer);
       isLoadedRef.current = true;
     } catch (error) {
-      console.error('Failed to load audio:', error);
+      console.error("Failed to load audio:", error);
     }
   }, [src, initAudioContext]);
 
@@ -1620,7 +1731,7 @@ export function useAudio(src: string, options: UseAudioOptions = {}) {
     const ctx = initAudioContext();
 
     // Resume context if suspended (iOS requirement)
-    if (ctx.state === 'suspended') {
+    if (ctx.state === "suspended") {
       await ctx.resume();
     }
 
@@ -1654,16 +1765,16 @@ export function useAudio(src: string, options: UseAudioOptions = {}) {
     // Preload on first user interaction
     const handleInteraction = () => {
       loadAudio();
-      document.removeEventListener('touchstart', handleInteraction);
-      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener("touchstart", handleInteraction);
+      document.removeEventListener("click", handleInteraction);
     };
 
-    document.addEventListener('touchstart', handleInteraction, { once: true });
-    document.addEventListener('click', handleInteraction, { once: true });
+    document.addEventListener("touchstart", handleInteraction, { once: true });
+    document.addEventListener("click", handleInteraction, { once: true });
 
     return () => {
-      document.removeEventListener('touchstart', handleInteraction);
-      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener("touchstart", handleInteraction);
+      document.removeEventListener("click", handleInteraction);
     };
   }, [loadAudio]);
 
@@ -1672,16 +1783,17 @@ export function useAudio(src: string, options: UseAudioOptions = {}) {
 ```
 
 Create `frontend/src/components/BellPlayer.tsx`:
+
 ```tsx
-import { useEffect, useRef } from 'react';
-import { useTimerStore } from '../stores/timerStore';
-import { useSettingsStore } from '../stores/settingsStore';
-import { useAudio } from '../hooks/useAudio';
+import { useEffect, useRef } from "react";
+import { useTimerStore } from "../stores/timerStore";
+import { useSettingsStore } from "../stores/settingsStore";
+import { useAudio } from "../hooks/useAudio";
 
 // Import bell sounds (place these files in assets/sounds/)
 // For development, these can be placeholder files or downloaded from freesound.org
-const startBellUrl = '/sounds/start-bell.mp3';
-const endBellUrl = '/sounds/end-bell.mp3';
+const startBellUrl = "/sounds/start-bell.mp3";
+const endBellUrl = "/sounds/end-bell.mp3";
 
 export default function BellPlayer() {
   const status = useTimerStore((state) => state.status);
@@ -1698,12 +1810,12 @@ export default function BellPlayer() {
     prevStatusRef.current = status;
 
     // Play start bell when transitioning from idle to running
-    if (prevStatus === 'idle' && status === 'running') {
+    if (prevStatus === "idle" && status === "running") {
       startBell.play();
     }
 
     // Play end bell when transitioning to complete
-    if (prevStatus === 'running' && status === 'complete') {
+    if (prevStatus === "running" && status === "complete") {
       endBell.play();
     }
   }, [status, bellEnabled, startBell, endBell]);
@@ -1714,6 +1826,7 @@ export default function BellPlayer() {
 ```
 
 **Note**: For bell sound files, create placeholders or download from freesound.org:
+
 ```bash
 # Create placeholder directory
 mkdir -p frontend/public/sounds
@@ -1722,12 +1835,14 @@ echo "Place start-bell.mp3 and end-bell.mp3 here" > frontend/public/sounds/READM
 ```
 
 **Verification**:
+
 - Bell plays when meditation starts (idle -> running)
 - Bell plays when meditation completes (running -> complete)
 - Bell respects bellEnabled setting
 - Audio works on iOS Safari after user gesture
 
 **Test Requirements**:
+
 - AudioContext initializes on user interaction
 - Bell sounds trigger on correct status transitions
 - Volume control works
@@ -1737,6 +1852,7 @@ echo "Place start-bell.mp3 and end-bell.mp3 here" > frontend/public/sounds/READM
 ### Phase 2: Visuals (Parallel Development)
 
 #### Task 2.0: Visuals Types File (PREREQUISITE)
+
 - **ID**: P2-000
 - **Dependencies**: P1-003
 - **Assigned**: Builder-B
@@ -1746,24 +1862,28 @@ echo "Place start-bell.mp3 and end-bell.mp3 here" > frontend/public/sounds/READM
 **Actions**:
 
 Create `frontend/src/components/Visuals/types.ts`:
+
 ```typescript
 export interface VisualProps {
   isActive: boolean;
   speed?: number; // 0.5 - 2.0, default 1.0
-  theme?: 'light' | 'dark';
+  theme?: "light" | "dark";
 }
 ```
 
 **Verification**:
+
 - TypeScript compiles without errors
 - All visual components can import `VisualProps` from `'../types'`
 
 **Test Requirements**:
+
 - Import statement works: `import { VisualProps } from '../types'`
 
 ---
 
 #### Task 2.1: Breathing Circle Visual
+
 - **ID**: P2-001
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C1
@@ -1776,9 +1896,10 @@ export interface VisualProps {
 **Actions**:
 
 Create `frontend/src/components/Visuals/BreathingCircle/BreathingCircle.tsx`:
+
 ```tsx
-import { motion } from 'framer-motion';
-import { VisualProps } from '../types';
+import { motion } from "framer-motion";
+import { VisualProps } from "../types";
 
 export default function BreathingCircle({ isActive, speed = 1 }: VisualProps) {
   const duration = 8 / speed; // 8 seconds base cycle
@@ -1787,36 +1908,48 @@ export default function BreathingCircle({ isActive, speed = 1 }: VisualProps) {
     <div className="absolute inset-0 flex items-center justify-center">
       <motion.div
         className="w-48 h-48 rounded-full bg-primary/30 blur-xl"
-        animate={isActive ? {
-          scale: [1, 1.5, 1],
-          opacity: [0.3, 0.6, 0.3],
-        } : {}}
+        animate={
+          isActive
+            ? {
+                scale: [1, 1.5, 1],
+                opacity: [0.3, 0.6, 0.3],
+              }
+            : {}
+        }
         transition={{
           duration,
           repeat: Infinity,
-          ease: 'easeInOut',
+          ease: "easeInOut",
         }}
       />
       <motion.div
         className="absolute w-32 h-32 rounded-full bg-primary/50"
-        animate={isActive ? {
-          scale: [1, 1.4, 1],
-        } : {}}
+        animate={
+          isActive
+            ? {
+                scale: [1, 1.4, 1],
+              }
+            : {}
+        }
         transition={{
           duration,
           repeat: Infinity,
-          ease: 'easeInOut',
+          ease: "easeInOut",
         }}
       />
       <motion.div
         className="absolute w-16 h-16 rounded-full bg-primary"
-        animate={isActive ? {
-          scale: [1, 1.3, 1],
-        } : {}}
+        animate={
+          isActive
+            ? {
+                scale: [1, 1.3, 1],
+              }
+            : {}
+        }
         transition={{
           duration,
           repeat: Infinity,
-          ease: 'easeInOut',
+          ease: "easeInOut",
         }}
       />
     </div>
@@ -1825,22 +1958,26 @@ export default function BreathingCircle({ isActive, speed = 1 }: VisualProps) {
 ```
 
 Create `frontend/src/components/Visuals/BreathingCircle/index.ts`:
+
 ```typescript
-export { default } from './BreathingCircle';
+export { default } from "./BreathingCircle";
 ```
 
 **Verification**:
+
 - Circle expands/contracts smoothly
 - Speed prop affects animation rate
 - Stops when isActive=false
 
 **Test Requirements**:
+
 - Renders without errors
 - Animation triggers when isActive=true
 
 ---
 
 #### Task 2.2: Particle Flow Visual
+
 - **ID**: P2-002
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C2
@@ -1853,9 +1990,10 @@ export { default } from './BreathingCircle';
 **Actions**:
 
 Create `frontend/src/components/Visuals/ParticleFlow/ParticleFlow.tsx`:
+
 ```tsx
-import { useRef, useEffect } from 'react';
-import { VisualProps } from '../types';
+import { useRef, useEffect } from "react";
+import { VisualProps } from "../types";
 
 interface Particle {
   x: number;
@@ -1875,7 +2013,7 @@ export default function ParticleFlow({ isActive, speed = 1 }: VisualProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Set canvas size
@@ -1885,7 +2023,7 @@ export default function ParticleFlow({ isActive, speed = 1 }: VisualProps) {
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     };
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
 
     // Initialize particles
     const particleCount = 100;
@@ -1904,7 +2042,8 @@ export default function ParticleFlow({ isActive, speed = 1 }: VisualProps) {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
       const primaryColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-primary').trim();
+        .getPropertyValue("--color-primary")
+        .trim();
 
       particlesRef.current.forEach((p) => {
         // Update position
@@ -1920,7 +2059,9 @@ export default function ParticleFlow({ isActive, speed = 1 }: VisualProps) {
         // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `${primaryColor}${Math.floor(p.alpha * 255).toString(16).padStart(2, '0')}`;
+        ctx.fillStyle = `${primaryColor}${Math.floor(p.alpha * 255)
+          .toString(16)
+          .padStart(2, "0")}`;
         ctx.fill();
       });
 
@@ -1932,40 +2073,39 @@ export default function ParticleFlow({ isActive, speed = 1 }: VisualProps) {
     }
 
     return () => {
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
   }, [isActive, speed]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-    />
-  );
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 ```
 
 Create `frontend/src/components/Visuals/ParticleFlow/index.ts`:
+
 ```typescript
-export { default } from './ParticleFlow';
+export { default } from "./ParticleFlow";
 ```
 
 **Verification**:
+
 - Particles drift smoothly
 - Responsive to canvas resize
 - Speed prop affects velocity
 - Particles wrap around edges
 
 **Test Requirements**:
+
 - Canvas renders
 - No memory leaks (cleanup on unmount)
 
 ---
 
 #### Task 2.3: Gradient Waves Visual
+
 - **ID**: P2-003
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C3
@@ -1979,9 +2119,10 @@ export { default } from './ParticleFlow';
 **Actions**:
 
 Create `frontend/src/components/Visuals/GradientWaves/GradientWaves.tsx`:
+
 ```tsx
-import { VisualProps } from '../types';
-import './GradientWaves.css';
+import { VisualProps } from "../types";
+import "./GradientWaves.css";
 
 export default function GradientWaves({ isActive, speed = 1 }: VisualProps) {
   const animationDuration = `${20 / speed}s`;
@@ -1989,15 +2130,15 @@ export default function GradientWaves({ isActive, speed = 1 }: VisualProps) {
   return (
     <div className="absolute inset-0 overflow-hidden">
       <div
-        className={`gradient-wave wave-1 ${isActive ? 'animate' : ''}`}
+        className={`gradient-wave wave-1 ${isActive ? "animate" : ""}`}
         style={{ animationDuration }}
       />
       <div
-        className={`gradient-wave wave-2 ${isActive ? 'animate' : ''}`}
+        className={`gradient-wave wave-2 ${isActive ? "animate" : ""}`}
         style={{ animationDuration }}
       />
       <div
-        className={`gradient-wave wave-3 ${isActive ? 'animate' : ''}`}
+        className={`gradient-wave wave-3 ${isActive ? "animate" : ""}`}
         style={{ animationDuration }}
       />
     </div>
@@ -2006,6 +2147,7 @@ export default function GradientWaves({ isActive, speed = 1 }: VisualProps) {
 ```
 
 Create `frontend/src/components/Visuals/GradientWaves/GradientWaves.css`:
+
 ```css
 .gradient-wave {
   position: absolute;
@@ -2051,28 +2193,36 @@ Create `frontend/src/components/Visuals/GradientWaves/GradientWaves.css`:
 }
 
 @keyframes wave-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 ```
 
 Create `frontend/src/components/Visuals/GradientWaves/index.ts`:
+
 ```typescript
-export { default } from './GradientWaves';
+export { default } from "./GradientWaves";
 ```
 
 **Verification**:
+
 - Waves rotate smoothly
 - Colors match theme
 - No jank on mobile
 
 **Test Requirements**:
+
 - CSS animation applies
 - Stops when isActive=false
 
 ---
 
 #### Task 2.4: Aurora Visual with WebGL
+
 - **ID**: P2-004
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C1
@@ -2087,6 +2237,7 @@ export { default } from './GradientWaves';
 **Actions**:
 
 Create `frontend/src/components/Visuals/Aurora/shaders.ts`:
+
 ```typescript
 export const vertexShader = `
   attribute vec2 a_position;
@@ -2182,7 +2333,11 @@ export const fragmentShader = `
   }
 `;
 
-export function createShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null {
+export function createShader(
+  gl: WebGLRenderingContext,
+  type: number,
+  source: string,
+): WebGLShader | null {
   const shader = gl.createShader(type);
   if (!shader) return null;
 
@@ -2190,7 +2345,7 @@ export function createShader(gl: WebGLRenderingContext, type: number, source: st
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+    console.error("Shader compile error:", gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
@@ -2198,7 +2353,11 @@ export function createShader(gl: WebGLRenderingContext, type: number, source: st
   return shader;
 }
 
-export function createProgram(gl: WebGLRenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader): WebGLProgram | null {
+export function createProgram(
+  gl: WebGLRenderingContext,
+  vertexShader: WebGLShader,
+  fragmentShader: WebGLShader,
+): WebGLProgram | null {
   const program = gl.createProgram();
   if (!program) return null;
 
@@ -2207,7 +2366,7 @@ export function createProgram(gl: WebGLRenderingContext, vertexShader: WebGLShad
   gl.linkProgram(program);
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error('Program link error:', gl.getProgramInfoLog(program));
+    console.error("Program link error:", gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
     return null;
   }
@@ -2217,18 +2376,24 @@ export function createProgram(gl: WebGLRenderingContext, vertexShader: WebGLShad
 ```
 
 Create `frontend/src/components/Visuals/Aurora/Aurora.tsx`:
+
 ```tsx
-import { useRef, useEffect, useState } from 'react';
-import { VisualProps } from '../types';
-import AuroraFallback from './AuroraFallback';
-import { vertexShader, fragmentShader, createShader, createProgram } from './shaders';
+import { useRef, useEffect, useState } from "react";
+import { VisualProps } from "../types";
+import AuroraFallback from "./AuroraFallback";
+import {
+  vertexShader,
+  fragmentShader,
+  createShader,
+  createProgram,
+} from "./shaders";
 
 function isWebGLSupported(): boolean {
   try {
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     return !!(
       window.WebGLRenderingContext &&
-      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
     );
   } catch {
     return false;
@@ -2260,9 +2425,11 @@ export default function Aurora({ isActive, speed = 1 }: VisualProps) {
       canvas.height = canvas.offsetHeight * window.devicePixelRatio;
     };
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
 
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as WebGLRenderingContext;
+    const gl =
+      canvas.getContext("webgl") ||
+      (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
     if (!gl) {
       setUseWebGL(false);
       return;
@@ -2288,28 +2455,25 @@ export default function Aurora({ isActive, speed = 1 }: VisualProps) {
     // Create vertex buffer for fullscreen quad
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      -1, -1,
-       1, -1,
-      -1,  1,
-      -1,  1,
-       1, -1,
-       1,  1,
-    ]), gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW,
+    );
 
     // Set up position attribute
-    const positionLocation = gl.getAttribLocation(program, 'a_position');
+    const positionLocation = gl.getAttribLocation(program, "a_position");
     gl.enableVertexAttribArray(positionLocation);
     gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
     // Get uniform locations
-    const timeLocation = gl.getUniformLocation(program, 'u_time');
-    const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    const timeLocation = gl.getUniformLocation(program, "u_time");
+    const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
 
     glRef.current = { gl, program, timeLocation, resolutionLocation };
 
     return () => {
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
       gl.deleteProgram(program);
       gl.deleteShader(vShader);
       gl.deleteShader(fShader);
@@ -2330,7 +2494,7 @@ export default function Aurora({ isActive, speed = 1 }: VisualProps) {
     const render = () => {
       if (!isActive) return;
 
-      const time = (Date.now() - startTime) / 1000 * speed;
+      const time = ((Date.now() - startTime) / 1000) * speed;
 
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform1f(timeLocation, time);
@@ -2352,19 +2516,15 @@ export default function Aurora({ isActive, speed = 1 }: VisualProps) {
     return <AuroraFallback isActive={isActive} speed={speed} />;
   }
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-    />
-  );
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 ```
 
 Create `frontend/src/components/Visuals/Aurora/AuroraFallback.tsx`:
+
 ```tsx
-import { useRef, useEffect } from 'react';
-import { VisualProps } from '../types';
+import { useRef, useEffect } from "react";
+import { VisualProps } from "../types";
 
 export default function AuroraFallback({ isActive, speed = 1 }: VisualProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -2373,7 +2533,7 @@ export default function AuroraFallback({ isActive, speed = 1 }: VisualProps) {
     const canvas = canvasRef.current;
     if (!canvas || !isActive) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Set canvas size
@@ -2392,8 +2552,8 @@ export default function AuroraFallback({ isActive, speed = 1 }: VisualProps) {
 
       // Dark sky background
       const skyGradient = ctx.createLinearGradient(0, 0, 0, height);
-      skyGradient.addColorStop(0, '#001020');
-      skyGradient.addColorStop(1, '#000510');
+      skyGradient.addColorStop(0, "#001020");
+      skyGradient.addColorStop(1, "#000510");
       ctx.fillStyle = skyGradient;
       ctx.fillRect(0, 0, width, height);
 
@@ -2406,11 +2566,17 @@ export default function AuroraFallback({ isActive, speed = 1 }: VisualProps) {
 
         // Color varies by band
         const hue = 120 + Math.sin(time * 0.2 + i) * 40; // Green to cyan
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
         gradient.addColorStop(0.3, `hsla(${hue}, 80%, 50%, ${0.1 + i * 0.03})`);
-        gradient.addColorStop(0.5, `hsla(${hue}, 80%, 60%, ${0.15 + i * 0.02})`);
-        gradient.addColorStop(0.7, `hsla(${hue + 20}, 70%, 50%, ${0.1 + i * 0.02})`);
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(
+          0.5,
+          `hsla(${hue}, 80%, 60%, ${0.15 + i * 0.02})`,
+        );
+        gradient.addColorStop(
+          0.7,
+          `hsla(${hue + 20}, 70%, 50%, ${0.1 + i * 0.02})`,
+        );
+        gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, width, height);
@@ -2425,27 +2591,25 @@ export default function AuroraFallback({ isActive, speed = 1 }: VisualProps) {
     return () => cancelAnimationFrame(animationId);
   }, [isActive, speed]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-    />
-  );
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 ```
 
 Create `frontend/src/components/Visuals/Aurora/index.ts`:
+
 ```typescript
-export { default } from './Aurora';
+export { default } from "./Aurora";
 ```
 
 **Verification**:
+
 - WebGL version works on desktop Chrome/Safari
 - Fallback activates on iOS Safari if WebGL fails
 - Smooth animation in both modes
 - Aurora bands wave and change color
 
 **Test Requirements**:
+
 - `isWebGLSupported()` correctly detects support
 - Fallback renders without WebGL
 - Shader compiles without errors
@@ -2453,6 +2617,7 @@ export { default } from './Aurora';
 ---
 
 #### Task 2.5: Mandala Visual
+
 - **ID**: P2-005
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C2
@@ -2465,9 +2630,10 @@ export { default } from './Aurora';
 **Actions**:
 
 Create `frontend/src/components/Visuals/Mandala/Mandala.tsx`:
+
 ```tsx
-import { motion } from 'framer-motion';
-import { VisualProps } from '../types';
+import { motion } from "framer-motion";
+import { VisualProps } from "../types";
 
 export default function Mandala({ isActive, speed = 1 }: VisualProps) {
   const layers = 6;
@@ -2487,9 +2653,9 @@ export default function Mandala({ isActive, speed = 1 }: VisualProps) {
               transition={{
                 duration: (30 + layerIndex * 10) / speed,
                 repeat: Infinity,
-                ease: 'linear',
+                ease: "linear",
               }}
-              style={{ transformOrigin: 'center' }}
+              style={{ transformOrigin: "center" }}
             >
               {Array.from({ length: petals }).map((_, petalIndex) => {
                 const angle = (360 / petals) * petalIndex;
@@ -2519,22 +2685,26 @@ export default function Mandala({ isActive, speed = 1 }: VisualProps) {
 ```
 
 Create `frontend/src/components/Visuals/Mandala/index.ts`:
+
 ```typescript
-export { default } from './Mandala';
+export { default } from "./Mandala";
 ```
 
 **Verification**:
+
 - Mandala rotates with multiple layers at different speeds
 - SVG scales properly on different screen sizes
 - Smooth animation
 
 **Test Requirements**:
+
 - SVG renders correctly
 - All layers animate
 
 ---
 
 #### Task 2.6: Cosmic Dust Visual
+
 - **ID**: P2-006
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C3
@@ -2547,9 +2717,10 @@ export { default } from './Mandala';
 **Actions**:
 
 Create `frontend/src/components/Visuals/CosmicDust/CosmicDust.tsx`:
+
 ```tsx
-import { useRef, useEffect } from 'react';
-import { VisualProps } from '../types';
+import { useRef, useEffect } from "react";
+import { VisualProps } from "../types";
 
 interface Star {
   x: number;
@@ -2566,7 +2737,7 @@ export default function CosmicDust({ isActive, speed = 1 }: VisualProps) {
     const canvas = canvasRef.current;
     if (!canvas || !isActive) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     canvas.width = canvas.offsetWidth * window.devicePixelRatio;
@@ -2587,7 +2758,7 @@ export default function CosmicDust({ isActive, speed = 1 }: VisualProps) {
     const render = () => {
       if (!isActive) return;
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
       ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
       stars.forEach((star) => {
@@ -2596,12 +2767,16 @@ export default function CosmicDust({ isActive, speed = 1 }: VisualProps) {
 
         // Draw star with glow
         const gradient = ctx.createRadialGradient(
-          star.x, star.y, 0,
-          star.x, star.y, star.radius * 3
+          star.x,
+          star.y,
+          0,
+          star.x,
+          star.y,
+          star.radius * 3,
         );
         gradient.addColorStop(0, `rgba(255, 255, 255, ${brightness})`);
         gradient.addColorStop(0.5, `rgba(200, 220, 255, ${brightness * 0.5})`);
-        gradient.addColorStop(1, 'rgba(200, 220, 255, 0)');
+        gradient.addColorStop(1, "rgba(200, 220, 255, 0)");
 
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius * 3, 0, Math.PI * 2);
@@ -2635,22 +2810,26 @@ export default function CosmicDust({ isActive, speed = 1 }: VisualProps) {
 ```
 
 Create `frontend/src/components/Visuals/CosmicDust/index.ts`:
+
 ```typescript
-export { default } from './CosmicDust';
+export { default } from "./CosmicDust";
 ```
 
 **Verification**:
+
 - Stars twinkle with glow effect
 - Slow downward drift creates depth
 - Works on mobile
 
 **Test Requirements**:
+
 - Canvas renders stars
 - Animation is smooth at 60fps
 
 ---
 
 #### Task 2.7: Zen Garden Visual
+
 - **ID**: P2-007
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C1
@@ -2663,9 +2842,10 @@ export { default } from './CosmicDust';
 **Actions**:
 
 Create `frontend/src/components/Visuals/ZenGarden/ZenGarden.tsx`:
+
 ```tsx
-import { motion } from 'framer-motion';
-import { VisualProps } from '../types';
+import { motion } from "framer-motion";
+import { VisualProps } from "../types";
 
 export default function ZenGarden({ isActive, speed = 1 }: VisualProps) {
   const ripples = 12;
@@ -2675,7 +2855,13 @@ export default function ZenGarden({ isActive, speed = 1 }: VisualProps) {
     <div className="absolute inset-0 flex items-center justify-center bg-surface">
       <svg viewBox="0 0 400 400" className="w-full h-full max-w-2xl">
         {/* Sand background */}
-        <rect x="0" y="0" width="400" height="400" fill="var(--color-surface)" />
+        <rect
+          x="0"
+          y="0"
+          width="400"
+          height="400"
+          fill="var(--color-surface)"
+        />
 
         {/* Ripple lines */}
         {Array.from({ length: ripples }).map((_, i) => {
@@ -2690,26 +2876,51 @@ export default function ZenGarden({ isActive, speed = 1 }: VisualProps) {
               strokeWidth="1"
               fill="none"
               opacity={0.3}
-              animate={isActive ? {
-                d: [
-                  `M 0 ${yOffset} Q 100 ${yOffset - amplitude} 200 ${yOffset} T 400 ${yOffset}`,
-                  `M 0 ${yOffset} Q 100 ${yOffset + amplitude} 200 ${yOffset} T 400 ${yOffset}`,
-                  `M 0 ${yOffset} Q 100 ${yOffset - amplitude} 200 ${yOffset} T 400 ${yOffset}`,
-                ],
-              } : {}}
+              animate={
+                isActive
+                  ? {
+                      d: [
+                        `M 0 ${yOffset} Q 100 ${yOffset - amplitude} 200 ${yOffset} T 400 ${yOffset}`,
+                        `M 0 ${yOffset} Q 100 ${yOffset + amplitude} 200 ${yOffset} T 400 ${yOffset}`,
+                        `M 0 ${yOffset} Q 100 ${yOffset - amplitude} 200 ${yOffset} T 400 ${yOffset}`,
+                      ],
+                    }
+                  : {}
+              }
               transition={{
                 duration: duration + i * 0.5,
                 repeat: Infinity,
-                ease: 'easeInOut',
+                ease: "easeInOut",
               }}
             />
           );
         })}
 
         {/* Stones */}
-        <ellipse cx="320" cy="280" rx="25" ry="15" fill="var(--color-text-muted)" opacity="0.5" />
-        <ellipse cx="80" cy="150" rx="20" ry="12" fill="var(--color-text-muted)" opacity="0.4" />
-        <ellipse cx="250" cy="100" rx="15" ry="10" fill="var(--color-text-muted)" opacity="0.3" />
+        <ellipse
+          cx="320"
+          cy="280"
+          rx="25"
+          ry="15"
+          fill="var(--color-text-muted)"
+          opacity="0.5"
+        />
+        <ellipse
+          cx="80"
+          cy="150"
+          rx="20"
+          ry="12"
+          fill="var(--color-text-muted)"
+          opacity="0.4"
+        />
+        <ellipse
+          cx="250"
+          cy="100"
+          rx="15"
+          ry="10"
+          fill="var(--color-text-muted)"
+          opacity="0.3"
+        />
       </svg>
     </div>
   );
@@ -2717,22 +2928,26 @@ export default function ZenGarden({ isActive, speed = 1 }: VisualProps) {
 ```
 
 Create `frontend/src/components/Visuals/ZenGarden/index.ts`:
+
 ```typescript
-export { default } from './ZenGarden';
+export { default } from "./ZenGarden";
 ```
 
 **Verification**:
+
 - Sand ripples animate smoothly
 - Stones are static
 - Calming, minimalist aesthetic
 
 **Test Requirements**:
+
 - SVG paths animate
 - Performance is good on mobile
 
 ---
 
 #### Task 2.8: Liquid Metal Visual
+
 - **ID**: P2-008
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C2
@@ -2745,9 +2960,10 @@ export { default } from './ZenGarden';
 **Actions**:
 
 Create `frontend/src/components/Visuals/LiquidMetal/LiquidMetal.tsx`:
+
 ```tsx
-import { useRef, useEffect } from 'react';
-import { VisualProps } from '../types';
+import { useRef, useEffect } from "react";
+import { VisualProps } from "../types";
 
 interface Ball {
   x: number;
@@ -2764,7 +2980,7 @@ export default function LiquidMetal({ isActive, speed = 1 }: VisualProps) {
     const canvas = canvasRef.current;
     if (!canvas || !isActive) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const width = canvas.offsetWidth;
@@ -2798,7 +3014,8 @@ export default function LiquidMetal({ isActive, speed = 1 }: VisualProps) {
 
         // Bounce off walls
         if (ball.x < ball.radius || ball.x > width - ball.radius) ball.vx *= -1;
-        if (ball.y < ball.radius || ball.y > height - ball.radius) ball.vy *= -1;
+        if (ball.y < ball.radius || ball.y > height - ball.radius)
+          ball.vy *= -1;
 
         // Draw metallic gradient
         const gradient = ctx.createRadialGradient(
@@ -2807,12 +3024,12 @@ export default function LiquidMetal({ isActive, speed = 1 }: VisualProps) {
           0,
           ball.x,
           ball.y,
-          ball.radius
+          ball.radius,
         );
-        gradient.addColorStop(0, '#ffffff');
-        gradient.addColorStop(0.3, '#c0c0c0');
-        gradient.addColorStop(0.7, '#808080');
-        gradient.addColorStop(1, '#404040');
+        gradient.addColorStop(0, "#ffffff");
+        gradient.addColorStop(0.3, "#c0c0c0");
+        gradient.addColorStop(0.7, "#808080");
+        gradient.addColorStop(1, "#404040");
 
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
@@ -2828,32 +3045,31 @@ export default function LiquidMetal({ isActive, speed = 1 }: VisualProps) {
     return () => cancelAnimationFrame(animationId);
   }, [isActive, speed]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-    />
-  );
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 ```
 
 Create `frontend/src/components/Visuals/LiquidMetal/index.ts`:
+
 ```typescript
-export { default } from './LiquidMetal';
+export { default } from "./LiquidMetal";
 ```
 
 **Verification**:
+
 - Balls merge with metaball effect
 - Performance is acceptable on mobile (reduced ball count)
 - Metallic gradient visible
 
 **Test Requirements**:
+
 - Canvas renders
 - No frame drops on mobile
 
 ---
 
 #### Task 2.9: Sacred Geometry Visual
+
 - **ID**: P2-009
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C3
@@ -2866,9 +3082,10 @@ export { default } from './LiquidMetal';
 **Actions**:
 
 Create `frontend/src/components/Visuals/SacredGeometry/SacredGeometry.tsx`:
+
 ```tsx
-import { motion } from 'framer-motion';
-import { VisualProps } from '../types';
+import { motion } from "framer-motion";
+import { VisualProps } from "../types";
 
 export default function SacredGeometry({ isActive, speed = 1 }: VisualProps) {
   const duration = 30 / speed;
@@ -2893,7 +3110,7 @@ export default function SacredGeometry({ isActive, speed = 1 }: VisualProps) {
         transition={{
           duration,
           repeat: Infinity,
-          ease: 'linear',
+          ease: "linear",
         }}
       >
         {/* Outer rings */}
@@ -2907,9 +3124,13 @@ export default function SacredGeometry({ isActive, speed = 1 }: VisualProps) {
             stroke="var(--color-primary)"
             strokeWidth="0.5"
             opacity={0.2}
-            animate={isActive ? {
-              opacity: [0.2, 0.4, 0.2],
-            } : {}}
+            animate={
+              isActive
+                ? {
+                    opacity: [0.2, 0.4, 0.2],
+                  }
+                : {}
+            }
             transition={{
               duration: duration / 3,
               repeat: Infinity,
@@ -2929,10 +3150,14 @@ export default function SacredGeometry({ isActive, speed = 1 }: VisualProps) {
             stroke="var(--color-primary)"
             strokeWidth="1"
             opacity={0.5}
-            animate={isActive ? {
-              scale: [1, 1.05, 1],
-              opacity: [0.5, 0.8, 0.5],
-            } : {}}
+            animate={
+              isActive
+                ? {
+                    scale: [1, 1.05, 1],
+                    opacity: [0.5, 0.8, 0.5],
+                  }
+                : {}
+            }
             transition={{
               duration: duration / 6,
               repeat: Infinity,
@@ -2950,22 +3175,26 @@ export default function SacredGeometry({ isActive, speed = 1 }: VisualProps) {
 ```
 
 Create `frontend/src/components/Visuals/SacredGeometry/index.ts`:
+
 ```typescript
-export { default } from './SacredGeometry';
+export { default } from "./SacredGeometry";
 ```
 
 **Verification**:
+
 - Flower of Life pattern visible
 - Gentle pulsing animation
 - Slow rotation
 
 **Test Requirements**:
+
 - SVG renders correctly
 - Animation is smooth
 
 ---
 
 #### Task 2.10: Ocean Depth Visual
+
 - **ID**: P2-010
 - **Dependencies**: P1-005, P2-000
 - **Assigned**: Builder-C3
@@ -2978,9 +3207,10 @@ export { default } from './SacredGeometry';
 **Actions**:
 
 Create `frontend/src/components/Visuals/OceanDepth/OceanDepth.tsx`:
+
 ```tsx
-import { useRef, useEffect } from 'react';
-import { VisualProps } from '../types';
+import { useRef, useEffect } from "react";
+import { VisualProps } from "../types";
 
 interface Organism {
   x: number;
@@ -2999,7 +3229,7 @@ export default function OceanDepth({ isActive, speed = 1 }: VisualProps) {
     const canvas = canvasRef.current;
     if (!canvas || !isActive) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const width = canvas.offsetWidth;
@@ -3026,8 +3256,8 @@ export default function OceanDepth({ isActive, speed = 1 }: VisualProps) {
 
       // Dark blue gradient background
       const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
-      bgGradient.addColorStop(0, '#001220');
-      bgGradient.addColorStop(1, '#000510');
+      bgGradient.addColorStop(0, "#001220");
+      bgGradient.addColorStop(1, "#000510");
       ctx.fillStyle = bgGradient;
       ctx.fillRect(0, 0, width, height);
 
@@ -3037,12 +3267,19 @@ export default function OceanDepth({ isActive, speed = 1 }: VisualProps) {
 
         // Glow effect
         const glow = ctx.createRadialGradient(
-          org.x, org.y, 0,
-          org.x, org.y, org.radius * 4
+          org.x,
+          org.y,
+          0,
+          org.x,
+          org.y,
+          org.radius * 4,
         );
         glow.addColorStop(0, `hsla(${org.hue}, 100%, 70%, ${brightness})`);
-        glow.addColorStop(0.5, `hsla(${org.hue}, 100%, 50%, ${brightness * 0.3})`);
-        glow.addColorStop(1, 'transparent');
+        glow.addColorStop(
+          0.5,
+          `hsla(${org.hue}, 100%, 50%, ${brightness * 0.3})`,
+        );
+        glow.addColorStop(1, "transparent");
 
         ctx.beginPath();
         ctx.arc(org.x, org.y, org.radius * 4, 0, Math.PI * 2);
@@ -3075,32 +3312,31 @@ export default function OceanDepth({ isActive, speed = 1 }: VisualProps) {
     return () => cancelAnimationFrame(animationId);
   }, [isActive, speed]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-    />
-  );
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 ```
 
 Create `frontend/src/components/Visuals/OceanDepth/index.ts`:
+
 ```typescript
-export { default } from './OceanDepth';
+export { default } from "./OceanDepth";
 ```
 
 **Verification**:
+
 - Bioluminescent organisms glow and pulse
 - Deep ocean atmosphere
 - Smooth drifting motion
 
 **Test Requirements**:
+
 - Canvas renders
 - Glow effects visible
 
 ---
 
 #### Task 2.11: Visual Selector Component
+
 - **ID**: P2-011
 - **Dependencies**: P2-001, P2-002, P2-003 (at least 3 visuals)
 - **Assigned**: Builder-B
@@ -3111,33 +3347,34 @@ export { default } from './OceanDepth';
 **Actions**:
 
 Create `frontend/src/components/Visuals/VisualSelector.tsx`:
+
 ```tsx
-import { useTimerStore } from '../../stores/timerStore';
-import { useTranslation } from 'react-i18next';
+import { useTimerStore } from "../../stores/timerStore";
+import { useTranslation } from "react-i18next";
 
 const VISUALS = [
-  { id: 'breathingCircle', preview: '⭕' },
-  { id: 'particleFlow', preview: '✨' },
-  { id: 'gradientWaves', preview: '🌊' },
-  { id: 'aurora', preview: '🌌' },
-  { id: 'mandala', preview: '🔮' },
-  { id: 'cosmicDust', preview: '⭐' },
-  { id: 'zenGarden', preview: '🪨' },
-  { id: 'liquidMetal', preview: '💧' },
-  { id: 'sacredGeometry', preview: '📐' },
-  { id: 'oceanDepth', preview: '🐙' },
+  { id: "breathingCircle", preview: "⭕" },
+  { id: "particleFlow", preview: "✨" },
+  { id: "gradientWaves", preview: "🌊" },
+  { id: "aurora", preview: "🌌" },
+  { id: "mandala", preview: "🔮" },
+  { id: "cosmicDust", preview: "⭐" },
+  { id: "zenGarden", preview: "🪨" },
+  { id: "liquidMetal", preview: "💧" },
+  { id: "sacredGeometry", preview: "📐" },
+  { id: "oceanDepth", preview: "🐙" },
 ];
 
 export default function VisualSelector() {
   const { t } = useTranslation();
   const { selectedVisual, setSelectedVisual, status } = useTimerStore();
 
-  if (status !== 'idle') return null;
+  if (status !== "idle") return null;
 
   return (
     <div className="mt-8">
       <h3 className="text-sm text-text-muted mb-3 text-center">
-        {t('visuals.select')}
+        {t("visuals.select")}
       </h3>
       <div className="grid grid-cols-5 gap-2">
         {VISUALS.map((visual) => (
@@ -3146,8 +3383,8 @@ export default function VisualSelector() {
             onClick={() => setSelectedVisual(visual.id)}
             className={`p-3 rounded-lg text-2xl ${
               selectedVisual === visual.id
-                ? 'bg-primary/20 ring-2 ring-primary'
-                : 'bg-surface'
+                ? "bg-primary/20 ring-2 ring-primary"
+                : "bg-surface"
             }`}
             title={t(`visuals.${visual.id}`)}
           >
@@ -3161,34 +3398,37 @@ export default function VisualSelector() {
 ```
 
 Create `frontend/src/components/Visuals/index.ts` (INCLUDES visualComponents export):
+
 ```tsx
-import { lazy } from 'react';
+import { lazy } from "react";
 
 export const visualComponents = {
-  breathingCircle: lazy(() => import('./BreathingCircle/BreathingCircle')),
-  particleFlow: lazy(() => import('./ParticleFlow/ParticleFlow')),
-  gradientWaves: lazy(() => import('./GradientWaves/GradientWaves')),
-  aurora: lazy(() => import('./Aurora/Aurora')),
-  mandala: lazy(() => import('./Mandala/Mandala')),
-  cosmicDust: lazy(() => import('./CosmicDust/CosmicDust')),
-  zenGarden: lazy(() => import('./ZenGarden/ZenGarden')),
-  liquidMetal: lazy(() => import('./LiquidMetal/LiquidMetal')),
-  sacredGeometry: lazy(() => import('./SacredGeometry/SacredGeometry')),
-  oceanDepth: lazy(() => import('./OceanDepth/OceanDepth')),
+  breathingCircle: lazy(() => import("./BreathingCircle/BreathingCircle")),
+  particleFlow: lazy(() => import("./ParticleFlow/ParticleFlow")),
+  gradientWaves: lazy(() => import("./GradientWaves/GradientWaves")),
+  aurora: lazy(() => import("./Aurora/Aurora")),
+  mandala: lazy(() => import("./Mandala/Mandala")),
+  cosmicDust: lazy(() => import("./CosmicDust/CosmicDust")),
+  zenGarden: lazy(() => import("./ZenGarden/ZenGarden")),
+  liquidMetal: lazy(() => import("./LiquidMetal/LiquidMetal")),
+  sacredGeometry: lazy(() => import("./SacredGeometry/SacredGeometry")),
+  oceanDepth: lazy(() => import("./OceanDepth/OceanDepth")),
 };
 
 export type VisualId = keyof typeof visualComponents;
 
-export { default as VisualSelector } from './VisualSelector';
+export { default as VisualSelector } from "./VisualSelector";
 ```
 
 **Verification**:
+
 - All 10 visuals selectable
 - Lazy loading works
 - Selected visual highlighted
 - `t('visuals.select')` displays correctly
 
 **Test Requirements**:
+
 - Clicking visual updates store
 - Lazy loaded components render
 
@@ -3197,6 +3437,7 @@ export { default as VisualSelector } from './VisualSelector';
 ### Phase 3: Breathing Guide
 
 #### Task 3.1: Breathing Pattern Engine
+
 - **ID**: P3-001
 - **Dependencies**: P1-006
 - **Assigned**: Builder-D
@@ -3208,39 +3449,76 @@ export { default as VisualSelector } from './VisualSelector';
 **Actions**:
 
 Create `frontend/src/components/BreathingGuide/patterns.ts`:
+
 ```typescript
 export interface BreathingPattern {
   id: string;
   nameKey: string; // i18n key
-  inhale: number;  // seconds
+  inhale: number; // seconds
   holdIn: number;
   exhale: number;
   holdOut: number;
 }
 
 export const BREATHING_PATTERNS: BreathingPattern[] = [
-  { id: '478', nameKey: 'breathing.patterns.478', inhale: 4, holdIn: 7, exhale: 8, holdOut: 0 },
-  { id: 'box', nameKey: 'breathing.patterns.box', inhale: 4, holdIn: 4, exhale: 4, holdOut: 4 },
-  { id: 'calming', nameKey: 'breathing.patterns.calming', inhale: 4, holdIn: 0, exhale: 6, holdOut: 0 },
-  { id: 'energizing', nameKey: 'breathing.patterns.energizing', inhale: 6, holdIn: 0, exhale: 2, holdOut: 0 },
+  {
+    id: "478",
+    nameKey: "breathing.patterns.478",
+    inhale: 4,
+    holdIn: 7,
+    exhale: 8,
+    holdOut: 0,
+  },
+  {
+    id: "box",
+    nameKey: "breathing.patterns.box",
+    inhale: 4,
+    holdIn: 4,
+    exhale: 4,
+    holdOut: 4,
+  },
+  {
+    id: "calming",
+    nameKey: "breathing.patterns.calming",
+    inhale: 4,
+    holdIn: 0,
+    exhale: 6,
+    holdOut: 0,
+  },
+  {
+    id: "energizing",
+    nameKey: "breathing.patterns.energizing",
+    inhale: 6,
+    holdIn: 0,
+    exhale: 2,
+    holdOut: 0,
+  },
 ];
 
-export type BreathPhase = 'inhale' | 'holdIn' | 'exhale' | 'holdOut';
+export type BreathPhase = "inhale" | "holdIn" | "exhale" | "holdOut";
 
 export function getPhaseKey(phase: BreathPhase): string {
   switch (phase) {
-    case 'inhale': return 'breathing.inhale';
-    case 'holdIn':
-    case 'holdOut': return 'breathing.hold';
-    case 'exhale': return 'breathing.exhale';
+    case "inhale":
+      return "breathing.inhale";
+    case "holdIn":
+    case "holdOut":
+      return "breathing.hold";
+    case "exhale":
+      return "breathing.exhale";
   }
 }
 ```
 
 Create `frontend/src/stores/breathingStore.ts` (REQUIRED for Meditate.tsx):
+
 ```typescript
-import { create } from 'zustand';
-import { BreathingPattern, BreathPhase, BREATHING_PATTERNS } from '../components/BreathingGuide/patterns';
+import { create } from "zustand";
+import {
+  BreathingPattern,
+  BreathPhase,
+  BREATHING_PATTERNS,
+} from "../components/BreathingGuide/patterns";
 
 interface BreathingState {
   pattern: BreathingPattern;
@@ -3256,19 +3534,25 @@ interface BreathingState {
 
 export const useBreathingStore = create<BreathingState>((set, get) => ({
   pattern: BREATHING_PATTERNS[1], // Box breathing default
-  phase: 'inhale',
+  phase: "inhale",
   phaseTime: 4,
   cycleCount: 0,
   isActive: false,
 
   setPattern: (id) => {
-    const pattern = BREATHING_PATTERNS.find((p) => p.id === id) || BREATHING_PATTERNS[1];
-    set({ pattern, phase: 'inhale', phaseTime: pattern.inhale, cycleCount: 0 });
+    const pattern =
+      BREATHING_PATTERNS.find((p) => p.id === id) || BREATHING_PATTERNS[1];
+    set({ pattern, phase: "inhale", phaseTime: pattern.inhale, cycleCount: 0 });
   },
 
   start: () => {
     const { pattern } = get();
-    set({ isActive: true, phase: 'inhale', phaseTime: pattern.inhale, cycleCount: 0 });
+    set({
+      isActive: true,
+      phase: "inhale",
+      phaseTime: pattern.inhale,
+      cycleCount: 0,
+    });
   },
 
   stop: () => set({ isActive: false }),
@@ -3283,8 +3567,13 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
     }
 
     // Move to next phase
-    const phases: BreathPhase[] = ['inhale', 'holdIn', 'exhale', 'holdOut'];
-    const durations = [pattern.inhale, pattern.holdIn, pattern.exhale, pattern.holdOut];
+    const phases: BreathPhase[] = ["inhale", "holdIn", "exhale", "holdOut"];
+    const durations = [
+      pattern.inhale,
+      pattern.holdIn,
+      pattern.exhale,
+      pattern.holdOut,
+    ];
 
     let nextPhaseIndex = phases.indexOf(phase) + 1;
 
@@ -3296,7 +3585,7 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
     if (nextPhaseIndex >= 4) {
       // Complete cycle, restart
       set({
-        phase: 'inhale',
+        phase: "inhale",
         phaseTime: pattern.inhale,
         cycleCount: cycleCount + 1,
       });
@@ -3311,9 +3600,10 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
 ```
 
 Create `frontend/src/hooks/useBreathingTimer.ts`:
+
 ```typescript
-import { useEffect, useRef } from 'react';
-import { useBreathingStore } from '../stores/breathingStore';
+import { useEffect, useRef } from "react";
+import { useBreathingStore } from "../stores/breathingStore";
 
 export function useBreathingTimer() {
   const { isActive, tick } = useBreathingStore();
@@ -3338,12 +3628,14 @@ export function useBreathingTimer() {
 ```
 
 **Verification**:
+
 - Pattern timing is accurate
 - Phase transitions work correctly
 - Cycle counter increments
 - Phases with 0 duration are skipped
 
 **Test Requirements**:
+
 - Box breathing: 4-4-4-4 timing
 - 4-7-8: inhale->holdIn->exhale (no holdOut)
 - Calming: inhale->exhale only
@@ -3351,6 +3643,7 @@ export function useBreathingTimer() {
 ---
 
 #### Task 3.2: Flower Animation (Apple Watch Style)
+
 - **ID**: P3-002
 - **Dependencies**: P3-001
 - **Assigned**: Builder-D
@@ -3361,9 +3654,10 @@ export function useBreathingTimer() {
 **Actions**:
 
 Create `frontend/src/components/BreathingGuide/FlowerAnimation.tsx`:
+
 ```tsx
-import { useBreathingStore } from '../../stores/breathingStore';
-import './FlowerAnimation.css';
+import { useBreathingStore } from "../../stores/breathingStore";
+import "./FlowerAnimation.css";
 
 export default function FlowerAnimation() {
   const { pattern, phase, isActive } = useBreathingStore();
@@ -3374,13 +3668,15 @@ export default function FlowerAnimation() {
   return (
     <div className="flower-container">
       <div
-        className={`flower ${isActive ? 'active' : ''} ${phase}`}
-        style={{
-          '--inhale-duration': `${pattern.inhale}s`,
-          '--hold-in-duration': `${pattern.holdIn}s`,
-          '--exhale-duration': `${pattern.exhale}s`,
-          '--hold-out-duration': `${pattern.holdOut}s`,
-        } as React.CSSProperties}
+        className={`flower ${isActive ? "active" : ""} ${phase}`}
+        style={
+          {
+            "--inhale-duration": `${pattern.inhale}s`,
+            "--hold-in-duration": `${pattern.holdIn}s`,
+            "--exhale-duration": `${pattern.exhale}s`,
+            "--hold-out-duration": `${pattern.holdOut}s`,
+          } as React.CSSProperties
+        }
       >
         {petals.map((_, i) => (
           <div
@@ -3400,6 +3696,7 @@ export default function FlowerAnimation() {
 ```
 
 Create `frontend/src/components/BreathingGuide/FlowerAnimation.css`:
+
 ```css
 .flower-container {
   display: flex;
@@ -3472,18 +3769,21 @@ Create `frontend/src/components/BreathingGuide/FlowerAnimation.css`:
 ```
 
 **Verification**:
+
 - Petals expand on inhale, contract on exhale
 - Hold phases maintain position
 - `mix-blend-mode: screen` creates overlapping glow effect
 - Animation timing matches pattern
 
 **Test Requirements**:
+
 - Animation syncs with breathing phase
 - CSS variables correctly set duration
 
 ---
 
 #### Task 3.3: Circle Animation (Simple Alternative)
+
 - **ID**: P3-003
 - **Dependencies**: P3-001
 - **Assigned**: Builder-D
@@ -3493,9 +3793,10 @@ Create `frontend/src/components/BreathingGuide/FlowerAnimation.css`:
 **Actions**:
 
 Create `frontend/src/components/BreathingGuide/CircleAnimation.tsx`:
+
 ```tsx
-import { motion } from 'framer-motion';
-import { useBreathingStore } from '../../stores/breathingStore';
+import { motion } from "framer-motion";
+import { useBreathingStore } from "../../stores/breathingStore";
 
 export default function CircleAnimation() {
   const { pattern, phase, phaseTime, isActive } = useBreathingStore();
@@ -3504,13 +3805,13 @@ export default function CircleAnimation() {
   const getScale = () => {
     if (!isActive) return 0.5;
     switch (phase) {
-      case 'inhale':
+      case "inhale":
         return 0.5 + (1 - phaseTime / pattern.inhale) * 0.5;
-      case 'holdIn':
+      case "holdIn":
         return 1;
-      case 'exhale':
+      case "exhale":
         return 1 - (1 - phaseTime / pattern.exhale) * 0.5;
-      case 'holdOut':
+      case "holdOut":
         return 0.5;
     }
   };
@@ -3520,12 +3821,12 @@ export default function CircleAnimation() {
       <motion.div
         className="w-48 h-48 rounded-full border-4 border-primary flex items-center justify-center"
         animate={{ scale: getScale() }}
-        transition={{ duration: 0.5, ease: 'easeInOut' }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
       >
         <motion.div
           className="w-32 h-32 rounded-full bg-primary/30"
           animate={{ scale: getScale() }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
         />
       </motion.div>
     </div>
@@ -3534,17 +3835,20 @@ export default function CircleAnimation() {
 ```
 
 **Verification**:
+
 - Circle grows/shrinks with breathing
 - Smooth transitions between phases
 - Works as fallback for simpler devices
 
 **Test Requirements**:
+
 - Scale updates each second
 - Animation is smooth
 
 ---
 
 #### Task 3.4: Standalone Breathing Mode
+
 - **ID**: P3-004
 - **Dependencies**: P3-001, P3-002, P3-003
 - **Assigned**: Builder-D
@@ -3556,19 +3860,23 @@ export default function CircleAnimation() {
 **Actions**:
 
 Create `frontend/src/components/BreathingGuide/BreathingGuide.tsx`:
+
 ```tsx
-import { useTranslation } from 'react-i18next';
-import { useBreathingTimer } from '../../hooks/useBreathingTimer';
-import { BREATHING_PATTERNS, getPhaseKey } from './patterns';
-import FlowerAnimation from './FlowerAnimation';
-import CircleAnimation from './CircleAnimation';
+import { useTranslation } from "react-i18next";
+import { useBreathingTimer } from "../../hooks/useBreathingTimer";
+import { BREATHING_PATTERNS, getPhaseKey } from "./patterns";
+import FlowerAnimation from "./FlowerAnimation";
+import CircleAnimation from "./CircleAnimation";
 
 interface Props {
-  variant?: 'flower' | 'circle';
+  variant?: "flower" | "circle";
   showControls?: boolean;
 }
 
-export default function BreathingGuide({ variant = 'flower', showControls = true }: Props) {
+export default function BreathingGuide({
+  variant = "flower",
+  showControls = true,
+}: Props) {
   const { t } = useTranslation();
   const {
     pattern,
@@ -3585,7 +3893,7 @@ export default function BreathingGuide({ variant = 'flower', showControls = true
     <div className="flex flex-col items-center">
       {/* Animation */}
       <div className="w-full max-w-md aspect-square">
-        {variant === 'flower' ? <FlowerAnimation /> : <CircleAnimation />}
+        {variant === "flower" ? <FlowerAnimation /> : <CircleAnimation />}
       </div>
 
       {/* Phase indicator */}
@@ -3599,7 +3907,7 @@ export default function BreathingGuide({ variant = 'flower', showControls = true
       {/* Cycle counter */}
       {cycleCount > 0 && (
         <p className="text-sm text-text-muted mt-4">
-          {cycleCount} {t('breathing.cycles')}
+          {cycleCount} {t("breathing.cycles")}
         </p>
       )}
 
@@ -3615,8 +3923,8 @@ export default function BreathingGuide({ variant = 'flower', showControls = true
                   onClick={() => setPattern(p.id)}
                   className={`px-4 py-2 rounded-full text-sm ${
                     pattern.id === p.id
-                      ? 'bg-primary text-white'
-                      : 'bg-surface border border-border'
+                      ? "bg-primary text-white"
+                      : "bg-surface border border-border"
                   }`}
                 >
                   {t(p.nameKey)}
@@ -3632,14 +3940,14 @@ export default function BreathingGuide({ variant = 'flower', showControls = true
                 onClick={start}
                 className="bg-primary text-white px-8 py-3 rounded-full text-lg"
               >
-                {t('timer.start')}
+                {t("timer.start")}
               </button>
             ) : (
               <button
                 onClick={stop}
                 className="bg-surface border border-red-500 text-red-500 px-8 py-3 rounded-full"
               >
-                {t('timer.stop')}
+                {t("timer.stop")}
               </button>
             )}
           </div>
@@ -3651,18 +3959,20 @@ export default function BreathingGuide({ variant = 'flower', showControls = true
 ```
 
 Create `frontend/src/components/BreathingGuide/index.ts`:
+
 ```typescript
-export { default as BreathingGuide } from './BreathingGuide';
-export { default as FlowerAnimation } from './FlowerAnimation';
-export { default as CircleAnimation } from './CircleAnimation';
-export * from './patterns';
+export { default as BreathingGuide } from "./BreathingGuide";
+export { default as FlowerAnimation } from "./FlowerAnimation";
+export { default as CircleAnimation } from "./CircleAnimation";
+export * from "./patterns";
 ```
 
 Update `frontend/src/pages/Breathe.tsx` (FULL VERSION):
+
 ```tsx
-import { BreathingGuide } from '../components/BreathingGuide';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { BreathingGuide } from "../components/BreathingGuide";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 export default function Breathe() {
   const { t } = useTranslation();
@@ -3670,7 +3980,9 @@ export default function Breathe() {
   return (
     <div className="min-h-screen p-4 flex flex-col">
       <header className="py-4">
-        <Link to="/" className="text-text-muted">&larr; {t('app.title')}</Link>
+        <Link to="/" className="text-text-muted">
+          &larr; {t("app.title")}
+        </Link>
       </header>
 
       <main className="flex-1 flex items-center justify-center">
@@ -3682,12 +3994,14 @@ export default function Breathe() {
 ```
 
 **Verification**:
+
 - Standalone page at `/breathe`
 - Pattern selector works
 - Phase text updates in real-time
 - Cycle counter increments
 
 **Test Requirements**:
+
 - Page renders
 - All 4 patterns selectable
 - Start/stop controls work
@@ -3695,6 +4009,7 @@ export default function Breathe() {
 ---
 
 #### Task 3.5: Timer Integration
+
 - **ID**: P3-005
 - **Dependencies**: P3-001, P1-006
 - **Assigned**: Builder-D
@@ -3704,28 +4019,31 @@ export default function Breathe() {
 **Actions**:
 
 Update `frontend/src/pages/Meditate.tsx` (FULL VERSION with all imports):
+
 ```tsx
-import { Suspense } from 'react';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { useTimer } from '../hooks/useTimer';
-import { useTimerStore } from '../stores/timerStore';
-import { useBreathingStore } from '../stores/breathingStore';
-import { Timer, DurationPicker } from '../components/Timer';
-import { VisualSelector, visualComponents } from '../components/Visuals';
-import { BreathingGuide } from '../components/BreathingGuide';
+import { Suspense } from "react";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { useTimer } from "../hooks/useTimer";
+import { useTimerStore } from "../stores/timerStore";
+import { useBreathingStore } from "../stores/breathingStore";
+import { Timer, DurationPicker } from "../components/Timer";
+import { VisualSelector, visualComponents } from "../components/Visuals";
+import { BreathingGuide } from "../components/BreathingGuide";
 
 export default function Meditate() {
   const { t } = useTranslation();
   const { status, selectedVisual, breathingEnabled } = useTimer();
-  const setBreathingEnabled = useTimerStore((state) => state.setBreathingEnabled);
+  const setBreathingEnabled = useTimerStore(
+    (state) => state.setBreathingEnabled,
+  );
   const { start: startBreathing, stop: stopBreathing } = useBreathingStore();
 
   // Sync breathing with timer
   useEffect(() => {
     if (breathingEnabled) {
-      if (status === 'running') {
+      if (status === "running") {
         startBreathing();
       } else {
         stopBreathing();
@@ -3733,22 +4051,25 @@ export default function Meditate() {
     }
   }, [status, breathingEnabled, startBreathing, stopBreathing]);
 
-  const VisualComponent = visualComponents[selectedVisual as keyof typeof visualComponents];
-  const isRunning = status === 'running' || status === 'paused';
+  const VisualComponent =
+    visualComponents[selectedVisual as keyof typeof visualComponents];
+  const isRunning = status === "running" || status === "paused";
 
   return (
     <div className="min-h-screen relative">
       {/* Back button (only when idle) */}
-      {status === 'idle' && (
+      {status === "idle" && (
         <div className="absolute top-4 left-4 z-20">
-          <Link to="/" className="text-text-muted">&larr; {t('app.title')}</Link>
+          <Link to="/" className="text-text-muted">
+            &larr; {t("app.title")}
+          </Link>
         </div>
       )}
 
       {/* Visual background */}
       {isRunning && VisualComponent && (
         <Suspense fallback={<div className="absolute inset-0 bg-background" />}>
-          <VisualComponent isActive={status === 'running'} />
+          <VisualComponent isActive={status === "running"} />
         </Suspense>
       )}
 
@@ -3768,7 +4089,7 @@ export default function Meditate() {
         <VisualSelector />
 
         {/* Breathing toggle */}
-        {status === 'idle' && (
+        {status === "idle" && (
           <label className="flex items-center gap-2 mt-4 cursor-pointer">
             <input
               type="checkbox"
@@ -3776,7 +4097,7 @@ export default function Meditate() {
               onChange={(e) => setBreathingEnabled(e.target.checked)}
               className="w-5 h-5 accent-primary"
             />
-            <span>{t('breathing.enableDuringMeditation')}</span>
+            <span>{t("breathing.enableDuringMeditation")}</span>
           </label>
         )}
       </div>
@@ -3786,12 +4107,14 @@ export default function Meditate() {
 ```
 
 **Verification**:
+
 - Breathing guide overlay appears when enabled
 - Syncs with timer start/pause/stop
 - Visual plays behind breathing guide
 - No TypeScript errors with store reference
 
 **Test Requirements**:
+
 - Enabling breathing shows guide during meditation
 - Pause/resume syncs both timer and breathing
 
@@ -3800,18 +4123,21 @@ export default function Meditate() {
 ## Testing Strategy
 
 ### Unit Tests
+
 - **Stores**: Each Zustand store has isolated tests
 - **Patterns**: Breathing pattern calculations
 - **API**: Backend endpoint tests with pytest
 - **Types**: Visual components type-check correctly
 
 ### Integration Tests
+
 - **Timer + Session**: Full flow from start to complete
 - **Timer + Breathing**: Sync behavior
 - **Timer + Bell**: Bell plays at correct times
 - **i18n**: Language switching, including visuals.select
 
 ### Visual Tests (Manual)
+
 - Each visual renders on:
   - Desktop Chrome
   - Desktop Safari
@@ -3821,6 +4147,7 @@ export default function Meditate() {
 - Aurora: Test WebGL and fallback modes
 
 ### E2E Tests (Future)
+
 - Playwright for critical flows:
   - Start meditation -> complete
   - Breathing guide standalone
@@ -3833,6 +4160,7 @@ export default function Meditate() {
 **Total Tasks**: 21 (8 Phase 1 + 12 Phase 2 + 5 Phase 3)
 
 **v3 Fixes Applied**:
+
 - Plan is now FULLY SELF-CONTAINED (no v1 references)
 - breathingStore.ts included in Task 3.1
 - Visuals/index.ts with visualComponents export in Task 2.11
@@ -3844,6 +4172,7 @@ export default function Meditate() {
 - /breathe route added to App.tsx
 
 **Parallelism**:
+
 - Phase 1: Mostly sequential (1.3-1.5 parallel with 1.2, 1.8 parallel with 1.7)
 - Phase 2: 2.0 must complete first, then all 10 visuals fully parallel after 1.5
 - Phase 3: Sequential within phase, parallel with Phase 2
@@ -3851,6 +4180,7 @@ export default function Meditate() {
 **Critical Path**: P1-001 -> P1-003 -> P2-000 -> P2-001..10 -> P2-011
 
 **Estimated Timeline** (with 4 builders):
+
 - Phase 1: 2-3 days
 - Phase 2: 3-4 days (parallel)
 - Phase 3: 2-3 days (parallel with Phase 2)

@@ -1,0 +1,65 @@
+{
+  "app": {
+    "title": "마음챙김",
+    "tagline": "매일의 명상 습관"
+  },
+  "home": {
+    "startMeditation": "명상 시작",
+    "settings": "설정",
+    "todayGoal": "오늘의 목표"
+  },
+  "timer": {
+    "minutes": "분",
+    "start": "시작",
+    "pause": "일시정지",
+    "resume": "계속",
+    "stop": "종료",
+    "complete": "완료!"
+  },
+  "breathing": {
+    "title": "호흡 가이드",
+    "inhale": "들이쉬세요",
+    "hold": "멈추세요",
+    "exhale": "내쉬세요",
+    "cycles": "사이클",
+    "enableDuringMeditation": "명상 중 호흡 가이드",
+    "patterns": {
+      "478": "4-7-8 릴렉싱",
+      "box": "박스 브리딩",
+      "calming": "카밍 브레스",
+      "energizing": "에너자이징"
+    }
+  },
+  "visuals": {
+    "select": "시각 효과 선택",
+    "breathingCircle": "호흡 원",
+    "particleFlow": "파티클 흐름",
+    "gradientWaves": "그라데이션 물결",
+    "aurora": "오로라",
+    "mandala": "만다라",
+    "cosmicDust": "우주 먼지",
+    "zenGarden": "선 정원",
+    "liquidMetal": "리퀴드 메탈",
+    "sacredGeometry": "신성 기하학",
+    "oceanDepth": "심해"
+  },
+  "settings": {
+    "title": "설정",
+    "language": "언어",
+    "theme": "테마",
+    "darkMode": "다크 모드",
+    "lightMode": "라이트 모드",
+    "bellSound": "종소리",
+    "enableBell": "시작/종료 시 종소리"
+  },
+  "themes": {
+    "ocean": "오션",
+    "forest": "포레스트",
+    "sunset": "선셋",
+    "midnight": "미드나잇",
+    "sakura": "사쿠라",
+    "sand": "샌드",
+    "aurora": "오로라",
+    "zen": "젠"
+  }
+}
