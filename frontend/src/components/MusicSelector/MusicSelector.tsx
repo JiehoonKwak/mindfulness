@@ -136,6 +136,15 @@ export default function MusicSelector() {
           Generate music using the presets above
         </p>
       )}
+
+      {presets.length === 0 && (
+        <div className="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+          <p className="text-sm text-[var(--color-text-muted)]">
+            AI music generation requires GEMINI_API_KEY environment variable.
+            Set it in backend/.env to enable this feature.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

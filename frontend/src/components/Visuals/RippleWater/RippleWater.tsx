@@ -30,7 +30,7 @@ const fragmentShader = `
   void main() {
     float dist = length(vUv - 0.5);
     float alpha = smoothstep(0.5, 0.3, dist) * (0.2 + uRipple * 0.2);
-    vec3 color = vec3(0.39, 0.4, 0.95);
+    vec3 color = vec3(1.0, 1.0, 1.0);
 
     // Add subtle shimmer
     float shimmer = sin(uTime * 3.0 + dist * 10.0) * 0.1;

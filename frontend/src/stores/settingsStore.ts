@@ -4,16 +4,20 @@ import { persist } from "zustand/middleware";
 type ThemeId = "zen-dark" | "zen-light";
 type Language = "ko" | "en";
 type BellSound = "tibetan_bowl" | "singing_bowl" | "zen_gong" | "soft_chime";
+type AmbientSound = "rain" | "ocean" | "forest" | "tibetan_bowls" | "wind_chimes" |
+                    "white_noise" | "river" | "campfire" | "wind" | "birds" | "none";
 
 interface SettingsState {
   theme: ThemeId;
   language: Language;
   bellEnabled: boolean;
   bellSound: BellSound;
+  defaultAmbient: AmbientSound;
   setTheme: (theme: ThemeId) => void;
   setLanguage: (language: Language) => void;
   setBellEnabled: (enabled: boolean) => void;
   setBellSound: (sound: BellSound) => void;
+  setDefaultAmbient: (sound: AmbientSound) => void;
 }
 
 const LIGHT_THEMES: ThemeId[] = ["zen-light"];
@@ -25,6 +29,7 @@ export const useSettingsStore = create<SettingsState>()(
       language: "ko",
       bellEnabled: true,
       bellSound: "tibetan_bowl",
+      defaultAmbient: "none",
       setTheme: (theme) => {
         document.documentElement.setAttribute("data-theme", theme);
         document.documentElement.classList.toggle(
@@ -39,6 +44,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
       setBellEnabled: (enabled) => set({ bellEnabled: enabled }),
       setBellSound: (sound) => set({ bellSound: sound }),
+      setDefaultAmbient: (sound) => set({ defaultAmbient: sound }),
     }),
     { name: "mindfulness-settings" },
   ),

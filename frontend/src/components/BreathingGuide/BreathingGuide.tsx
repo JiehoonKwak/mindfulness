@@ -22,7 +22,7 @@ export default function BreathingGuide({ showControls = true }: Props) {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="w-full max-w-md aspect-square flex items-center justify-center">
+      <div className="w-full max-w-lg aspect-square flex items-center justify-center">
         <AuraBreathing />
       </div>
 
@@ -57,7 +57,7 @@ export default function BreathingGuide({ showControls = true }: Props) {
                     text-sm tracking-wider
                     ${
                       pattern.id === p.id
-                        ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white"
+                        ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-bg)]"
                         : "bg-[var(--color-surface)]/40 border-[var(--color-border)]/50 text-[var(--color-text-muted)]"
                     }
                   `}
@@ -74,9 +74,9 @@ export default function BreathingGuide({ showControls = true }: Props) {
                 onClick={start}
                 className="
                   w-16 h-16 rounded-full
-                  bg-[var(--color-primary)] text-white
+                  bg-[var(--color-primary)] text-[var(--color-bg)]
                   flex items-center justify-center
-                  shadow-lg shadow-[var(--color-primary)]/30
+                  shadow-lg shadow-black/20
                   hover:scale-105 transition-transform
                 "
               >

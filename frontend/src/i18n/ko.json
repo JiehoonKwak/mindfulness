@@ -31,11 +31,11 @@
     }
   },
   "visuals": {
-    "select": "시각 효과 선택",
+    "select": "비주얼 선택",
     "aurora": "오로라",
-    "breathSphere": "브레스 스피어",
-    "floatingOrbs": "플로팅 오브",
-    "rippleWater": "리플 워터"
+    "breathSphere": "별자리",
+    "floatingOrbs": "신성한 기하학",
+    "rippleWater": "물결"
   },
   "settings": {
     "title": "설정",
@@ -70,7 +70,9 @@
       "test": "테스트",
       "testSuccess": "테스트 알림을 보냈습니다!",
       "testFailed": "테스트 알림 전송 실패"
-    }
+    },
+    "defaultAmbient": "기본 배경 소리",
+    "defaultAmbientDescription": "명상 시작 시 자동 재생"
   },
   "themes": {
     "dark": "다크",
@@ -120,6 +122,14 @@
     "rain": "비",
     "ocean": "바다",
     "forest": "숲",
+    "tibetanBowls": "티베트 종",
+    "windChimes": "풍경",
+    "whiteNoise": "백색 소음",
+    "river": "강",
+    "campfire": "캠프파이어",
+    "wind": "바람",
+    "birds": "새소리",
+    "none": "없음",
     "music": "배경 음악"
   }
 }

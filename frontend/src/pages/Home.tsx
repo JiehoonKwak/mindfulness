@@ -5,6 +5,7 @@ import { getStatsSummary, getHeatmap } from "../api/stats";
 import type { StatsSummary, HeatmapEntry } from "../api/stats";
 import Heatmap from "../components/Stats/Heatmap";
 import { Icons } from "../components/Icons";
+import { ZenQuote } from "../components/ZenQuote";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -55,8 +56,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Spacer */}
-        <div className="flex-1" />
+        {/* Zen Quote in center */}
+        <div className="flex-1 flex items-center justify-center">
+          <ZenQuote />
+        </div>
 
         {/* Actions */}
         <section className="p-6 space-y-3">

@@ -27,8 +27,8 @@ export default function DurationPicker() {
               text-sm tracking-wider
               ${
                 currentMinutes === mins
-                  ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-white"
-                  : "bg-[var(--color-surface)]/40 border-[var(--color-border)]/50 text-[var(--color-text-muted)]"
+                  ? "bg-[var(--color-primary)] border-[var(--color-primary)] text-[var(--color-bg)]"
+                  : "bg-[var(--color-surface)]/40 border-[var(--color-border)] text-[var(--color-text)]"
               }
             `}
           >

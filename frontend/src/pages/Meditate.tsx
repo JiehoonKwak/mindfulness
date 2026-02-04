@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useTimer } from "../hooks/useTimer";
@@ -6,6 +6,7 @@ import { useAudioLayers } from "../hooks/useAudioLayers";
 import { useTimerStore } from "../stores/timerStore";
 import { useBreathingStore } from "../stores/breathingStore";
 import { useSessionStore } from "../stores/sessionStore";
+import { useSettingsStore } from "../stores/settingsStore";
 import { Timer, DurationPicker } from "../components/Timer";
 import { VisualSelector, visualComponents } from "../components/Visuals";
 import { BreathingGuide } from "../components/BreathingGuide";
@@ -15,9 +16,6 @@ import SoundMixer from "../components/SoundMixer/SoundMixer";
 export default function Meditate() {
   const { t } = useTranslation();
   const { status, selectedVisual, breathingEnabled } = useTimer();
-  const setBreathingEnabled = useTimerStore(
-    (state) => state.setBreathingEnabled,
-  );
   const reset = useTimerStore((state) => state.reset);
   const { start: startBreathing, stop: stopBreathing } = useBreathingStore();
   const { currentSessionId, updateJournal } = useSessionStore();
@@ -25,6 +23,20 @@ export default function Meditate() {
   const [showSoundMixer, setShowSoundMixer] = useState(false);
   const [activeAmbients, setActiveAmbients] = useState<Set<string>>(new Set());
   const audio = useAudioLayers();
+  const { defaultAmbient } = useSettingsStore();
+  const prevStatusRef = useRef(status);
+
+  // Auto-play default ambient when meditation starts (only on transition TO running)
+  useEffect(() => {
+    if (status === "running" && prevStatusRef.current !== "running" && defaultAmbient !== "none") {
+      const soundUrl = `/sounds/ambient/${defaultAmbient === "rain" ? "rain_light" :
+                                          defaultAmbient === "ocean" ? "ocean_waves" :
+                                          defaultAmbient}.mp3`;
+      audio.addAmbient(defaultAmbient, soundUrl);
+      setActiveAmbients((prev) => new Set([...prev, defaultAmbient]));
+    }
+    prevStatusRef.current = status;
+  }, [status, defaultAmbient, audio]);
 
   // Show journal modal when session completes
   useEffect(() => {
@@ -133,41 +145,6 @@ export default function Meditate() {
           <>
             <DurationPicker />
             <VisualSelector />
-
-            {/* Breathing toggle */}
-            <button
-              onClick={() => setBreathingEnabled(!breathingEnabled)}
-              className={`
-                mt-6 px-5 py-3 rounded-2xl backdrop-blur-xl
-                border transition-all duration-200
-                flex items-center gap-3
-                text-sm tracking-wider
-                ${
-                  breathingEnabled
-                    ? "bg-[var(--color-primary)]/10 border-[var(--color-primary)]/50 text-[var(--color-primary)]"
-                    : "bg-[var(--color-surface)]/30 border-[var(--color-border)]/30 text-[var(--color-text-muted)]"
-                }
-              `}
-            >
-              <div
-                className={`
-                  w-10 h-5 rounded-full transition-colors duration-200
-                  ${breathingEnabled ? "bg-[var(--color-primary)]" : "bg-[var(--color-border)]"}
-                `}
-              >
-                <div
-                  className={`
-                    w-4 h-4 rounded-full bg-white shadow-sm
-                    transform transition-transform duration-200
-                    translate-y-0.5
-                    ${breathingEnabled ? "translate-x-5" : "translate-x-0.5"}
-                  `}
-                />
-              </div>
-              <span className="uppercase tracking-widest text-xs">
-                {t("breathing.enableDuringMeditation")}
-              </span>
-            </button>
           </>
         )}
       </div>

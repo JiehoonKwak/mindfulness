@@ -65,10 +65,10 @@ export const fragmentShader = `
     band3 *= smoothstep(0.82, 0.55, uv.y + band3 * 0.08);
     aurora += band3 * 0.25;
 
-    // Zen color gradient - teal to blue (matching aura sphere)
-    vec3 color1 = vec3(0.18, 0.83, 0.75);  // Teal #2dd4bf
-    vec3 color2 = vec3(0.23, 0.51, 0.96);  // Blue #3b82f6
-    vec3 color3 = vec3(0.49, 0.23, 0.93);  // Purple accent
+    // Monochrome gradient - white to gray
+    vec3 color1 = vec3(1.0, 1.0, 1.0);     // White
+    vec3 color2 = vec3(0.7, 0.7, 0.7);     // Light gray
+    vec3 color3 = vec3(0.5, 0.5, 0.5);     // Mid gray
 
     float colorMix = snoise(vec2(uv.x * 1.5 + u_time * 0.04, u_time * 0.015)) * 0.5 + 0.5;
     vec3 auroraColor = mix(color1, color2, colorMix);
@@ -86,9 +86,9 @@ export const fragmentShader = `
     stars = pow(stars, 25.0) * 0.15;
     finalColor += vec3(stars) * (1.0 - aurora * 1.5);
 
-    // Dark zen background gradient
-    vec3 skyTop = vec3(0.02, 0.04, 0.08);
-    vec3 skyBottom = vec3(0.0, 0.01, 0.03);
+    // Pure black background gradient
+    vec3 skyTop = vec3(0.05, 0.05, 0.05);
+    vec3 skyBottom = vec3(0.0, 0.0, 0.0);
     vec3 sky = mix(skyBottom, skyTop, uv.y * 0.8);
 
     finalColor = max(finalColor, sky);

@@ -11,8 +11,8 @@ export type VisualId = keyof typeof visualComponents;
 
 export const VISUALS = [
   { id: "aurora", name: "Aurora" },
-  { id: "breathSphere", name: "Breath Sphere" },
-  { id: "floatingOrbs", name: "Floating Orbs" },
+  { id: "breathSphere", name: "Constellation" },
+  { id: "floatingOrbs", name: "Sacred Geometry" },
   { id: "rippleWater", name: "Ripple Water" },
 ] as const;
 

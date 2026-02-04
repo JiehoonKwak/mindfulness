@@ -3,18 +3,29 @@ import * as THREE from "three";
 import { useBreathingStore } from "../../../stores/breathingStore";
 import type { VisualProps } from "../types";
 
-const orbData = [
-  { pos: [-2, 1, 0], scale: 0.8, color: 0x6366f1 },
-  { pos: [2, -1, -1], scale: 0.6, color: 0x8b5cf6 },
-  { pos: [0, 2, -2], scale: 0.5, color: 0xa78bfa },
-  { pos: [-1, -2, -1], scale: 0.7, color: 0x7c3aed },
-  { pos: [1.5, 0.5, -0.5], scale: 0.4, color: 0xc4b5fd },
-];
+function createRing(radius: number, segments: number): THREE.BufferGeometry {
+  const points: THREE.Vector3[] = [];
+  for (let i = 0; i <= segments; i++) {
+    const angle = (i / segments) * Math.PI * 2;
+    points.push(new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0));
+  }
+  return new THREE.BufferGeometry().setFromPoints(points);
+}
+
+function createPolygon(radius: number, sides: number): THREE.BufferGeometry {
+  const points: THREE.Vector3[] = [];
+  for (let i = 0; i <= sides; i++) {
+    const angle = (i / sides) * Math.PI * 2 - Math.PI / 2;
+    points.push(new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0));
+  }
+  return new THREE.BufferGeometry().setFromPoints(points);
+}
 
 export default function FloatingOrbs({ isActive }: VisualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { phase, phaseTime, pattern } = useBreathingStore();
-  const orbsRef = useRef<THREE.Mesh[]>([]);
+  const shapesRef = useRef<THREE.Line[]>([]);
+  const materialsRef = useRef<THREE.LineBasicMaterial[]>([]);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -33,16 +44,11 @@ export default function FloatingOrbs({ isActive }: VisualProps) {
 
   const breathScale = useMemo(() => {
     switch (phase) {
-      case "inhale":
-        return 1 + progress * 0.3;
-      case "holdIn":
-        return 1.3;
-      case "exhale":
-        return 1.3 - progress * 0.3;
-      case "holdOut":
-        return 1;
-      default:
-        return 1;
+      case "inhale": return 0.8 + progress * 0.4;
+      case "holdIn": return 1.2;
+      case "exhale": return 1.2 - progress * 0.4;
+      case "holdOut": return 0.8;
+      default: return 1.0;
     }
   }, [phase, progress]);
 
@@ -54,37 +60,82 @@ export default function FloatingOrbs({ isActive }: VisualProps) {
     const height = container.clientHeight || window.innerHeight;
 
     sceneRef.current = new THREE.Scene();
-    cameraRef.current = new THREE.PerspectiveCamera(
-      50,
-      width / height,
-      0.1,
-      100,
-    );
-    cameraRef.current.position.z = 10;
+    cameraRef.current = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
+    cameraRef.current.position.z = 6;
 
-    rendererRef.current = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
+    rendererRef.current = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     rendererRef.current.setSize(width, height);
     rendererRef.current.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(rendererRef.current.domElement);
 
-    orbsRef.current = orbData.map(({ pos, scale, color }) => {
-      const geometry = new THREE.SphereGeometry(1, 32, 32);
-      const material = new THREE.MeshBasicMaterial({
-        color,
-        transparent: true,
-        opacity: 0.6,
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(pos[0], pos[1], pos[2]);
-      mesh.scale.setScalar(scale);
-      mesh.userData.baseScale = scale;
-      mesh.userData.offset = Math.random() * Math.PI * 2;
-      sceneRef.current!.add(mesh);
-      return mesh;
+    const lineMaterial = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.6,
     });
+
+    const dimMaterial = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.2,
+    });
+
+    materialsRef.current = [lineMaterial, dimMaterial];
+
+    // Create nested sacred geometry
+    const shapes: THREE.Line[] = [];
+
+    // Outer circles
+    [2.2, 2.0, 1.8].forEach((r, i) => {
+      const geo = createRing(r, 64);
+      const line = new THREE.Line(geo, i === 1 ? lineMaterial : dimMaterial);
+      line.userData = { baseRadius: r, type: "circle", speed: 0.1 + i * 0.05 };
+      shapes.push(line);
+      sceneRef.current!.add(line);
+    });
+
+    // Triangles (3 nested)
+    [1.5, 1.2, 0.9].forEach((r, i) => {
+      const geo = createPolygon(r, 3);
+      const line = new THREE.Line(geo, i === 0 ? lineMaterial : dimMaterial);
+      line.userData = { baseRadius: r, type: "triangle", speed: -0.15 - i * 0.05, rotOffset: i * Math.PI / 3 };
+      shapes.push(line);
+      sceneRef.current!.add(line);
+    });
+
+    // Hexagons (2 nested)
+    [1.4, 1.0].forEach((r, i) => {
+      const geo = createPolygon(r, 6);
+      const line = new THREE.Line(geo, i === 0 ? lineMaterial : dimMaterial);
+      line.userData = { baseRadius: r, type: "hexagon", speed: 0.08 + i * 0.04 };
+      shapes.push(line);
+      sceneRef.current!.add(line);
+    });
+
+    // Inner flower of life hint (small circles)
+    const flowerRadius = 0.4;
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const geo = createRing(flowerRadius, 32);
+      const line = new THREE.Line(geo, dimMaterial);
+      line.position.set(
+        Math.cos(angle) * flowerRadius * 1.5,
+        Math.sin(angle) * flowerRadius * 1.5,
+        0
+      );
+      line.userData = { baseRadius: flowerRadius, type: "flower", speed: 0.05, index: i };
+      shapes.push(line);
+      sceneRef.current!.add(line);
+    }
+
+    // Center circle
+    const centerGeo = createRing(0.3, 32);
+    const centerLine = new THREE.Line(centerGeo, lineMaterial);
+    centerLine.userData = { baseRadius: 0.3, type: "center", speed: -0.2 };
+    shapes.push(centerLine);
+    sceneRef.current!.add(centerLine);
+
+    shapesRef.current = shapes;
 
     const handleResize = () => {
       if (!container || !cameraRef.current || !rendererRef.current) return;
@@ -99,10 +150,8 @@ export default function FloatingOrbs({ isActive }: VisualProps) {
     return () => {
       window.removeEventListener("resize", handleResize);
       rendererRef.current?.dispose();
-      orbsRef.current.forEach((orb) => {
-        orb.geometry.dispose();
-        (orb.material as THREE.Material).dispose();
-      });
+      shapes.forEach((s) => s.geometry.dispose());
+      materialsRef.current.forEach((m) => m.dispose());
       if (container && rendererRef.current?.domElement) {
         container.removeChild(rendererRef.current.domElement);
       }
@@ -110,37 +159,28 @@ export default function FloatingOrbs({ isActive }: VisualProps) {
   }, []);
 
   useEffect(() => {
-    if (
-      !isActive ||
-      !rendererRef.current ||
-      !sceneRef.current ||
-      !cameraRef.current
-    )
-      return;
+    if (!isActive || !rendererRef.current || !sceneRef.current || !cameraRef.current) return;
 
     let time = 0;
     let animationId: number;
 
     const animate = () => {
-      time += 0.005;
+      time += 0.008;
 
-      orbsRef.current.forEach((orb, i) => {
-        // Gentle drift
-        orb.position.x += Math.sin(time + i) * 0.002;
-        orb.position.y += Math.cos(time + i * 0.7) * 0.002;
+      shapesRef.current.forEach((shape) => {
+        const { speed, type, rotOffset = 0 } = shape.userData;
 
-        // Keep orbs within bounds
-        orb.position.x = Math.max(-4, Math.min(4, orb.position.x));
-        orb.position.y = Math.max(-4, Math.min(4, orb.position.y));
+        // Rotate
+        shape.rotation.z = time * speed + rotOffset;
 
-        // Breath-synced scale
-        const baseScale = orb.userData.baseScale;
-        const targetScale = baseScale * breathScale;
-        orb.scale.setScalar(orb.scale.x + (targetScale - orb.scale.x) * 0.05);
+        // Scale with breath
+        const targetScale = breathScale;
+        shape.scale.setScalar(shape.scale.x + (targetScale - shape.scale.x) * 0.08);
 
-        // Opacity pulse
-        const mat = orb.material as THREE.MeshBasicMaterial;
-        mat.opacity = 0.4 + Math.sin(time * 2 + orb.userData.offset) * 0.2;
+        // Pulse opacity slightly
+        const mat = shape.material as THREE.LineBasicMaterial;
+        const baseOpacity = type === "circle" || type === "center" ? 0.6 : 0.25;
+        mat.opacity = baseOpacity + Math.sin(time * 2) * 0.1;
       });
 
       rendererRef.current!.render(sceneRef.current!, cameraRef.current!);

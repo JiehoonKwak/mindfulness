@@ -22,6 +22,20 @@ const BELL_SOUNDS = [
   { id: "soft_chime", labelKey: "settings.bells.softChime" },
 ] as const;
 
+const AMBIENT_OPTIONS = [
+  { id: "none", labelKey: "sounds.none" },
+  { id: "rain", labelKey: "sounds.rain" },
+  { id: "ocean", labelKey: "sounds.ocean" },
+  { id: "forest", labelKey: "sounds.forest" },
+  { id: "tibetan_bowls", labelKey: "sounds.tibetanBowls" },
+  { id: "wind_chimes", labelKey: "sounds.windChimes" },
+  { id: "white_noise", labelKey: "sounds.whiteNoise" },
+  { id: "river", labelKey: "sounds.river" },
+  { id: "campfire", labelKey: "sounds.campfire" },
+  { id: "wind", labelKey: "sounds.wind" },
+  { id: "birds", labelKey: "sounds.birds" },
+] as const;
+
 export default function Settings() {
   const { t, i18n } = useTranslation();
   const {
@@ -31,6 +45,8 @@ export default function Settings() {
     setBellEnabled,
     bellSound,
     setBellSound,
+    defaultAmbient,
+    setDefaultAmbient,
   } = useSettingsStore();
   const [exportFormat, setExportFormat] = useState<string>("json");
   const [exporting, setExporting] = useState(false);
@@ -92,7 +108,7 @@ export default function Settings() {
           ? t("settings.discord.testSuccess")
           : t("settings.discord.testFailed"),
       );
-    } catch (error) {
+    } catch {
       alert(t("settings.discord.testFailed"));
     } finally {
       setWebhookTesting(false);
@@ -212,6 +228,37 @@ export default function Settings() {
           )}
         </section>
 
+        {/* Default Ambient Sound Section */}
+        <section className="space-y-4">
+          <h2 className="text-sm uppercase tracking-widest text-[var(--color-text-muted)]">
+            {t("settings.defaultAmbient")}
+          </h2>
+          <p className="text-sm text-[var(--color-text-muted)]">
+            {t("settings.defaultAmbientDescription")}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {AMBIENT_OPTIONS.map((sound) => (
+              <button
+                key={sound.id}
+                onClick={() => setDefaultAmbient(sound.id)}
+                className={`
+                  px-4 py-3 rounded-xl backdrop-blur-xl
+                  bg-[var(--color-surface)]/40
+                  border transition-all duration-200
+                  text-sm
+                  ${
+                    defaultAmbient === sound.id
+                      ? "border-[var(--color-primary)] text-[var(--color-primary)]"
+                      : "border-[var(--color-border)]/50 text-[var(--color-text-muted)]"
+                  }
+                `}
+              >
+                {t(sound.labelKey)}
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* Export Section */}
         <section className="space-y-4">
           <h2 className="text-sm uppercase tracking-widest text-[var(--color-text-muted)]">
@@ -244,7 +291,7 @@ export default function Settings() {
             className="
               w-full py-3 rounded-xl
               bg-[var(--color-primary)]
-              text-white font-medium
+              text-[var(--color-bg)] font-medium
               hover:opacity-90 transition-opacity
               disabled:opacity-50
             "
@@ -289,7 +336,7 @@ export default function Settings() {
               className="
                 flex-1 py-3 rounded-xl
                 bg-[var(--color-primary)]
-                text-white font-medium
+                text-[var(--color-bg)] font-medium
                 hover:opacity-90 transition-opacity
                 disabled:opacity-50
               "

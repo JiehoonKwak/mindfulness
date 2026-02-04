@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { useBreathingStore } from "../../stores/breathingStore";
 import type { BreathPhase } from "./patterns";
 
-const SIZE = 320;
+const SIZE = 400;
 
 function getPhaseTargets(phase: BreathPhase, progress: number) {
   switch (phase) {
@@ -62,8 +62,8 @@ export default function AuraBreathing() {
         uTime: { value: 0 },
         uScale: { value: 0.7 },
         uIntensity: { value: 0.3 },
-        uColor1: { value: new THREE.Color("#2dd4bf") }, // teal
-        uColor2: { value: new THREE.Color("#3b82f6") }, // blue
+        uColor1: { value: new THREE.Color("#ffffff") },
+        uColor2: { value: new THREE.Color("#ffffff") },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -163,7 +163,7 @@ export default function AuraBreathing() {
       <div
         className="absolute w-64 h-64 rounded-full opacity-20 blur-3xl"
         style={{
-          background: "radial-gradient(circle, #2dd4bf 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)",
           top: "-20%",
           left: "-10%",
         }}
@@ -171,7 +171,7 @@ export default function AuraBreathing() {
       <div
         className="absolute w-64 h-64 rounded-full opacity-20 blur-3xl"
         style={{
-          background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)",
           bottom: "-20%",
           right: "-10%",
         }}

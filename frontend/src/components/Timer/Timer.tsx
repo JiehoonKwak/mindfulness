@@ -11,9 +11,18 @@ export default function Timer() {
   const { remaining, duration, status } = useTimer();
   const progress = duration > 0 ? ((duration - remaining) / duration) * 100 : 0;
 
+  // Don't render progress ring in idle state - ClockDial shows time
+  if (status === "idle") {
+    return (
+      <div className="flex flex-col items-center">
+        <TimerControls />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center">
-      {/* Progress Ring */}
+      {/* Progress Ring - only shown when not idle */}
       <div className="relative w-72 h-72">
         <svg className="w-full h-full transform -rotate-90">
           {/* Background ring */}
@@ -49,11 +58,6 @@ export default function Timer() {
           >
             {formatTime(remaining)}
           </span>
-          {status === "idle" && (
-            <span className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)] mt-2">
-              {Math.round(duration / 60)} min
-            </span>
-          )}
         </div>
       </div>
 
