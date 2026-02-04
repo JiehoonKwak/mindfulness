@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useSessionStore } from "./sessionStore";
 
 type TimerStatus = "idle" | "running" | "paused" | "complete";
 
@@ -41,17 +42,24 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 
   setBreathingPattern: (pattern) => set({ breathingPattern: pattern }),
 
-  start: () => set({ status: "running" }),
+  start: () => {
+    const { duration, selectedVisual } = get();
+    set({ status: "running" });
+    // Log session to backend
+    useSessionStore.getState().startSession(duration, selectedVisual);
+  },
 
   pause: () => set({ status: "paused" }),
 
   resume: () => set({ status: "running" }),
 
-  stop: () =>
-    set((state) => ({
-      status: "idle",
-      remaining: state.duration,
-    })),
+  stop: () => {
+    const { duration, remaining } = get();
+    const actualDuration = duration - remaining;
+    // Log abandoned session
+    useSessionStore.getState().abandonSession(actualDuration);
+    set({ status: "idle", remaining: duration });
+  },
 
   tick: () => {
     const { remaining, status } = get();
@@ -62,5 +70,10 @@ export const useTimerStore = create<TimerState>((set, get) => ({
     }
   },
 
-  complete: () => set({ status: "complete" }),
+  complete: () => {
+    const { duration } = get();
+    set({ status: "complete" });
+    // Log completed session
+    useSessionStore.getState().completeSession(duration);
+  },
 }));
