@@ -1,7 +1,14 @@
 import { useTimer } from "../../hooks/useTimer";
 
-export default function TimerControls() {
+interface TimerControlsProps {
+  onStopRequest?: () => void;  // Optional callback for stop confirmation
+}
+
+export default function TimerControls({ onStopRequest }: TimerControlsProps = {}) {
   const { status, start, pause, resume, stop } = useTimer();
+
+  // Use callback if provided, otherwise direct stop
+  const handleStop = onStopRequest || stop;
 
   return (
     <div className="flex gap-4 mt-8 items-center">
@@ -43,7 +50,7 @@ export default function TimerControls() {
             </svg>
           </button>
           <button
-            onClick={stop}
+            onClick={handleStop}
             className="
               w-14 h-14 rounded-full
               bg-[var(--color-surface)]/60 backdrop-blur-xl
@@ -84,7 +91,7 @@ export default function TimerControls() {
             </svg>
           </button>
           <button
-            onClick={stop}
+            onClick={handleStop}
             className="
               w-14 h-14 rounded-full
               bg-[var(--color-surface)]/60 backdrop-blur-xl

@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 
 interface AudioLayer {
   source: AudioBufferSourceNode | null;
@@ -7,9 +7,16 @@ interface AudioLayer {
   isPlaying: boolean;
 }
 
+interface MusicLayer {
+  source: AudioBufferSourceNode | null;
+  gainNode: GainNode;
+  buffer: AudioBuffer | null;
+  isPlaying: boolean;
+}
+
 interface UseAudioLayersReturn {
   playBell: (url: string) => Promise<void>;
-  addAmbient: (id: string, url: string) => Promise<void>;
+  addAmbient: (id: string, url: string, initialVolume?: number) => Promise<void>;
   removeAmbient: (id: string) => void;
   setAmbientVolume: (id: string, volume: number) => void;
   setMasterVolume: (volume: number) => void;
@@ -17,40 +24,90 @@ interface UseAudioLayersReturn {
   resumeAll: () => void;
   fadeOutAll: (durationMs?: number) => void;
   isAmbientPlaying: (id: string) => boolean;
+  // Music layer
+  playMusic: (url: string, volume?: number) => Promise<void>;
+  stopMusic: () => void;
+  setMusicVolume: (volume: number) => void;
+  isMusicPlaying: () => boolean;
+  // Audio context state
+  audioError: string | null;
+  isAudioReady: boolean;
+  initializeAudio: () => Promise<boolean>;
 }
 
 export function useAudioLayers(): UseAudioLayersReturn {
   const contextRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const ambientLayersRef = useRef<Map<string, AudioLayer>>(new Map());
+  const musicLayerRef = useRef<MusicLayer | null>(null);
   const bufferCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
+  const [audioError, setAudioError] = useState<string | null>(null);
+  const [isAudioReady, setIsAudioReady] = useState(false);
 
   // Initialize audio context on first use
   const getContext = useCallback(() => {
-    if (!contextRef.current) {
-      contextRef.current = new AudioContext();
-      masterGainRef.current = contextRef.current.createGain();
-      masterGainRef.current.connect(contextRef.current.destination);
+    try {
+      if (!contextRef.current) {
+        contextRef.current = new AudioContext();
+        masterGainRef.current = contextRef.current.createGain();
+        masterGainRef.current.connect(contextRef.current.destination);
+        setIsAudioReady(true);
+        setAudioError(null);
+      }
+      // Resume if suspended (browser autoplay policy)
+      if (contextRef.current.state === "suspended") {
+        contextRef.current.resume().catch(() => {
+          setAudioError("Audio blocked. Tap to enable sound.");
+        });
+      }
+      return contextRef.current;
+    } catch {
+      setAudioError("Audio not supported on this device.");
+      return null;
     }
-    // Resume if suspended (browser autoplay policy)
-    if (contextRef.current.state === "suspended") {
-      contextRef.current.resume();
-    }
-    return contextRef.current;
   }, []);
+
+  // Manual initialization for user gesture
+  const initializeAudio = useCallback(async (): Promise<boolean> => {
+    try {
+      const ctx = getContext();
+      if (!ctx) return false;
+
+      if (ctx.state === "suspended") {
+        await ctx.resume();
+      }
+      setIsAudioReady(true);
+      setAudioError(null);
+      return true;
+    } catch {
+      setAudioError("Failed to initialize audio.");
+      return false;
+    }
+  }, [getContext]);
 
   // Load and cache audio buffer
   const loadBuffer = useCallback(
-    async (url: string): Promise<AudioBuffer> => {
+    async (url: string): Promise<AudioBuffer | null> => {
       const cached = bufferCacheRef.current.get(url);
       if (cached) return cached;
 
       const ctx = getContext();
-      const response = await fetch(url);
-      const arrayBuffer = await response.arrayBuffer();
-      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
-      bufferCacheRef.current.set(url, audioBuffer);
-      return audioBuffer;
+      if (!ctx) return null;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          setAudioError(`Failed to load audio: ${url}`);
+          return null;
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+        bufferCacheRef.current.set(url, audioBuffer);
+        return audioBuffer;
+      } catch {
+        setAudioError("Failed to decode audio file.");
+        return null;
+      }
     },
     [getContext],
   );
@@ -59,14 +116,17 @@ export function useAudioLayers(): UseAudioLayersReturn {
   const playBell = useCallback(
     async (url: string) => {
       const ctx = getContext();
+      if (!ctx || !masterGainRef.current) return;
+
       const buffer = await loadBuffer(url);
+      if (!buffer) return;
 
       const source = ctx.createBufferSource();
       const gainNode = ctx.createGain();
 
       source.buffer = buffer;
       source.connect(gainNode);
-      gainNode.connect(masterGainRef.current!);
+      gainNode.connect(masterGainRef.current);
       gainNode.gain.value = 0.7;
 
       source.start();
@@ -76,8 +136,9 @@ export function useAudioLayers(): UseAudioLayersReturn {
 
   // Add looping ambient layer
   const addAmbient = useCallback(
-    async (id: string, url: string) => {
+    async (id: string, url: string, initialVolume: number = 0.5) => {
       const ctx = getContext();
+      if (!ctx || !masterGainRef.current) return;
 
       // Stop existing layer if present
       const existing = ambientLayersRef.current.get(id);
@@ -86,8 +147,10 @@ export function useAudioLayers(): UseAudioLayersReturn {
       }
 
       const buffer = await loadBuffer(url);
+      if (!buffer) return;
+
       const gainNode = ctx.createGain();
-      gainNode.connect(masterGainRef.current!);
+      gainNode.connect(masterGainRef.current);
       gainNode.gain.value = 0;
 
       const source = ctx.createBufferSource();
@@ -96,8 +159,8 @@ export function useAudioLayers(): UseAudioLayersReturn {
       source.connect(gainNode);
       source.start();
 
-      // Fade in
-      gainNode.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 1);
+      // Fade in to initial volume
+      gainNode.gain.linearRampToValueAtTime(initialVolume, ctx.currentTime + 1);
 
       ambientLayersRef.current.set(id, {
         source,
@@ -170,6 +233,11 @@ export function useAudioLayers(): UseAudioLayersReturn {
         layer.source?.stop();
       });
       ambientLayersRef.current.clear();
+      // Stop music too
+      if (musicLayerRef.current?.source) {
+        musicLayerRef.current.source.stop();
+        musicLayerRef.current = null;
+      }
       // Reset master volume
       if (masterGainRef.current) {
         masterGainRef.current.gain.value = 1;
@@ -182,12 +250,77 @@ export function useAudioLayers(): UseAudioLayersReturn {
     return ambientLayersRef.current.get(id)?.isPlaying ?? false;
   }, []);
 
+  // Play background music (looping)
+  const playMusic = useCallback(
+    async (url: string, volume: number = 0.5) => {
+      const ctx = getContext();
+      if (!ctx || !masterGainRef.current) return;
+
+      // Stop existing music if playing
+      if (musicLayerRef.current?.source) {
+        musicLayerRef.current.source.stop();
+      }
+
+      const buffer = await loadBuffer(url);
+      if (!buffer) return;
+
+      const gainNode = ctx.createGain();
+      gainNode.connect(masterGainRef.current);
+      gainNode.gain.value = 0;
+
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      source.connect(gainNode);
+      source.start();
+
+      // Fade in
+      gainNode.gain.linearRampToValueAtTime(volume, ctx.currentTime + 1.5);
+
+      musicLayerRef.current = {
+        source,
+        gainNode,
+        buffer,
+        isPlaying: true,
+      };
+    },
+    [getContext, loadBuffer],
+  );
+
+  // Stop music with fade out
+  const stopMusic = useCallback(() => {
+    const layer = musicLayerRef.current;
+    if (!layer?.source) return;
+
+    const ctx = contextRef.current;
+    if (ctx) {
+      layer.gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
+      setTimeout(() => {
+        layer.source?.stop();
+        musicLayerRef.current = null;
+      }, 500);
+    }
+  }, []);
+
+  // Set music volume
+  const setMusicVolume = useCallback((volume: number) => {
+    if (musicLayerRef.current) {
+      musicLayerRef.current.gainNode.gain.value = Math.max(0, Math.min(1, volume));
+    }
+  }, []);
+
+  // Check if music is playing
+  const isMusicPlaying = useCallback(() => {
+    return musicLayerRef.current?.isPlaying ?? false;
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       ambientLayersRef.current.forEach((layer) => {
         layer.source?.stop();
       });
+      musicLayerRef.current?.source?.stop();
       contextRef.current?.close();
     };
   }, []);
@@ -202,5 +335,14 @@ export function useAudioLayers(): UseAudioLayersReturn {
     resumeAll,
     fadeOutAll,
     isAmbientPlaying,
+    // Music layer
+    playMusic,
+    stopMusic,
+    setMusicVolume,
+    isMusicPlaying,
+    // Audio context state
+    audioError,
+    isAudioReady,
+    initializeAudio,
   };
 }

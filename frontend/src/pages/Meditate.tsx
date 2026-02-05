@@ -13,30 +13,46 @@ import { BreathingGuide } from "../components/BreathingGuide";
 import PostSessionModal from "../components/Journal/PostSessionModal";
 import SoundMixer from "../components/SoundMixer/SoundMixer";
 import { getAmbientUrl } from "../constants/sounds";
+import { API_BASE } from "../api/config";
 
 export default function Meditate() {
   const { t } = useTranslation();
   const { status, selectedVisual, breathingEnabled } = useTimer();
   const reset = useTimerStore((state) => state.reset);
+  const stop = useTimerStore((state) => state.stop);
   const { start: startBreathing, stop: stopBreathing } = useBreathingStore();
   const { currentSessionId, updateJournal } = useSessionStore();
   const [showJournalModal, setShowJournalModal] = useState(false);
   const [showSoundMixer, setShowSoundMixer] = useState(false);
+  const [showStopConfirm, setShowStopConfirm] = useState(false);
   const [activeAmbients, setActiveAmbients] = useState<Set<string>>(new Set());
+  const [isMusicActive, setIsMusicActive] = useState(false);
   const audio = useAudioLayers();
-  const { defaultAmbient } = useSettingsStore();
+  const { defaultAmbient, defaultMusic, musicVolume, ambientVolumes } = useSettingsStore();
   const prevStatusRef = useRef(status);
 
-  // Auto-play default ambient when meditation starts (only on transition TO running)
+  // Auto-play default ambient and music when meditation starts (only on transition TO running)
   useEffect(() => {
-    if (status === "running" && prevStatusRef.current !== "running" && defaultAmbient !== "none") {
-      const soundUrl = getAmbientUrl(defaultAmbient);
-      if (soundUrl) {
-        audio.addAmbient(defaultAmbient, soundUrl);
-        setActiveAmbients((prev) => new Set([...prev, defaultAmbient]));
+    if (status === "running" && prevStatusRef.current !== "running") {
+      // Play default ambient sound
+      if (defaultAmbient !== "none") {
+        const soundUrl = getAmbientUrl(defaultAmbient);
+        const volume = ambientVolumes[defaultAmbient as keyof typeof ambientVolumes] ?? 0.5;
+        if (soundUrl) {
+          audio.addAmbient(defaultAmbient, soundUrl, volume);
+          // Use setTimeout to avoid synchronous setState in effect
+          setTimeout(() => setActiveAmbients((prev) => new Set([...prev, defaultAmbient])), 0);
+        }
+      }
+
+      // Play default background music
+      if (defaultMusic?.filename) {
+        const musicUrl = `${API_BASE}/sounds/music/generated/${defaultMusic.filename}`;
+        audio.playMusic(musicUrl, musicVolume);
+        setTimeout(() => setIsMusicActive(true), 0);
       }
     }
-  }, [status, defaultAmbient, audio]);
+  }, [status, defaultAmbient, defaultMusic, musicVolume, ambientVolumes, audio]);
 
   // Handle audio on timer status changes
   useEffect(() => {
@@ -49,7 +65,10 @@ export default function Meditate() {
     } else if (prevStatusRef.current !== "idle" && status === "idle") {
       // Timer stopped - fade out and clear
       audio.fadeOutAll(500);
-      setActiveAmbients(new Set());
+      setTimeout(() => {
+        setActiveAmbients(new Set());
+        setIsMusicActive(false);
+      }, 0);
     }
     // CRITICAL: Update ref to track current status for next comparison
     prevStatusRef.current = status;
@@ -58,16 +77,34 @@ export default function Meditate() {
   // Show journal modal when session completes
   useEffect(() => {
     if (status === "complete" && currentSessionId) {
-      setShowJournalModal(true);
-      // Fade out ambient sounds
+      // Fade out all sounds (ambient + music)
       audio.fadeOutAll(2000);
-      setActiveAmbients(new Set());
+      setTimeout(() => {
+        setShowJournalModal(true);
+        setActiveAmbients(new Set());
+        setIsMusicActive(false);
+      }, 0);
     }
   }, [status, currentSessionId, audio]);
 
+  // Handle stop with confirmation
+  const handleStopRequest = () => {
+    setShowStopConfirm(true);
+  };
+
+  const handleStopConfirm = () => {
+    setShowStopConfirm(false);
+    stop();
+  };
+
+  const handleStopCancel = () => {
+    setShowStopConfirm(false);
+  };
+
   const handleToggleAmbient = (id: string, url: string, active: boolean) => {
     if (active) {
-      audio.addAmbient(id, url);
+      const volume = ambientVolumes[id as keyof typeof ambientVolumes] ?? 0.5;
+      audio.addAmbient(id, url, volume);
       setActiveAmbients((prev) => new Set([...prev, id]));
     } else {
       audio.removeAmbient(id);
@@ -78,6 +115,9 @@ export default function Meditate() {
       });
     }
   };
+
+  // Check if any audio is playing
+  const hasActiveAudio = activeAmbients.size > 0 || isMusicActive;
 
   // Sync breathing with timer
   useEffect(() => {
@@ -130,19 +170,33 @@ export default function Meditate() {
       {isRunning && (
         <button
           onClick={() => setShowSoundMixer(!showSoundMixer)}
-          className="
+          className={`
             absolute top-4 right-4 z-20
             w-10 h-10 rounded-full
             bg-[var(--color-surface)]/50 backdrop-blur-sm
             flex items-center justify-center
-            text-[var(--color-text-muted)]
-            hover:text-[var(--color-text)]
-            transition-colors
-          "
+            transition-all
+            ${hasActiveAudio
+              ? "text-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/30"
+              : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}
+          `}
           title={t("sounds.mixer")}
         >
-          🎵
+          <span className={hasActiveAudio ? "animate-pulse" : ""}>🎵</span>
+          {hasActiveAudio && (
+            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[var(--color-primary)]" />
+          )}
         </button>
+      )}
+
+      {/* Audio error message */}
+      {audio.audioError && (
+        <div
+          className="absolute top-16 right-4 z-20 p-3 rounded-xl bg-red-500/20 text-red-400 text-sm max-w-xs"
+          onClick={() => audio.initializeAudio()}
+        >
+          {audio.audioError}
+        </div>
       )}
 
       <SoundMixer
@@ -156,7 +210,7 @@ export default function Meditate() {
 
       {/* Timer UI */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4">
-        <Timer />
+        <Timer onStopRequest={handleStopRequest} />
 
         {status === "idle" && (
           <>
@@ -178,6 +232,32 @@ export default function Meditate() {
           reset();
         }}
       />
+
+      {/* Stop Confirmation Modal */}
+      {showStopConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-sm p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+            <h3 className="text-lg font-medium mb-2">{t("timer.stopConfirmTitle")}</h3>
+            <p className="text-sm text-[var(--color-text-muted)] mb-6">
+              {t("timer.stopConfirmMessage")}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleStopCancel}
+                className="flex-1 py-3 rounded-xl border border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-border)]/20 transition-colors"
+              >
+                {t("timer.continue")}
+              </button>
+              <button
+                onClick={handleStopConfirm}
+                className="flex-1 py-3 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-colors"
+              >
+                {t("timer.stop")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

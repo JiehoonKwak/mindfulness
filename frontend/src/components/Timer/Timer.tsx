@@ -7,7 +7,11 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-export default function Timer() {
+interface TimerProps {
+  onStopRequest?: () => void;
+}
+
+export default function Timer({ onStopRequest }: TimerProps = {}) {
   const { remaining, duration, status } = useTimer();
   const progress = duration > 0 ? ((duration - remaining) / duration) * 100 : 0;
 
@@ -15,7 +19,7 @@ export default function Timer() {
   if (status === "idle") {
     return (
       <div className="flex flex-col items-center">
-        <TimerControls />
+        <TimerControls onStopRequest={onStopRequest} />
       </div>
     );
   }
@@ -61,7 +65,7 @@ export default function Timer() {
         </div>
       </div>
 
-      <TimerControls />
+      <TimerControls onStopRequest={onStopRequest} />
     </div>
   );
 }

@@ -6,7 +6,13 @@
   "home": {
     "startMeditation": "Start Meditation",
     "settings": "Settings",
-    "todayGoal": "Today's Goal"
+    "todayGoal": "Today's Goal",
+    "quickSessions": {
+      "title": "Quick Start",
+      "quick": "Calm",
+      "focus": "Focus",
+      "relax": "Relax"
+    }
   },
   "timer": {
     "minutes": "min",
@@ -14,7 +20,10 @@
     "pause": "Pause",
     "resume": "Resume",
     "stop": "Stop",
-    "complete": "Complete!"
+    "complete": "Complete!",
+    "continue": "Continue",
+    "stopConfirmTitle": "End Session?",
+    "stopConfirmMessage": "Your progress will be saved as incomplete. Are you sure you want to stop?"
   },
   "breathing": {
     "title": "Breathing Guide",
@@ -123,6 +132,7 @@
   },
   "sounds": {
     "mixer": "Sound Mixer",
+    "mixerHelp": "Mix multiple sounds together for a custom ambient",
     "master": "Master Volume",
     "rain": "Rain",
     "ocean": "Ocean",
@@ -135,6 +145,16 @@
     "wind": "Wind",
     "birds": "Birds",
     "none": "None",
-    "music": "Background Music"
+    "music": "Background Music",
+    "musicDescription": "Select music to auto-play during meditation",
+    "musicVolume": "Music Volume",
+    "selectDefault": "Select for Meditation",
+    "generateNew": "Generate New",
+    "generate": "Generate",
+    "generating": "Generating...",
+    "generateHint": "Generate music using the presets above",
+    "apiKeyRequired": "AI music generation requires GEMINI_API_KEY. Set it in backend/.env to enable.",
+    "preview": "Preview",
+    "pause": "Pause"
   }
 }
