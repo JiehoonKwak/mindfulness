@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import MoodSelector from "./MoodSelector";
 import NotesInput from "./NotesInput";
+import { getStreak } from "../../api/stats";
+import { useTimerStore } from "../../stores/timerStore";
 
 interface PostSessionModalProps {
   isOpen: boolean;
@@ -18,6 +20,19 @@ export default function PostSessionModal({
   const { t } = useTranslation();
   const [mood, setMood] = useState<string | null>(null);
   const [note, setNote] = useState("");
+  const [streak, setStreak] = useState<number>(0);
+  const duration = useTimerStore((state) => state.duration);
+
+  // Fetch streak when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      getStreak().then((data) => {
+        setStreak(data.current);
+      }).catch(() => {
+        setStreak(0);
+      });
+    }
+  }, [isOpen]);
 
   const handleSave = () => {
     onSave(mood, note);
@@ -51,11 +66,38 @@ export default function PostSessionModal({
               space-y-6
             "
           >
-            <h2 className="text-xl font-light text-center">
-              {t("journal.title")}
-            </h2>
+            {/* Celebration Header */}
+            <div className="text-center space-y-2">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="text-4xl"
+              >
+                ✨
+              </motion.div>
+              <h2 className="text-xl font-light text-[var(--color-primary)]">
+                {t("timer.wellDone")}
+              </h2>
+              <p className="text-sm text-[var(--color-text-muted)]">
+                {Math.floor(duration / 60)} {t("timer.minutes")} {t("timer.sessionComplete").toLowerCase()}
+              </p>
+              {streak > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex items-center justify-center gap-2 text-sm"
+                >
+                  <span className="text-orange-500">🔥</span>
+                  <span className="text-[var(--color-text-muted)]">
+                    {streak} {t("goals.dayStreak")}
+                  </span>
+                </motion.div>
+              )}
+            </div>
 
-            <div className="space-y-2">
+            <div className="border-t border-[var(--color-border)]/30 pt-4 space-y-2">
               <p className="text-sm text-[var(--color-text-muted)] text-center">
                 {t("journal.howDoYouFeel")}
               </p>

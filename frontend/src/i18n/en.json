@@ -20,10 +20,14 @@
     "pause": "Pause",
     "resume": "Resume",
     "stop": "Stop",
+    "cancel": "Cancel",
     "complete": "Complete!",
     "continue": "Continue",
+    "getReady": "Get Ready",
     "stopConfirmTitle": "End Session?",
-    "stopConfirmMessage": "Your progress will be saved as incomplete. Are you sure you want to stop?"
+    "stopConfirmMessage": "Your progress will be saved as incomplete. Are you sure you want to stop?",
+    "wellDone": "Well Done!",
+    "sessionComplete": "Session Complete"
   },
   "breathing": {
     "title": "Breathing Guide",

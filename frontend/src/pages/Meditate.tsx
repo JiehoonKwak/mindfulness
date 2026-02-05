@@ -133,6 +133,7 @@ export default function Meditate() {
   const VisualComponent =
     visualComponents[selectedVisual as keyof typeof visualComponents];
   const isRunning = status === "running" || status === "paused";
+  const isActive = isRunning || status === "countdown";
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -148,8 +149,8 @@ export default function Meditate() {
         </div>
       )}
 
-      {/* Visual background */}
-      {isRunning && VisualComponent && (
+      {/* Visual background - show during countdown and running */}
+      {isActive && VisualComponent && (
         <Suspense
           fallback={<div className="absolute inset-0 bg-[var(--color-bg)]" />}
         >
