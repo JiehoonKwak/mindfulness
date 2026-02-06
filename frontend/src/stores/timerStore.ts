@@ -1,11 +1,12 @@
 import { create } from "zustand";
 import { useSessionStore } from "./sessionStore";
 
-type TimerStatus = "idle" | "running" | "paused" | "complete";
+type TimerStatus = "idle" | "countdown" | "running" | "paused" | "complete";
 
 interface TimerState {
   duration: number; // seconds
   remaining: number; // seconds
+  countdown: number; // countdown seconds before start (3, 2, 1)
   status: TimerStatus;
   selectedVisual: string;
   breathingEnabled: boolean;
@@ -19,6 +20,7 @@ interface TimerState {
   resume: () => void;
   stop: () => void;
   tick: () => void;
+  tickCountdown: () => void;
   complete: () => void;
   reset: () => void;
 }
@@ -26,6 +28,7 @@ interface TimerState {
 export const useTimerStore = create<TimerState>((set, get) => ({
   duration: 600, // 10 minutes default
   remaining: 600,
+  countdown: 3,
   status: "idle",
   selectedVisual: "aurora",
   breathingEnabled: false,
@@ -44,10 +47,8 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   setBreathingPattern: (pattern) => set({ breathingPattern: pattern }),
 
   start: () => {
-    const { duration, selectedVisual } = get();
-    set({ status: "running" });
-    // Log session to backend
-    useSessionStore.getState().startSession(duration, selectedVisual);
+    // Start with countdown phase
+    set({ status: "countdown", countdown: 3 });
   },
 
   pause: () => set({ status: "paused" }),
@@ -55,11 +56,24 @@ export const useTimerStore = create<TimerState>((set, get) => ({
   resume: () => set({ status: "running" }),
 
   stop: () => {
-    const { duration, remaining } = get();
-    const actualDuration = duration - remaining;
-    // Log abandoned session
-    useSessionStore.getState().abandonSession(actualDuration);
-    set({ status: "idle", remaining: duration });
+    const { duration, remaining, status } = get();
+    // Only log if we were actually running (not just in countdown)
+    if (status === "running" || status === "paused") {
+      const actualDuration = duration - remaining;
+      useSessionStore.getState().abandonSession(actualDuration);
+    }
+    set({ status: "idle", remaining: duration, countdown: 3 });
+  },
+
+  tickCountdown: () => {
+    const { countdown, duration, selectedVisual } = get();
+    if (countdown > 1) {
+      set({ countdown: countdown - 1 });
+    } else {
+      // Countdown finished, start the actual session
+      set({ status: "running", countdown: 3 });
+      useSessionStore.getState().startSession(duration, selectedVisual);
+    }
   },
 
   tick: () => {
@@ -80,6 +94,6 @@ export const useTimerStore = create<TimerState>((set, get) => ({
 
   reset: () => {
     const { duration } = get();
-    set({ status: "idle", remaining: duration });
+    set({ status: "idle", remaining: duration, countdown: 3 });
   },
 }));

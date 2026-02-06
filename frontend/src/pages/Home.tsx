@@ -1,17 +1,29 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getStatsSummary, getHeatmap } from "../api/stats";
 import type { StatsSummary, HeatmapEntry } from "../api/stats";
 import Heatmap from "../components/Stats/Heatmap";
 import { Icons } from "../components/Icons";
 import { ZenQuote } from "../components/ZenQuote";
+import { useTimerStore } from "../stores/timerStore";
+import { useSettingsStore } from "../stores/settingsStore";
+
+// Quick session presets
+const QUICK_SESSIONS = [
+  { id: "quick", minutes: 3, ambient: "rain", labelKey: "home.quickSessions.quick" },
+  { id: "focus", minutes: 10, ambient: "white_noise", labelKey: "home.quickSessions.focus" },
+  { id: "relax", minutes: 15, ambient: "ocean", labelKey: "home.quickSessions.relax" },
+] as const;
 
 export default function Home() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [summary, setSummary] = useState<StatsSummary | null>(null);
   const [heatmap, setHeatmap] = useState<HeatmapEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const setDuration = useTimerStore((state) => state.setDuration);
+  const setDefaultAmbient = useSettingsStore((state) => state.setDefaultAmbient);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +42,12 @@ export default function Home() {
     };
     fetchData();
   }, []);
+
+  const startQuickSession = (minutes: number, ambient: string) => {
+    setDuration(minutes);
+    setDefaultAmbient(ambient as "rain" | "ocean" | "white_noise" | "none");
+    navigate("/meditate");
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-bg)] text-[var(--color-text)]">
@@ -60,6 +78,27 @@ export default function Home() {
         <div className="flex-1 flex items-center justify-center">
           <ZenQuote />
         </div>
+
+        {/* Quick Sessions */}
+        <section className="px-6 pb-2">
+          <h3 className="text-xs uppercase tracking-widest text-[var(--color-text-muted)] mb-3">
+            {t("home.quickSessions.title")}
+          </h3>
+          <div className="flex gap-2">
+            {QUICK_SESSIONS.map((session) => (
+              <button
+                key={session.id}
+                onClick={() => startQuickSession(session.minutes, session.ambient)}
+                className="flex-1 py-3 px-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-accent)] transition-colors text-center"
+              >
+                <div className="text-sm font-medium">{session.minutes} min</div>
+                <div className="text-xs text-[var(--color-text-muted)]">
+                  {t(session.labelKey)}
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
 
         {/* Actions */}
         <section className="p-6 space-y-3">

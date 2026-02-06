@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useTimer } from "../../hooks/useTimer";
 import TimerControls from "./TimerControls";
 
@@ -7,15 +8,50 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-export default function Timer() {
-  const { remaining, duration, status } = useTimer();
+interface TimerProps {
+  onStopRequest?: () => void;
+}
+
+export default function Timer({ onStopRequest }: TimerProps = {}) {
+  const { t } = useTranslation();
+  const { remaining, duration, status, countdown } = useTimer();
   const progress = duration > 0 ? ((duration - remaining) / duration) * 100 : 0;
 
   // Don't render progress ring in idle state - ClockDial shows time
   if (status === "idle") {
     return (
       <div className="flex flex-col items-center">
-        <TimerControls />
+        <TimerControls onStopRequest={onStopRequest} />
+      </div>
+    );
+  }
+
+  // Countdown phase - show preparation screen
+  if (status === "countdown") {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <div className="relative w-72 h-72 flex items-center justify-center">
+          {/* Pulsing ring */}
+          <div className="absolute inset-0 rounded-full border-2 border-[var(--color-primary)]/30 animate-ping" />
+          <div className="absolute inset-4 rounded-full border border-[var(--color-primary)]/50" />
+
+          <div className="flex flex-col items-center z-10">
+            <span className="text-8xl font-extralight text-[var(--color-primary)] animate-pulse">
+              {countdown}
+            </span>
+            <span className="text-sm text-[var(--color-text-muted)] mt-4 tracking-widest uppercase">
+              {t("timer.getReady")}
+            </span>
+          </div>
+        </div>
+
+        {/* Cancel button during countdown */}
+        <button
+          onClick={onStopRequest}
+          className="mt-8 px-6 py-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
+        >
+          {t("timer.cancel")}
+        </button>
       </div>
     );
   }
@@ -61,7 +97,7 @@ export default function Timer() {
         </div>
       </div>
 
-      <TimerControls />
+      <TimerControls onStopRequest={onStopRequest} />
     </div>
   );
 }
