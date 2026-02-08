@@ -28,8 +28,8 @@ export default function Insights() {
         setSummary(summaryData);
         setHeatmap(heatmapData);
         setSessions(sessionsData);
-      } catch (error) {
-        console.error("Failed to fetch insights:", error);
+      } catch {
+        // Fetch failed silently — UI shows loading/empty state
       } finally {
         setLoading(false);
       }
@@ -84,7 +84,7 @@ export default function Insights() {
         <div className="px-6 pb-6">
           {loading ? (
             <div className="text-center text-[var(--color-text-muted)] py-8">
-              Loading...
+              {t("common.loading")}
             </div>
           ) : tab === "overview" ? (
             <div className="space-y-6">
@@ -101,7 +101,9 @@ export default function Insights() {
                 <StatCard
                   label={t("stats.currentStreak")}
                   value={summary?.current_streak || 0}
-                  icon={<Icons.flame className="w-4 h-4 text-orange-500" />}
+                  icon={
+                    <Icons.flame className="w-4 h-4 text-[var(--color-text)]" />
+                  }
                 />
                 <StatCard
                   label={t("stats.longestStreak")}
@@ -184,7 +186,7 @@ function SessionList({
                   : "bg-[var(--color-text-muted)]/20 text-[var(--color-text-muted)]"
               }`}
             >
-              {s.completed ? "Completed" : t("history.incomplete")}
+              {s.completed ? t("history.completed") : t("history.incomplete")}
             </div>
           </div>
           {s.note && <p className="mt-2 text-caption line-clamp-2">{s.note}</p>}

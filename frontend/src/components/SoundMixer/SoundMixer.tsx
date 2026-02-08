@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { AMBIENT_SOUNDS } from "../../constants/sounds";
 import { useSettingsStore } from "../../stores/settingsStore";
+import { Icons } from "../Icons";
 
 interface SoundMixerProps {
   isOpen: boolean;
@@ -11,13 +12,6 @@ interface SoundMixerProps {
   onMasterVolumeChange: (volume: number) => void;
   activeAmbients: Set<string>;
 }
-
-// Sound categories for organization (can be used for future grouped UI)
-// const SOUND_CATEGORIES = {
-//   nature: ["rain", "ocean", "forest", "river", "wind", "birds"],
-//   ambient: ["white_noise", "campfire"],
-//   instrumental: ["tibetan_bowls", "wind_chimes"],
-// };
 
 export default function SoundMixer({
   isOpen,
@@ -72,7 +66,7 @@ export default function SoundMixer({
               onClick={onClose}
               className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
             >
-              ✕
+              <Icons.x className="w-4 h-4" />
             </button>
           </div>
 
@@ -103,7 +97,8 @@ export default function SoundMixer({
           {/* Ambient sounds */}
           <div className="space-y-3">
             {AMBIENT_SOUNDS.map((sound) => {
-              const volume = ambientVolumes[sound.id as keyof typeof ambientVolumes] ?? 0.5;
+              const volume =
+                ambientVolumes[sound.id as keyof typeof ambientVolumes] ?? 0.5;
               return (
                 <div key={sound.id} className="space-y-2">
                   <div className="flex items-center justify-between">

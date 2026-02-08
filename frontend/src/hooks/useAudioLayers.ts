@@ -16,7 +16,11 @@ interface MusicLayer {
 
 interface UseAudioLayersReturn {
   playBell: (url: string) => Promise<void>;
-  addAmbient: (id: string, url: string, initialVolume?: number) => Promise<void>;
+  addAmbient: (
+    id: string,
+    url: string,
+    initialVolume?: number,
+  ) => Promise<void>;
   removeAmbient: (id: string) => void;
   setAmbientVolume: (id: string, volume: number) => void;
   setMasterVolume: (volume: number) => void;
@@ -305,7 +309,10 @@ export function useAudioLayers(): UseAudioLayersReturn {
   // Set music volume
   const setMusicVolume = useCallback((volume: number) => {
     if (musicLayerRef.current) {
-      musicLayerRef.current.gainNode.gain.value = Math.max(0, Math.min(1, volume));
+      musicLayerRef.current.gainNode.gain.value = Math.max(
+        0,
+        Math.min(1, volume),
+      );
     }
   }, []);
 
@@ -316,8 +323,9 @@ export function useAudioLayers(): UseAudioLayersReturn {
 
   // Cleanup on unmount
   useEffect(() => {
+    const ambientLayers = ambientLayersRef.current;
     return () => {
-      ambientLayersRef.current.forEach((layer) => {
+      ambientLayers.forEach((layer) => {
         layer.source?.stop();
       });
       musicLayerRef.current?.source?.stop();

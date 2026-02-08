@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import type { HeatmapEntry } from "../../api/stats";
 
 interface HeatmapProps {
@@ -18,6 +19,7 @@ function getIntensity(minutes: number): number {
 }
 
 export default function Heatmap({ data, loading }: HeatmapProps) {
+  const { t } = useTranslation();
   const grid = useMemo(() => {
     const dataMap = new Map(data.map((d) => [d.date, d]));
     const today = new Date();
@@ -64,7 +66,7 @@ export default function Heatmap({ data, loading }: HeatmapProps) {
   if (loading) {
     return (
       <div className="h-32 flex items-center justify-center text-[var(--color-text-muted)]">
-        Loading...
+        {t("common.loading")}
       </div>
     );
   }
@@ -78,7 +80,7 @@ export default function Heatmap({ data, loading }: HeatmapProps) {
               <div
                 key={cell.date}
                 className={`w-3 h-3 rounded-sm ${intensityColors[cell.intensity]} transition-colors`}
-                title={`${cell.date}: ${cell.minutes} min`}
+                title={`${cell.date}: ${cell.minutes} ${t("timer.minutes")}`}
               />
             ))}
           </div>

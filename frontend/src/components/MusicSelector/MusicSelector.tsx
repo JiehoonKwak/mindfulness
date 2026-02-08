@@ -20,7 +20,8 @@ interface Track {
 
 export default function MusicSelector() {
   const { t } = useTranslation();
-  const { defaultMusic, setDefaultMusic, musicVolume, setMusicVolume } = useSettingsStore();
+  const { defaultMusic, setDefaultMusic, musicVolume, setMusicVolume } =
+    useSettingsStore();
   const [presets, setPresets] = useState<Preset[]>([]);
   const [library, setLibrary] = useState<Track[]>([]);
   const [generating, setGenerating] = useState(false);
@@ -35,7 +36,7 @@ export default function MusicSelector() {
       audio.pause();
       audio.src = "";
     };
-  }, []);
+  }, [audio]);
 
   const fetchPresets = async () => {
     try {
@@ -43,8 +44,8 @@ export default function MusicSelector() {
       if (res.ok) {
         setPresets(await res.json());
       }
-    } catch (error) {
-      console.error("Failed to fetch presets:", error);
+    } catch {
+      // Silently handled — UI shows empty state
     }
   };
 
@@ -54,8 +55,8 @@ export default function MusicSelector() {
       if (res.ok) {
         setLibrary(await res.json());
       }
-    } catch (error) {
-      console.error("Failed to fetch library:", error);
+    } catch {
+      // Silently handled — UI shows empty state
     }
   };
 
@@ -70,8 +71,8 @@ export default function MusicSelector() {
       if (res.ok) {
         await fetchLibrary();
       }
-    } catch (error) {
-      console.error("Failed to generate music:", error);
+    } catch {
+      // Silently handled — generating state resets below
     } finally {
       setGenerating(false);
     }
@@ -143,15 +144,19 @@ export default function MusicSelector() {
             className={`
               w-full flex items-center gap-3 p-3 rounded-xl
               bg-[var(--color-surface)] border transition-colors text-left
-              ${!defaultMusic
-                ? "border-[var(--color-primary)] text-[var(--color-primary)]"
-                : "border-[var(--color-border)] text-[var(--color-text-muted)]"}
+              ${
+                !defaultMusic
+                  ? "border-[var(--color-primary)] text-[var(--color-primary)]"
+                  : "border-[var(--color-border)] text-[var(--color-text-muted)]"
+              }
             `}
           >
-            <span className={`
+            <span
+              className={`
               w-4 h-4 rounded-full border-2 flex items-center justify-center
               ${!defaultMusic ? "border-[var(--color-primary)]" : "border-[var(--color-border)]"}
-            `}>
+            `}
+            >
               {!defaultMusic && (
                 <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" />
               )}
@@ -167,9 +172,11 @@ export default function MusicSelector() {
                 className={`
                   flex items-center gap-3 p-3 rounded-xl
                   bg-[var(--color-surface)] border transition-colors
-                  ${isSelected
-                    ? "border-[var(--color-primary)]"
-                    : "border-[var(--color-border)]"}
+                  ${
+                    isSelected
+                      ? "border-[var(--color-primary)]"
+                      : "border-[var(--color-border)]"
+                  }
                 `}
               >
                 {/* Radio button for selection */}
@@ -197,7 +204,11 @@ export default function MusicSelector() {
                 <button
                   onClick={() => playTrack(track)}
                   className="p-2 hover:bg-[var(--color-border)]/20 rounded-lg transition-colors"
-                  title={playing === track.id ? t("sounds.pause") : t("sounds.preview")}
+                  title={
+                    playing === track.id
+                      ? t("sounds.pause")
+                      : t("sounds.preview")
+                  }
                 >
                   {playing === track.id ? (
                     <Icons.pause className="w-4 h-4" />

@@ -10,6 +10,7 @@ import { useSettingsStore } from "../stores/settingsStore";
 import { Timer, DurationPicker } from "../components/Timer";
 import { VisualSelector, visualComponents } from "../components/Visuals";
 import { BreathingGuide } from "../components/BreathingGuide";
+import { Icons } from "../components/Icons";
 import PostSessionModal from "../components/Journal/PostSessionModal";
 import SoundMixer from "../components/SoundMixer/SoundMixer";
 import { getAmbientUrl } from "../constants/sounds";
@@ -28,7 +29,8 @@ export default function Meditate() {
   const [activeAmbients, setActiveAmbients] = useState<Set<string>>(new Set());
   const [isMusicActive, setIsMusicActive] = useState(false);
   const audio = useAudioLayers();
-  const { defaultAmbient, defaultMusic, musicVolume, ambientVolumes } = useSettingsStore();
+  const { defaultAmbient, defaultMusic, musicVolume, ambientVolumes } =
+    useSettingsStore();
   const prevStatusRef = useRef(status);
 
   // Auto-play default ambient and music when meditation starts (only on transition TO running)
@@ -37,11 +39,14 @@ export default function Meditate() {
       // Play default ambient sound
       if (defaultAmbient !== "none") {
         const soundUrl = getAmbientUrl(defaultAmbient);
-        const volume = ambientVolumes[defaultAmbient as keyof typeof ambientVolumes] ?? 0.5;
+        const volume =
+          ambientVolumes[defaultAmbient as keyof typeof ambientVolumes] ?? 0.5;
         if (soundUrl) {
           audio.addAmbient(defaultAmbient, soundUrl, volume);
           // Use setTimeout to avoid synchronous setState in effect
-          setTimeout(() => setActiveAmbients((prev) => new Set([...prev, defaultAmbient])), 0);
+          queueMicrotask(() =>
+            setActiveAmbients((prev) => new Set([...prev, defaultAmbient])),
+          );
         }
       }
 
@@ -49,10 +54,17 @@ export default function Meditate() {
       if (defaultMusic?.filename) {
         const musicUrl = `${API_BASE}/sounds/music/generated/${defaultMusic.filename}`;
         audio.playMusic(musicUrl, musicVolume);
-        setTimeout(() => setIsMusicActive(true), 0);
+        queueMicrotask(() => setIsMusicActive(true));
       }
     }
-  }, [status, defaultAmbient, defaultMusic, musicVolume, ambientVolumes, audio]);
+  }, [
+    status,
+    defaultAmbient,
+    defaultMusic,
+    musicVolume,
+    ambientVolumes,
+    audio,
+  ]);
 
   // Handle audio on timer status changes
   useEffect(() => {
@@ -65,10 +77,10 @@ export default function Meditate() {
     } else if (prevStatusRef.current !== "idle" && status === "idle") {
       // Timer stopped - fade out and clear
       audio.fadeOutAll(500);
-      setTimeout(() => {
+      queueMicrotask(() => {
         setActiveAmbients(new Set());
         setIsMusicActive(false);
-      }, 0);
+      });
     }
     // CRITICAL: Update ref to track current status for next comparison
     prevStatusRef.current = status;
@@ -79,11 +91,11 @@ export default function Meditate() {
     if (status === "complete" && currentSessionId) {
       // Fade out all sounds (ambient + music)
       audio.fadeOutAll(2000);
-      setTimeout(() => {
+      queueMicrotask(() => {
         setShowJournalModal(true);
         setActiveAmbients(new Set());
         setIsMusicActive(false);
-      }, 0);
+      });
     }
   }, [status, currentSessionId, audio]);
 
@@ -177,13 +189,17 @@ export default function Meditate() {
             bg-[var(--color-surface)]/50 backdrop-blur-sm
             flex items-center justify-center
             transition-all
-            ${hasActiveAudio
-              ? "text-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/30"
-              : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"}
+            ${
+              hasActiveAudio
+                ? "text-[var(--color-primary)] ring-2 ring-[var(--color-primary)]/30"
+                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+            }
           `}
           title={t("sounds.mixer")}
         >
-          <span className={hasActiveAudio ? "animate-pulse" : ""}>🎵</span>
+          <Icons.music
+            className={`w-5 h-5 ${hasActiveAudio ? "animate-pulse" : ""}`}
+          />
           {hasActiveAudio && (
             <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[var(--color-primary)]" />
           )}
@@ -238,7 +254,9 @@ export default function Meditate() {
       {showStopConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="w-full max-w-sm p-6 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)]">
-            <h3 className="text-lg font-medium mb-2">{t("timer.stopConfirmTitle")}</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {t("timer.stopConfirmTitle")}
+            </h3>
             <p className="text-sm text-[var(--color-text-muted)] mb-6">
               {t("timer.stopConfirmMessage")}
             </p>

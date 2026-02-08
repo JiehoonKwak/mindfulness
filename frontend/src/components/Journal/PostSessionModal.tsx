@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import MoodSelector from "./MoodSelector";
 import NotesInput from "./NotesInput";
+import { Icons } from "../Icons";
 import { getStreak } from "../../api/stats";
 import { useTimerStore } from "../../stores/timerStore";
 
@@ -26,11 +27,13 @@ export default function PostSessionModal({
   // Fetch streak when modal opens
   useEffect(() => {
     if (isOpen) {
-      getStreak().then((data) => {
-        setStreak(data.current);
-      }).catch(() => {
-        setStreak(0);
-      });
+      getStreak()
+        .then((data) => {
+          setStreak(data.current);
+        })
+        .catch(() => {
+          setStreak(0);
+        });
     }
   }, [isOpen]);
 
@@ -68,19 +71,12 @@ export default function PostSessionModal({
           >
             {/* Celebration Header */}
             <div className="text-center space-y-2">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="text-4xl"
-              >
-                ✨
-              </motion.div>
               <h2 className="text-xl font-light text-[var(--color-primary)]">
                 {t("timer.wellDone")}
               </h2>
               <p className="text-sm text-[var(--color-text-muted)]">
-                {Math.floor(duration / 60)} {t("timer.minutes")} {t("timer.sessionComplete").toLowerCase()}
+                {Math.floor(duration / 60)} {t("timer.minutes")}{" "}
+                {t("timer.sessionComplete").toLowerCase()}
               </p>
               {streak > 0 && (
                 <motion.div
@@ -89,7 +85,7 @@ export default function PostSessionModal({
                   transition={{ delay: 0.4 }}
                   className="flex items-center justify-center gap-2 text-sm"
                 >
-                  <span className="text-orange-500">🔥</span>
+                  <Icons.flame className="w-4 h-4 text-[var(--color-text)]" />
                   <span className="text-[var(--color-text-muted)]">
                     {streak} {t("goals.dayStreak")}
                   </span>

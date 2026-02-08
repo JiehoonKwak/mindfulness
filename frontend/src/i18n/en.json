@@ -14,6 +14,9 @@
       "relax": "Relax"
     }
   },
+  "common": {
+    "loading": "Loading..."
+  },
   "timer": {
     "minutes": "min",
     "start": "Start",
@@ -22,6 +25,7 @@
     "stop": "Stop",
     "cancel": "Cancel",
     "complete": "Complete!",
+    "done": "Done",
     "continue": "Continue",
     "getReady": "Get Ready",
     "stopConfirmTitle": "End Session?",
@@ -116,6 +120,13 @@
     "skip": "Skip",
     "save": "Save"
   },
+  "mood": {
+    "calm": "Calm",
+    "happy": "Happy",
+    "peaceful": "Peaceful",
+    "neutral": "Neutral",
+    "tired": "Tired"
+  },
   "goals": {
     "noGoal": "No goal set",
     "dayStreak": "day streak",
@@ -128,7 +139,8 @@
     "title": "History",
     "all": "All",
     "noSessions": "No sessions yet",
-    "incomplete": "Incomplete"
+    "incomplete": "Incomplete",
+    "completed": "Completed"
   },
   "insights": {
     "overview": "Overview",

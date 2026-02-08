@@ -1,10 +1,14 @@
+import { useTranslation } from "react-i18next";
 import { useTimer } from "../../hooks/useTimer";
 
 interface TimerControlsProps {
-  onStopRequest?: () => void;  // Optional callback for stop confirmation
+  onStopRequest?: () => void; // Optional callback for stop confirmation
 }
 
-export default function TimerControls({ onStopRequest }: TimerControlsProps = {}) {
+export default function TimerControls({
+  onStopRequest,
+}: TimerControlsProps = {}) {
+  const { t } = useTranslation();
   const { status, start, pause, resume, stop } = useTimer();
 
   // Use callback if provided, otherwise direct stop
@@ -17,7 +21,7 @@ export default function TimerControls({ onStopRequest }: TimerControlsProps = {}
           onClick={start}
           className="
             w-16 h-16 rounded-full
-            bg-[var(--color-primary)] text-white
+            bg-[var(--color-primary)] text-[var(--color-bg)]
             flex items-center justify-center
             shadow-lg shadow-[var(--color-primary)]/30
             hover:scale-105 active:scale-95
@@ -74,7 +78,7 @@ export default function TimerControls({ onStopRequest }: TimerControlsProps = {}
             onClick={resume}
             className="
               w-16 h-16 rounded-full
-              bg-[var(--color-primary)] text-white
+              bg-[var(--color-primary)] text-[var(--color-bg)]
               flex items-center justify-center
               shadow-lg shadow-[var(--color-primary)]/30
               hover:scale-105 active:scale-95
@@ -112,7 +116,7 @@ export default function TimerControls({ onStopRequest }: TimerControlsProps = {}
       {status === "complete" && (
         <div className="flex flex-col items-center gap-4">
           <div className="text-xl font-light tracking-widest uppercase text-[var(--color-primary)]">
-            Complete
+            {t("timer.complete")}
           </div>
           <button
             onClick={stop}
@@ -124,7 +128,7 @@ export default function TimerControls({ onStopRequest }: TimerControlsProps = {}
               hover:bg-[var(--color-surface)] transition-colors
             "
           >
-            Done
+            {t("timer.done")}
           </button>
         </div>
       )}

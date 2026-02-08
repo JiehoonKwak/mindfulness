@@ -1,34 +1,31 @@
+import { useTranslation } from "react-i18next";
+
 interface MoodSelectorProps {
   value: string | null;
   onChange: (mood: string) => void;
 }
 
-const MOODS = [
-  { id: "calm", emoji: "😌", label: "Calm" },
-  { id: "happy", emoji: "😊", label: "Happy" },
-  { id: "peaceful", emoji: "🙂", label: "Peaceful" },
-  { id: "neutral", emoji: "😐", label: "Neutral" },
-  { id: "tired", emoji: "😔", label: "Tired" },
-];
+const MOOD_IDS = ["calm", "happy", "peaceful", "neutral", "tired"] as const;
 
 export default function MoodSelector({ value, onChange }: MoodSelectorProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="flex justify-center gap-3">
-      {MOODS.map((mood) => (
+    <div className="flex justify-center gap-2">
+      {MOOD_IDS.map((id) => (
         <button
-          key={mood.id}
-          onClick={() => onChange(mood.id)}
+          key={id}
+          onClick={() => onChange(id)}
           className={`
-            text-3xl p-2 rounded-xl transition-all duration-200
+            px-3 py-2 rounded-xl text-sm transition-all duration-200
             ${
-              value === mood.id
-                ? "bg-[var(--color-primary)]/30 scale-110"
-                : "hover:bg-[var(--color-surface)]/50"
+              value === id
+                ? "bg-[var(--color-primary)] text-[var(--color-bg)] scale-105"
+                : "bg-[var(--color-surface)]/50 text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
             }
           `}
-          title={mood.label}
         >
-          {mood.emoji}
+          {t(`mood.${id}`)}
         </button>
       ))}
     </div>

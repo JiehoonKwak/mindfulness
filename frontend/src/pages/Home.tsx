@@ -11,9 +11,24 @@ import { useSettingsStore } from "../stores/settingsStore";
 
 // Quick session presets
 const QUICK_SESSIONS = [
-  { id: "quick", minutes: 3, ambient: "rain", labelKey: "home.quickSessions.quick" },
-  { id: "focus", minutes: 10, ambient: "white_noise", labelKey: "home.quickSessions.focus" },
-  { id: "relax", minutes: 15, ambient: "ocean", labelKey: "home.quickSessions.relax" },
+  {
+    id: "quick",
+    minutes: 3,
+    ambient: "rain",
+    labelKey: "home.quickSessions.quick",
+  },
+  {
+    id: "focus",
+    minutes: 10,
+    ambient: "white_noise",
+    labelKey: "home.quickSessions.focus",
+  },
+  {
+    id: "relax",
+    minutes: 15,
+    ambient: "ocean",
+    labelKey: "home.quickSessions.relax",
+  },
 ] as const;
 
 export default function Home() {
@@ -23,7 +38,9 @@ export default function Home() {
   const [heatmap, setHeatmap] = useState<HeatmapEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const setDuration = useTimerStore((state) => state.setDuration);
-  const setDefaultAmbient = useSettingsStore((state) => state.setDefaultAmbient);
+  const setDefaultAmbient = useSettingsStore(
+    (state) => state.setDefaultAmbient,
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,8 +51,8 @@ export default function Home() {
         ]);
         setSummary(summaryData);
         setHeatmap(heatmapData);
-      } catch (error) {
-        console.error("Failed to fetch home data:", error);
+      } catch {
+        // Data fetch failed silently — UI shows loading/empty state
       } finally {
         setLoading(false);
       }
@@ -65,7 +82,7 @@ export default function Home() {
           <Heatmap data={heatmap} loading={loading} />
           <div className="flex justify-between mt-3 text-caption">
             <span className="flex items-center gap-1.5">
-              <Icons.flame className="w-4 h-4 text-orange-500" />
+              <Icons.flame className="w-4 h-4 text-[var(--color-text)]" />
               {summary?.current_streak || 0} {t("goals.dayStreak")}
             </span>
             <span className="text-mono">
@@ -88,7 +105,9 @@ export default function Home() {
             {QUICK_SESSIONS.map((session) => (
               <button
                 key={session.id}
-                onClick={() => startQuickSession(session.minutes, session.ambient)}
+                onClick={() =>
+                  startQuickSession(session.minutes, session.ambient)
+                }
                 className="flex-1 py-3 px-2 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-accent)] transition-colors text-center"
               >
                 <div className="text-sm font-medium">{session.minutes} min</div>
