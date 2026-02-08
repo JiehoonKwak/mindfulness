@@ -15,8 +15,8 @@ warn() { echo -e "${YELLOW}[dev]${NC} $1"; }
 err() { echo -e "${RED}[dev]${NC} $1" >&2; }
 
 # Fixed ports
-FE_PORT=3141
-BE_PORT=8141
+FE_PORT=14300
+BE_PORT=14301
 
 FRONTEND_PID=""
 BACKEND_PID=""

@@ -9,7 +9,7 @@ Meditation web app with custom timer, 4 animated visuals, breathing guides, soun
 ## Commands
 
 ```bash
-# Full stack (fe:3141 + be:8141)
+# Full stack (fe:14300 + be:14301)
 ./dev start
 
 # Frontend only

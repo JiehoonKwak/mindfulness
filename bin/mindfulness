@@ -2,8 +2,8 @@
 set -e
 
 PROJECT_DIR="$HOME/DevHub/sideprojects/mindfulness"
-FE_PORT="${MINDFULNESS_FE_PORT:-3141}"
-BE_PORT="${MINDFULNESS_BE_PORT:-8141}"
+FE_PORT="${MINDFULNESS_FE_PORT:-14300}"
+BE_PORT="${MINDFULNESS_BE_PORT:-14301}"
 
 # Colors
 RED='\033[0;31m'
@@ -35,8 +35,8 @@ Ports:
   Backend:  $BE_PORT (http://localhost:$BE_PORT)
 
 Environment Variables:
-  MINDFULNESS_FE_PORT   Frontend port (default: 3141)
-  MINDFULNESS_BE_PORT   Backend port (default: 8141)
+  MINDFULNESS_FE_PORT   Frontend port (default: 14300)
+  MINDFULNESS_BE_PORT   Backend port (default: 14301)
 EOF
 }
 

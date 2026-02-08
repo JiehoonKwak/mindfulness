@@ -1,9 +1,10 @@
 server:
   host: "0.0.0.0"
-  port: 8141
+  port: 14301
   cors_origins:
-    - "http://localhost:3141"
-    - "http://127.0.0.1:3141"
+    - "http://localhost:14300"
+    - "http://127.0.0.1:14300"
+    - "http://100.113.50.116:14300"
     # Add your Tailscale IP/hostname here for remote access
 
 database:

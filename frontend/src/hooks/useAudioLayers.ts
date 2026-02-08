@@ -321,6 +321,19 @@ export function useAudioLayers(): UseAudioLayersReturn {
     return musicLayerRef.current?.isPlaying ?? false;
   }, []);
 
+  // Unlock AudioContext on first user gesture (Mobile Safari autoplay policy)
+  useEffect(() => {
+    const handleInteraction = () => {
+      getContext();
+    };
+    document.addEventListener("touchstart", handleInteraction, { once: true });
+    document.addEventListener("click", handleInteraction, { once: true });
+    return () => {
+      document.removeEventListener("touchstart", handleInteraction);
+      document.removeEventListener("click", handleInteraction);
+    };
+  }, [getContext]);
+
   // Cleanup on unmount
   useEffect(() => {
     const ambientLayers = ambientLayersRef.current;
